@@ -18,11 +18,11 @@ export class MyRectangle extends CGFobject {
 	}
 	
 	initBuffers() {
-		this.vertices = [
-			this.x1, this.y1, 0,	//0
-			this.x2, this.y1, 0,	//1
-			this.x1, this.y2, 0,	//2
-			this.x2, this.y2, 0		//3
+		this.vertices = [	// x1 =-0.5 y1=-1 x2=0.5 y2=1
+			this.x1, this.y1, 0,	//0 (-0.5,-1)
+			this.x2, this.y1, 0,	//1 (0.5, -1)
+			this.x1, this.y2, 0,	//2 (-0.5, 1)
+			this.x2, this.y2, 0		//3 (0.5, 1)
 		];
 
 		//Counter-clockwise reference of vertices
