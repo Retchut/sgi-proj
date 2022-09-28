@@ -49,6 +49,9 @@
                       x2="4" y2="0" z2="0"
                       x3="3" y3="1" z3="0" />
         </primitive>
+        <primitive id="demoSphere">
+            <sphere radius="2" slices="100" stacks="100" />
+        </primitive>
     </primitives>
 
     <components>
