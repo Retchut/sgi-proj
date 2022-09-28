@@ -3,6 +3,7 @@ import { MyRectangle } from './MyRectangle.js';
 import { MyTriangle } from './MyTriangle.js';
 import { MyCylinder } from './MyCylinder.js';
 import { MySphere } from './MySphere.js';
+import { MyTorus } from './MyTorus.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -613,33 +614,58 @@ export class MySceneGraph {
                 var triangle = new MyTriangle(this.scene, primitiveId, x1, y1, z1, x2, y2, z2, x3, y3, z3);
                 this.primitives[primitiveId] = triangle;
             }
-            else if (primitiveType == 'cylinder'){
+            else if (primitiveType == 'cylinder') {
                 var slices = this.reader.getFloat(grandChildren[0], 'slices');
-                if(slices < 3 || isNaN(slices))
+                if (slices < 3 || isNaN(slices))
                     return "Cylinder slices are invalid for cylinder with ID = " + primitiveId;
-                
+
                 var cylinder = new MyCylinder(this.scene, primitiveId, slices);
-                this.primitives[primitiveId] =  cylinder;
+                this.primitives[primitiveId] = cylinder;
             }
             else if (primitiveType == 'sphere') {
-                // x1
+                // radius
                 var radius = this.reader.getFloat(grandChildren[0], 'radius');
                 if (!(x1 != null && !isNaN(x1)))
-                    return "unable to parse x1 of the primitive coordinates for ID = " + primitiveId;
+                    return "unable to parse radius for ID = " + primitiveId;
 
-                // y1
+                // slices
                 var slices = this.reader.getInteger(grandChildren[0], 'slices');
                 if (!(y1 != null && !isNaN(y1)))
-                    return "unable to parse y1 of the primitive coordinates for ID = " + primitiveId;
+                    return "unable to parse slices for ID = " + primitiveId;
 
-                // x2
+                // stacks
                 var stacks = this.reader.getInteger(grandChildren[0], 'stacks');
                 if (!(x2 != null && !isNaN(x2) && x2 > x1))
-                    return "unable to parse x2 of the primitive coordinates for ID = " + primitiveId;
-                
+                    return "unable to parse stacks for ID = " + primitiveId;
+
                 var sphere = new MySphere(this.scene, primitiveId, radius, slices, stacks);
 
                 this.primitives[primitiveId] = sphere;
+            }
+            else if (primitiveType == 'torus') {
+                // inner
+                var inner = this.reader.getFloat(grandChildren[0], 'inner');
+                if (!(x1 != null && !isNaN(x1)))
+                    return "unable to parse inner radius for ID = " + primitiveId;
+
+                // outer
+                var outer = this.reader.getFloat(grandChildren[0], 'outer');
+                if (!(y1 != null && !isNaN(y1)))
+                    return "unable to parse outer radius for ID = " + primitiveId;
+
+                // slices
+                var slices = this.reader.getInteger(grandChildren[0], 'slices');
+                if (!(x2 != null && !isNaN(x2) && x2 > x1))
+                    return "unable to parse slices for ID = " + primitiveId;
+
+                // loops
+                var loops = this.reader.getInteger(grandChildren[0], 'loops');
+                if (!(x2 != null && !isNaN(x2) && x2 > x1))
+                    return "unable to parse stacks for ID = " + primitiveId;
+
+                var torus = new MyTorus(this.scene, primitiveId, inner, outer, slices, loops);
+                console.log(torus);
+                this.primitives[primitiveId] = torus;
             }
             else {
                 console.warn("To do: Parse other primitives.");
@@ -822,6 +848,7 @@ export class MySceneGraph {
         //To do: Create display loop for transversing the scene graph
 
         //To test the parsing/creation of the primitives, call the display function directly
+        
         for (const primitiveID in this.primitives) {
             this.primitives[primitiveID].display()
         }
