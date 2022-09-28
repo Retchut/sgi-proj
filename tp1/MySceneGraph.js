@@ -1,6 +1,7 @@
 import { CGFXMLreader } from '../lib/CGF.js';
 import { MyRectangle } from './MyRectangle.js';
 import { MyTriangle } from './MyTriangle.js';
+import { MyCylinder } from './MyCylinder.js';
 import { MySphere } from './MySphere.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
@@ -561,7 +562,6 @@ export class MySceneGraph {
                     return "unable to parse y2 of the primitive coordinates for ID = " + primitiveId;
 
                 var rect = new MyRectangle(this.scene, primitiveId, x1, x2, y1, y2);
-
                 this.primitives[primitiveId] = rect;
             }
             else if (primitiveType == 'triangle') {
@@ -610,10 +610,16 @@ export class MySceneGraph {
                 if (!(z3 != null && !isNaN(z3)))
                     return "unable to parse z3 of the primitive coordinates for ID = " + primitiveId;
 
-
                 var triangle = new MyTriangle(this.scene, primitiveId, x1, y1, z1, x2, y2, z2, x3, y3, z3);
-
                 this.primitives[primitiveId] = triangle;
+            }
+            else if (primitiveType == 'cylinder'){
+                var slices = this.reader.getFloat(grandChildren[0], 'slices');
+                if(slices < 3 || isNaN(slices))
+                    return "Cylinder slices are invalid for cylinder with ID = " + primitiveId;
+                
+                var cylinder = new MyCylinder(this.scene, primitiveId, slices);
+                this.primitives[primitiveId] =  cylinder;
             }
             else if (primitiveType == 'sphere') {
                 // x1
