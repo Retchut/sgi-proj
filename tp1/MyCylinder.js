@@ -38,19 +38,6 @@ export class MyCylinder extends CGFobject {
             angle += angleIncrement;
             texmap += texmapIncrement;
         }
-        
-        // build cylinder circles
-        let circleTriangles = (this.slices -2) * 2
-        for(let i = 0; i < circleTriangles; i++){
-            let i1 = i+2;
-            let i2 = i+4;
-            if( (i%2) == 0 ){
-                this.indices.push(0, i1, i2)
-            }
-            else{
-                this.indices.push(1, i2, i1)
-            }
-        }
 
         // calculate the indexes for a "body" triangle
         for(let i = 0; i < this.slices*2; i+=2){
