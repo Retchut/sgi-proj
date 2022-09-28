@@ -26,26 +26,18 @@ export class MyTriangle extends CGFobject {
         this.indices = [
             0, 1, 2
         ]
+
+        let normals = vec3.create();
+        let v1 = vec3.fromValues((this.x2-this.x1), (this.y2-this.y1), (this.z2-this.z1));
+        let v2 = vec3.fromValues((this.x3-this.x1), (this.y3-this.y1), (this.z3-this.z1));
         
-        // TODO: find out how to use vec3 functions
-        let getNormal = () => {
-            let aux1 = [(this.x2-this.x1), (this.y2-this.y1), (this.z2-this.z1)]
-            let aux2 = [(this.x3-this.x1), (this.y3-this.y1), (this.z3-this.z1)]
-            let parallelVec = [
-                                aux1[1]*aux2[2] - aux2[1]*aux1[2],
-                                aux1[2]*aux2[0] - aux2[2]*aux1[0],
-                                aux1[0]*aux2[1] - aux2[0]*aux1[1]
-                            ]
-            let max = parallelVec.reduce((a, b) => Math.max(Math.abs(a), Math.abs(b)));
-            
-            return [parallelVec[0]/max, parallelVec[1]/max, parallelVec[2]/max]
-        }
-        let val = getNormal()
+        vec3.cross(normals, v1, v2);
+        vec3.normalize(normals, normals);
 
 		this.normals = [
-			val[0], val[1], val[2],
-			val[0], val[1], val[2],
-			val[0], val[1], val[2]
+			normals[0], normals[1], normals[2],
+			normals[0], normals[1], normals[2],
+			normals[0], normals[1], normals[2]
 		];
 
 		this.texCoords = [
