@@ -17,11 +17,11 @@ export class MyCylinder extends CGFobject {
         this.indices = [];
         this.normals = [];
         this.texCoords=[];
-        var textmap = 0;
-        var textmapadd = 1/this.slices;
+        var texmap = 0;
+        var texmapIncrement = 1/this.slices;
 
         let angle = 0;
-        let increment = 2 * Math.PI / this.slices;
+        let angleIncrement = 2 * Math.PI / this.slices;
         
         for(let i = 0; i < this.slices; i++){
             let sin = Math.sin(angle);
@@ -29,13 +29,14 @@ export class MyCylinder extends CGFobject {
 
             this.vertices.push(cos, 0, sin);
             this.normals.push(cos, 0, sin);
-            this.texCoords.push(textmap, 0);
+            this.texCoords.push(texmap, 0);
 
             this.vertices.push(cos, 1, sin);
             this.normals.push(cos, 1, sin);
-            this.texCoords.push(textmap, 1);
+            this.texCoords.push(texmap, 1);
 
-            angle += increment;
+            angle += angleIncrement;
+            texmap += texmapIncrement;
         }
         
         // build cylinder circles
