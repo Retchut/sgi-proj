@@ -614,11 +614,17 @@ export class MySceneGraph {
                 this.primitives[primitiveId] = triangle;
             }
             else if (primitiveType == 'cylinder'){
+                var bRadius = this.reader.getFloat(grandChildren[0], 'bRadius');
+                var tRadius = this.reader.getFloat(grandChildren[0], 'tRadius');
+                var height = this.reader.getFloat(grandChildren[0], 'height');
+
                 var slices = this.reader.getFloat(grandChildren[0], 'slices');
                 if(slices < 3 || isNaN(slices))
                     return "Cylinder slices are invalid for cylinder with ID = " + primitiveId;
+
+                var stacks = this.reader.getFloat(grandChildren[0], 'stacks');
                 
-                var cylinder = new MyCylinder(this.scene, primitiveId, slices);
+                var cylinder = new MyCylinder(this.scene, primitiveId, bRadius, tRadius, height, slices, stacks);
                 this.primitives[primitiveId] =  cylinder;
             }
             else if (primitiveType == 'sphere') {

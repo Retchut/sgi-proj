@@ -6,9 +6,13 @@ import {CGFobject} from '../lib/CGF.js';
  * @constructor
  */
 export class MyCylinder extends CGFobject {
-    constructor(scene, id, slices) {
+    constructor(scene, id, bRadius, tRadius, height, slices, stacks) {
         super(scene);
+        this.bRadius = bRadius;
+        this.tRadius = tRadius;
+        this.height = height;
         this.slices = slices; // always >= 3
+        this.stacks = stacks;
         this.initBuffers();
     }
 
@@ -20,26 +24,33 @@ export class MyCylinder extends CGFobject {
         var texmap = 0;
         var texmapIncrement = 1/this.slices;
 
-        let angle = 0;
-        let angleIncrement = 2 * Math.PI / this.slices;
+        let sliceAng = 0;
+        let sliceAngIncrement = 2 * Math.PI / this.slices;
+        let stackIncrement = this.height / this.stacks;
+
+        // base radius
+        // top radius
+        // divisões em rotação (slices)
+        // divisões em altura (stacks)
+
         
         for(let i = 0; i < this.slices; i++){
-            let sin = Math.sin(angle);
-            let cos = Math.cos(angle);
+            let sin = Math.sin(sliceAng);
+            let cos = Math.cos(sliceAng);
 
-            this.vertices.push(cos, 0, sin);
-            this.normals.push(cos, 0, sin);
+            this.vertices.push(sin, cos, 0);
+            this.normals.push(sin, cos, 0);
             this.texCoords.push(texmap, 0);
 
-            this.vertices.push(cos, 1, sin);
-            this.normals.push(cos, 1, sin);
-            this.texCoords.push(texmap, 1);
+            this.vertices.push(sin, cos, this.height);
+            this.normals.push(sin, cos, this.height);
+            this.texCoords.push(texmap, this.height);
 
-            angle += angleIncrement;
+            sliceAng += sliceAngIncrement;
             texmap += texmapIncrement;
         }
 
-        // calculate the indexes for a "body" triangle
+        // calculate the indexes for a "body" trisliceAng
         for(let i = 0; i < this.slices*2; i+=2){
             let mod = this.slices*2
             let i0 = i % mod;
@@ -65,7 +76,7 @@ export class MyCylinder extends CGFobject {
     }
 
     setFillMode() {
-        this.primitiveType=this.scene.gl.TRIANGLES;
+        this.primitiveType=this.scene.gl.TRIsliceAngS;
     }
 
     setLineMode()
