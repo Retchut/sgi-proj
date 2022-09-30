@@ -27,7 +27,6 @@ export class MyTorus extends CGFobject {
         this.indices = [];
         this.normals = [];
         this.texCoords = [];
-        console.log("HERE1")
         var phi = 0;
         var theta = 0;
         var phiInc = (2 * Math.PI) / this.latDivs;
@@ -38,7 +37,6 @@ export class MyTorus extends CGFobject {
         for (let latitude = 0; latitude <= this.latDivs; latitude++) {
             var sinPhi = Math.sin(phi);
             var cosPhi = Math.cos(phi);
-            console.log("HERE1")
 
             // in each stack, build all the slices around, starting on longitude 0
             theta = 0;
@@ -48,7 +46,6 @@ export class MyTorus extends CGFobject {
                 var y = (this.outer  + this.inner * Math.cos(theta)) * sinPhi
                 var z = this.inner * Math.sin(theta);
                 this.vertices.push(x, y, z);
-                console.log("HERE2")
                 //--- Indices
                 if (latitude < this.latDivs && longitude < this.longDivs) {
                     var current = latitude * latVertices + longitude;
