@@ -55,21 +55,31 @@ export class MyCylinder extends CGFobject {
             }
         }
         
-        for(let i = 0; i < this.slices; i++){
-            let mod = this.slices * 2;
-            let i1 = (i+this.slices+1) % mod;
-            let i2 = (i+1) % mod;
-            let i3 = (i+this.slices) % mod;
-            let i4 = (i+this.slices+1) % mod;
-            if(i == this.slices-1){
-                this.indices.push(i,i2,i1);
-                i4 += this.slices;
-                this.indices.push(i,i3,i4);
+        let mod = this.stacks * this.slices + this.slices;
+        for(let stack = 0; stack < this.stacks; stack++){
+            let increment = stack * 4
+            for(let i = 0; i < this.slices; i++){
+                let stackMin = i + increment;
+                let i1 = (stackMin+this.slices+1) % mod;
+                let i2 = (stackMin+1) % mod;
+                let i3 = (stackMin+this.slices) % mod;
+                let i4 = (stackMin+this.slices+1) % mod;
+
+                if((stackMin%this.slices) !== (this.slices-1)){
+                    this.indices.push(stackMin,i1,i2);
+                    this.indices.push(stackMin,i3,i4);
+                }
             }
-            else{
-                this.indices.push(i,i1,i2);
-                this.indices.push(i,i3,i4);
-            }
+        }
+
+        //last indices of slices
+        for(let i = this.slices-1; i < mod-1; i+=this.slices){
+            let i1 = i+1;
+            let i2 = (i+1) % this.slices;
+            let i3 = i+this.slices;
+            let i4 = i+1
+            this.indices.push(i,i1,i2)
+            this.indices.push(i,i3,i4)
         }
 
         this.primitiveType = this.scene.gl.TRIANGLES;
