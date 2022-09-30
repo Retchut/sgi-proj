@@ -1,5 +1,5 @@
 <sxs>
-    <scene root="demoRoot" axis_length="5"/>
+    <scene root="demoRoot" axis_length="5" />
 
     <views default="defaultCamera">
         <perspective id="defaultCamera" near="0.1" far="500" angle="45">
@@ -33,6 +33,24 @@
             <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
             <specular r="0.6" g="0.0" b="0.0" a="1.0" />
         </material>
+        <material id="planetYellowMaterial" shininess="3">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="0.78" b="0.17" a="1.0" />
+            <diffuse r="0.6" g="0.4" b="0.0" a="1.0" />
+            <specular r="0.6" g="0.4" b="0.0" a="1.0" />
+        </material>
+        <material id="planetBlueMaterial" shininess="3">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="0.0" g="0.76" b="1.0" a="1.0" />
+            <diffuse r="0.0" g="0.45" b="0.6" a="1.0" />
+            <specular r="0.0" g="0.45" b="0.6" a="1.0" />
+        </material>
+        <material id="ringMaterial" shininess="3">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="0.55" g="0.55" b="0.55" a="0.7" />
+            <diffuse r="0.3" g="0.3" b="0.3" a="0.7" />
+            <specular r="0.3" g="0.3" b="0.3" a="0.7" />
+        </material>
     </materials>
 
     <transformations>
@@ -45,34 +63,153 @@
 
     <primitives>
         <primitive id="demoTriangle">
-            <triangle x1="1" y1="0" z1="0"
-                      x2="4" y2="0" z2="0"
-                      x3="3" y3="1" z3="0" />
+            <triangle x1="1" y1="0" z1="0" x2="4" y2="0" z2="0" x3="3" y3="1" z3="0" />
         </primitive>
-        <primitive id="demoCylinder">
-            <cylinder bRadius="1" tRadius="1" height="3"
-                      slices="3" stacks="3"/>
+        <!-- <primitive id="demoCylinder">
+            <cylinder bRadius="1" tRadius="1" height="3" slices="3" stacks="3" />
+        </primitive> -->
+        <primitive id="poleCylinder">
+            <cylinder base="0.1" top="0" height="2" slices="50" stacks="50" />
+        </primitive>
+        <primitive id="poleFlag">
+            <triangle x1="0" y1="0" z1="1.5" x2="0" y2="0" z2="2" x3="0.3" y3="0" z3="1.75" />
         </primitive>
         <primitive id="demoSphere">
             <sphere radius="1" slices="100" stacks="100" />
         </primitive>
         <primitive id="demoTorus">
-            <torus inner="1" outer="4" slices="100" loops="100" />
+            <torus inner="0.2" outer="1.5" slices="100" loops="100" />
         </primitive>
     </primitives>
 
     <components>
         <component id="demoRoot">
             <transformation>
-                <translate x="0" y="0" z="1" />
-                <scale x="2" y="1" z="1" />
             </transformation>
             <materials>
                 <material id="demoMaterial" />
             </materials>
-            <texture id="demoTexture"/>
+            <texture id="none" />
             <children>
-                <primitiveref id="demoRectangle" />
+                <componentref id="planet1" />
+                <componentref id="planet2" />
+                <componentref id="planet3" />
+                <componentref id="planet4" />
+                <componentref id="planet5" />
+            </children>
+        </component>
+        <component id="planetRing">
+            <transformation>
+                <scale x="1" y="1" z="0.3" />
+            </transformation>
+            <materials>
+                <material id="ringMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <primitiveref id="demoTorus" />
+            </children>
+        </component>
+        <component id="planet">
+            <transformation></transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <primitiveref id="demoSphere" />
+            </children>
+        </component>
+        <component id="ringPlanet">
+            <transformation></transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="planet" />
+                <componentref id="planetRing" />
+            </children>
+        </component>
+        <component id="planet1">
+            <transformation>
+                <translate x="5" y="0" z="5" />
+                <rotate axis="x" angle="85" />
+                <scale x="2" y="2" z="1.9" />
+            </transformation>
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="ringPlanet" />
+            </children>
+        </component>
+        <component id="planet2">
+            <transformation>
+                <translate x="-4" y="0.5" z="0" />
+                <rotate axis="z" angle="7" />
+                <rotate axis="x" angle="95" />
+                <scale x="0.7" y="0.7" z="0.6" />
+            </transformation>
+            <materials>
+                <material id="planetBlueMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="ringPlanet" />
+            </children>
+        </component>
+        <component id="planet3">
+            <transformation>
+                <translate x="-2.5" y="-0.5" z="-5" />
+            </transformation>
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="planet" />
+            </children>
+        </component>
+        <component id="planet4">
+            <transformation>
+                <translate x="2" y="3" z="-3" />
+                <scale x="0.7" y="0.5" z="0.7" />
+            </transformation>
+            <materials>
+                <material id="planetBlueMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="planet" />
+            </children>
+        </component>
+        <component id="flagPole">
+            <transformation>
+                <translate x="0" y="0" z="0.5" />
+            </transformation>
+            <materials>
+                <material id="demoMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <primitiveref id="poleCylinder" />
+                <primitiveref id="poleFlag" />
+            </children>
+        </component>
+        <component id="planet5">
+            <transformation>
+                <rotate axis="x" angle="-90" />
+                <scale x="2" y="2" z="2" />
+            </transformation>
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="planet" />
+                <componentref id="flagPole" />
             </children>
         </component>
     </components>
