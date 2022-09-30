@@ -32,35 +32,54 @@ export class MyCylinder extends CGFobject {
         // top radius
         // divisões em rotação (slices)
         // divisões em altura (stacks)
+        this.texCoords.push(texmap, 0);
+        this.texCoords.push(texmap, this.height);
+        console.table({'slices':this.slices, 'stacks':this.stacks, 
+                        'sliceAngIncrement':sliceAngIncrement, 'stackIncrement':stackIncrement});
 
+        for(let i = 0; i <= this.stacks; i++){
+            let currentHeight = 0 + i*stackIncrement;
+            console.log(currentHeight)
+            for(let i = 0; i < this.slices; i++){
+                let sin = Math.sin(sliceAng);
+                let cos = Math.cos(sliceAng);
+
+                sin = Math.round(sin)
+                cos = Math.round(cos)
+    
+                this.vertices.push(sin, cos, currentHeight);
+                this.normals.push(sin, cos, currentHeight);
+    
+                sliceAng += sliceAngIncrement;
+                texmap += texmapIncrement;
+            }
+        }
         
-        for(let i = 0; i < this.slices; i++){
-            let sin = Math.sin(sliceAng);
-            let cos = Math.cos(sliceAng);
+        let mod = this.stacks * this.slices + this.slices;
+        for(let stack = 0; stack < this.stacks; stack++){
+            let increment = stack * 4
+            for(let i = 0; i < this.slices; i++){
+                let stackMin = i + increment;
+                let i1 = (stackMin+this.slices+1) % mod;
+                let i2 = (stackMin+1) % mod;
+                let i3 = (stackMin+this.slices) % mod;
+                let i4 = (stackMin+this.slices+1) % mod;
 
-            this.vertices.push(sin, cos, 0);
-            this.normals.push(sin, cos, 0);
-            this.texCoords.push(texmap, 0);
-
-            this.vertices.push(sin, cos, this.height);
-            this.normals.push(sin, cos, this.height);
-            this.texCoords.push(texmap, this.height);
-
-            sliceAng += sliceAngIncrement;
-            texmap += texmapIncrement;
+                if((stackMin%this.slices) !== (this.slices-1)){
+                    this.indices.push(stackMin,i1,i2);
+                    this.indices.push(stackMin,i3,i4);
+                }
+            }
         }
 
-        // calculate the indexes for a "body" trisliceAng
-        for(let i = 0; i < this.slices*2; i+=2){
-            let mod = this.slices*2
-            let i0 = i % mod;
-            let i1 = (i+1) % mod;
-            let i2 = (i+2) % mod;
-            let i3 = (i+1) % mod;
-            let i4 = (i+3) % mod;
-            let i5 = (i+2) % mod;
-            this.indices.push(i0, i1, i2);
-            this.indices.push(i3, i4, i5);
+        //last indices of slices
+        for(let i = this.slices-1; i < mod-1; i+=this.slices){
+            let i1 = i+1;
+            let i2 = (i+1) % this.slices;
+            let i3 = i+this.slices;
+            let i4 = i+1
+            this.indices.push(i,i1,i2)
+            this.indices.push(i,i3,i4)
         }
 
         this.primitiveType = this.scene.gl.TRIANGLES;
