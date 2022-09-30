@@ -32,35 +32,44 @@ export class MyCylinder extends CGFobject {
         // top radius
         // divisões em rotação (slices)
         // divisões em altura (stacks)
+        this.texCoords.push(texmap, 0);
+        this.texCoords.push(texmap, this.height);
+        console.table({'slices':this.slices, 'stacks':this.stacks, 
+                        'sliceAngIncrement':sliceAngIncrement, 'stackIncrement':stackIncrement});
 
+        for(let i = 0; i <= this.stacks; i++){
+            let currentHeight = 0 + i*stackIncrement;
+            console.log(currentHeight)
+            for(let i = 0; i < this.slices; i++){
+                let sin = Math.sin(sliceAng);
+                let cos = Math.cos(sliceAng);
+
+                sin = Math.round(sin)
+                cos = Math.round(cos)
+    
+                this.vertices.push(sin, cos, currentHeight);
+                this.normals.push(sin, cos, currentHeight);
+    
+                sliceAng += sliceAngIncrement;
+                texmap += texmapIncrement;
+            }
+        }
         
         for(let i = 0; i < this.slices; i++){
-            let sin = Math.sin(sliceAng);
-            let cos = Math.cos(sliceAng);
-
-            this.vertices.push(sin, cos, 0);
-            this.normals.push(sin, cos, 0);
-            this.texCoords.push(texmap, 0);
-
-            this.vertices.push(sin, cos, this.height);
-            this.normals.push(sin, cos, this.height);
-            this.texCoords.push(texmap, this.height);
-
-            sliceAng += sliceAngIncrement;
-            texmap += texmapIncrement;
-        }
-
-        // calculate the indexes for a "body" trisliceAng
-        for(let i = 0; i < this.slices*2; i+=2){
-            let mod = this.slices*2
-            let i0 = i % mod;
-            let i1 = (i+1) % mod;
-            let i2 = (i+2) % mod;
-            let i3 = (i+1) % mod;
-            let i4 = (i+3) % mod;
-            let i5 = (i+2) % mod;
-            this.indices.push(i0, i1, i2);
-            this.indices.push(i3, i4, i5);
+            let mod = this.slices * 2;
+            let i1 = (i+this.slices+1) % mod;
+            let i2 = (i+1) % mod;
+            let i3 = (i+this.slices) % mod;
+            let i4 = (i+this.slices+1) % mod;
+            if(i == this.slices-1){
+                this.indices.push(i,i2,i1);
+                i4 += this.slices;
+                this.indices.push(i,i3,i4);
+            }
+            else{
+                this.indices.push(i,i1,i2);
+                this.indices.push(i,i3,i4);
+            }
         }
 
         this.primitiveType = this.scene.gl.TRIANGLES;
