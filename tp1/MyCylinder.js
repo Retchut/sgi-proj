@@ -21,11 +21,13 @@ export class MyCylinder extends CGFobject {
         this.indices = [];
         this.normals = [];
         this.texCoords=[];
+
         var texmap = 0;
         var texmapIncrement = 1/this.slices;
 
         let sliceAng = 0;
         let sliceAngIncrement = 2 * Math.PI / this.slices;
+        
         let stackIncrement = this.height / this.stacks;
 
         // base radius
@@ -43,43 +45,28 @@ export class MyCylinder extends CGFobject {
             for(let i = 0; i < this.slices; i++){
                 let sin = Math.sin(sliceAng);
                 let cos = Math.cos(sliceAng);
-
-                sin = Math.round(sin)
-                cos = Math.round(cos)
     
-                this.vertices.push(sin, cos, currentHeight);
-                this.normals.push(sin, cos, currentHeight);
+                this.vertices.push(cos, sin, currentHeight);
+                this.normals.push(cos, sin, currentHeight);
     
                 sliceAng += sliceAngIncrement;
                 texmap += texmapIncrement;
             }
         }
-        
-        let mod = this.stacks * this.slices + this.slices;
+
         for(let stack = 0; stack < this.stacks; stack++){
-            let increment = stack * 4
-            for(let i = 0; i < this.slices; i++){
-                let stackMin = i + increment;
-                let i1 = (stackMin+this.slices+1) % mod;
-                let i2 = (stackMin+1) % mod;
-                let i3 = (stackMin+this.slices) % mod;
-                let i4 = (stackMin+this.slices+1) % mod;
+            for(let slice = 0; slice < this.slices; slice++){
+                let stackIncrement = stack*this.slices;
+                let x1 = stackIncrement + slice;
+                let y1 = stackIncrement + (slice+1)%this.slices;
+                let z1 = stackIncrement + slice+this.slices;
+                this.indices.push(x1,y1,z1);
 
-                if((stackMin%this.slices) !== (this.slices-1)){
-                    this.indices.push(stackMin,i1,i2);
-                    this.indices.push(stackMin,i3,i4);
-                }
+                let x2 = (stack + 1) * this.slices + slice;
+                let y2 = stack * this.slices + (slice + 1) % this.slices;
+                let z2 = (stack + 1) * this.slices + (slice + 1) % this.slices;
+                this.indices.push(x2, y2, z2);
             }
-        }
-
-        //last indices of slices
-        for(let i = this.slices-1; i < mod-1; i+=this.slices){
-            let i1 = i+1;
-            let i2 = (i+1) % this.slices;
-            let i3 = i+this.slices;
-            let i4 = i+1
-            this.indices.push(i,i1,i2)
-            this.indices.push(i,i3,i4)
         }
 
         this.primitiveType = this.scene.gl.TRIANGLES;
