@@ -69,7 +69,7 @@
 
     <primitives>
         <primitive id="demoCylinder">
-            <cylinder bRadius="1" tRadius="1" height="5" slices="50" stacks="5" />
+            <cylinder bRadius="3" tRadius="5" height="4" slices="50" stacks="4" />
         </primitive>
     </primitives>
 

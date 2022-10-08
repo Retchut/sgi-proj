@@ -27,44 +27,41 @@ export class MyCylinder extends CGFobject {
 
         let sliceAng = 0;
         let sliceAngIncrement = 2 * Math.PI / this.slices;
-        
         let stackIncrement = this.height / this.stacks;
+        let radiusDecrement = (this.bRadius - this.tRadius) / this.stacks;
 
-        // base radius
-        // top radius
-        // divisões em rotação (slices)
-        // divisões em altura (stacks)
-        this.texCoords.push(texmap, 0);
-        this.texCoords.push(texmap, this.height);
-        console.table({'slices':this.slices, 'stacks':this.stacks, 
-                        'sliceAngIncrement':sliceAngIncrement, 'stackIncrement':stackIncrement});
 
         for(let i = 0; i <= this.stacks; i++){
-            let currentHeight = 0 + i*stackIncrement;
-            console.log(currentHeight)
+            let currentHeight = i*stackIncrement;
+            let currentRadius = this.bRadius - i*radiusDecrement;
             for(let i = 0; i < this.slices; i++){
-                let sin = Math.sin(sliceAng);
-                let cos = Math.cos(sliceAng);
+
+                let x = currentRadius * Math.cos(sliceAng);
+                let y = currentRadius * Math.sin(sliceAng);
     
-                this.vertices.push(cos, sin, currentHeight);
-                this.normals.push(cos, sin, currentHeight);
-    
+                this.vertices.push(x, y, currentHeight);
+                this.normals.push(x, y, currentHeight);
+                this.texCoords.push(texmap, this.height);
+                this.texCoords.push(texmap, 0); //TODO: check this
+
                 sliceAng += sliceAngIncrement;
                 texmap += texmapIncrement;
             }
         }
 
+        // setup indices
         for(let stack = 0; stack < this.stacks; stack++){
             for(let slice = 0; slice < this.slices; slice++){
-                let stackIncrement = stack*this.slices;
-                let x1 = stackIncrement + slice;
-                let y1 = stackIncrement + (slice+1)%this.slices;
-                let z1 = stackIncrement + slice+this.slices;
+                let offset = stack*this.slices;
+
+                let x1 = offset + slice;
+                let y1 = offset + (slice+1)%this.slices;
+                let z1 = offset + slice+this.slices;
                 this.indices.push(x1,y1,z1);
 
-                let x2 = (stack + 1) * this.slices + slice;
-                let y2 = stack * this.slices + (slice + 1) % this.slices;
-                let z2 = (stack + 1) * this.slices + (slice + 1) % this.slices;
+                let x2 = (offset + this.slices) + slice;
+                let y2 = offset + (slice + 1) % this.slices;
+                let z2 = (offset + this.slices) + (slice + 1) % this.slices;
                 this.indices.push(x2, y2, z2);
             }
         }
