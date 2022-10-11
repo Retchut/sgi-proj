@@ -615,8 +615,8 @@ export class MySceneGraph {
                 this.primitives[primitiveId] = triangle;
             }
             else if (primitiveType == 'cylinder'){
-                var bRadius = this.reader.getFloat(grandChildren[0], 'bRadius');
-                var tRadius = this.reader.getFloat(grandChildren[0], 'tRadius');
+                var base = this.reader.getFloat(grandChildren[0], 'base');
+                var top = this.reader.getFloat(grandChildren[0], 'top');
                 var height = this.reader.getFloat(grandChildren[0], 'height');
 
                 var slices = this.reader.getFloat(grandChildren[0], 'slices');
