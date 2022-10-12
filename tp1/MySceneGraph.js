@@ -61,7 +61,7 @@ export class MySceneGraph {
 
         // Here should go the calls for different functions to parse the various blocks
         var error = this.parseXMLFile(rootElement);
-
+        
         if (error != null) {
             this.onXMLError(error);
             return;
@@ -625,7 +625,7 @@ export class MySceneGraph {
 
                 var stacks = this.reader.getFloat(grandChildren[0], 'stacks');
                 
-                var cylinder = new MyCylinder(this.scene, primitiveId, bRadius, tRadius, height, slices, stacks);
+                var cylinder = new MyCylinder(this.scene, primitiveId, base, top, height, slices, stacks);
                 this.primitives[primitiveId] =  cylinder;
             }
             else if (primitiveType == 'sphere') {
@@ -641,7 +641,7 @@ export class MySceneGraph {
 
                 // stacks
                 var stacks = this.reader.getInteger(grandChildren[0], 'stacks');
-                if (!(x2 != null && !isNaN(x2) && x2 > x1))
+                if (!(x2 != null && !isNaN(x2)))
                     return "unable to parse stacks for ID = " + primitiveId;
 
                 var sphere = new MySphere(this.scene, primitiveId, radius, slices, stacks);
@@ -661,16 +661,15 @@ export class MySceneGraph {
 
                 // slices
                 var slices = this.reader.getInteger(grandChildren[0], 'slices');
-                if (!(x2 != null && !isNaN(x2) && x2 > x1))
+                if (!(x2 != null && !isNaN(x2)))
                     return "unable to parse slices for ID = " + primitiveId;
 
                 // loops
                 var loops = this.reader.getInteger(grandChildren[0], 'loops');
-                if (!(x2 != null && !isNaN(x2) && x2 > x1))
+                if (!(x2 != null && !isNaN(x2)))
                     return "unable to parse stacks for ID = " + primitiveId;
 
                 var torus = new MyTorus(this.scene, primitiveId, inner, outer, slices, loops);
-                console.log(torus);
                 this.primitives[primitiveId] = torus;
             }
             else {
@@ -692,7 +691,7 @@ export class MySceneGraph {
         this.components = [];
 
         var grandChildren = [];
-        var grandgrandChildren = [];
+        var grandGrandChildren = [];
         var nodeNames = [];
 
         // Any number of components.
@@ -714,6 +713,8 @@ export class MySceneGraph {
 
             grandChildren = children[i].children;
 
+            // set component id
+
             nodeNames = [];
             for (var j = 0; j < grandChildren.length; j++) {
                 nodeNames.push(grandChildren[j].nodeName);
@@ -724,15 +725,57 @@ export class MySceneGraph {
             var textureIndex = nodeNames.indexOf("texture");
             var childrenIndex = nodeNames.indexOf("children");
 
-            this.onXMLMinorError("To do: Parse components.");
-            // Transformations
+            var component = {transformations: [], materials:[], texture:[], children:{primitiveRefs:[], componentRefs:[]}}
 
+            // Transformations
+            // grandGrandChildren = grandChildren[transformationIndex].children
+            // for (var j = 0; j < grandGrandChildren.length; j++) {
+            //     component.transformations.push(grandGrandChildren[j]);
+            // }
+            this.onXMLMinorError("To do: Parse component transformations.");
+            
             // Materials
+            this.onXMLMinorError("To do: Parse component materials.");
 
             // Texture
+            this.onXMLMinorError("To do: Parse component textures.");
 
             // Children
+            grandGrandChildren = grandChildren[childrenIndex].children
+            for (var j = 0; j < grandGrandChildren.length; j++) {
+                if (grandGrandChildren[j].nodeName == "primitiveref") {
+                    var primitiveId = this.reader.getString(grandGrandChildren[j], 'id');
+                    if (this.primitives[primitiveId] == null) {
+                        this.onXMLMinorError("Primitive " + primitiveId + " of " + componentID + " not defined.");
+                        continue;
+                    }
+                    component.children.primitiveRefs.push(primitiveId);
+                }
+                else if (grandGrandChildren[j].nodeName == "componentref"){
+                    var componentId = this.reader.getString(grandGrandChildren[j], 'id');
+                    component.children.componentRefs.push(componentId);
+                }
+                else {
+                    this.onXMLMinorError("unknown tag <" + grandGrandChildren[i].nodeName + ">");
+                }
+            }
+            
+            this.components[componentID] = component;
         }
+
+        for (const componentID in this.components) {
+            var childRefs = this.components[componentID].children.componentRefs;
+            var validComponentRefs = [];
+            for(var i = 0; i < childRefs.length; i++){
+                if (this.components[childRefs[i]] == null) {
+                    this.onXMLMinorError("Component " + childRefs[i] + " referenced by " + componentID + " is undefined.");
+                    continue;
+                }
+                validComponentRefs.push(childRefs[i]);
+            }
+            this.components[componentID].children.componentRefs = validComponentRefs;
+        }
+        
     }
 
 
@@ -847,10 +890,39 @@ export class MySceneGraph {
         console.log("   " + message);
     }
 
+    // drawComponent(currentNode) {
+    //     // multiply the current scene transformation matrix by the current component matrix
+            //access primitives via id
+    //     this.multMatrix(currentNode.m);
+    //     for(var i = 0; i < currentNode.children.length ;i++) {
+    //         // preserve current scene transformation matrix
+    //         this.pushMatrix();
+    //         // recursively visit the next child component
+    //         // this.drawComponent(currentNode.children[i],...);
+    //         // restore scene transformation matrix
+    //         this.popMatrix();
+    //     }
+    // }
+
     /**
      * Displays the scene, processing each node, starting in the root node.
      */
     displayScene() {
+        // Initialize Model-View matrix as identity (no transformation
+        // this.updateProjectionMatrix();
+        // this.loadIdentity();
+        
+        // Apply transformations corresponding to the camera position relative to the origin
+        // this.applyViewMatrix();
+
+        // preserve the scene current matrix
+        // this.pushMatrix()
+
+        // this.drawComponent(this.root);
+
+        // restore the last preserved scene matrix
+        // this.popMatrix()
+
         //To do: Create display loop for transversing the scene graph
 
         //To test the parsing/creation of the primitives, call the display function directly

@@ -81,7 +81,16 @@
             </materials>
             <texture id="none" />
             <children>
-                <componentref id="" />«
+                <componentref id="testCylinder" />
+            </children>
+        </component>
+        <component id="testCylinder">
+            <materials>
+                <material id="demoCylinder" />
+            </materials>
+            <texture id="demoTexture" />
+            <children>
+                <primitiveref id="demoCylinder"/>
             </children>
         </component>
     </components>
