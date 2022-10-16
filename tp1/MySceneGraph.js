@@ -1,4 +1,4 @@
-import { CGFXMLreader } from '../lib/CGF.js';
+import { CGFappearance, CGFXMLreader } from '../lib/CGF.js';
 import { MyRectangle } from './MyRectangle.js';
 import { MyTriangle } from './MyTriangle.js';
 import { MyCylinder } from './MyCylinder.js';
@@ -410,11 +410,9 @@ export class MySceneGraph {
      */
     parseMaterials(materialsNode) {
         var children = materialsNode.children;
+        var grandChildren = [];
 
         this.materials = [];
-
-        var grandChildren = [];
-        var nodeNames = [];
 
         // Any number of materials.
         for (var i = 0; i < children.length; i++) {
@@ -433,11 +431,38 @@ export class MySceneGraph {
             if (this.materials[materialID] != null)
                 return "ID must be unique for each light (conflict: ID = " + materialID + ")";
 
+            var grandChildren = children[i].children;
+
+            var material = new CGFappearance(this.scene);
+
+            // emission, ambient, diffuse, specular
+            for (var j = 0; j < grandChildren.length; j++){
+                let r = this.reader.getString(grandChildren[j], 'r');
+                let g = this.reader.getString(grandChildren[j], 'g');
+                let b = this.reader.getString(grandChildren[j], 'b');
+                let a = this.reader.getString(grandChildren[j], 'a');
+                switch(grandChildren[j].nodeName){
+                    case "emission":
+                        material.setEmission(r,g,b,a);
+                        break;
+                    case "ambient":
+                        material.setAmbient(r,g,b,a);
+                        break;
+                    case "diffuse":
+                        material.setDiffuse(r,g,b,a);
+                        break;
+                    case "specular":
+                        material.setSpecular(r,g,b,a);
+                        break;
+                }
+            }
+            this.materials[materialID] = material;
+
             //Continue here
             this.onXMLMinorError("To do: Parse materials.");
         }
 
-        //this.log("Parsed materials");
+        this.log("Parsed materials");
         return null;
     }
 
@@ -518,10 +543,9 @@ export class MySceneGraph {
      */
     parsePrimitives(primitivesNode) {
         var children = primitivesNode.children;
+        var grandChildren = [];
 
         this.primitives = [];
-
-        var grandChildren = [];
 
         // Any number of primitives.
         for (var i = 0; i < children.length; i++) {
@@ -790,24 +814,22 @@ export class MySceneGraph {
                     continue;
                 }
                 var materialID = this.reader.getString(material, 'id');
-                this.onXMLMinorError("Check if material exists before assiging (uncomment line below this, after parsing materials).");
-                // if (this.materials[materialID] == null) {
-                //     this.onXMLMinorError("Material " + materialID + " of " + componentID + " not defined.");
-                //     continue;
-                // }
+                if (this.materials[materialID] == null) {
+                    this.onXMLMinorError("Material " + materialID + " of " + componentID + " not defined.");
+                    continue;
+                }
                 component.materials.push(materialID);
             }
 
             // Texture
             var textureId = this.reader.getString(grandChildren[textureIndex], 'id');
             if(textureId != "none"){
+                if (this.textures[textureID] == null) {
+                    this.onXMLMinorError("Texture " + textureID + " of " + componentID + " not defined.");
+                    continue;
+                }
                 component.texture.push(textureId);
             }
-            this.onXMLMinorError("Check if material exists before assiging (uncomment line below this, after parsing materials).");
-            // if (this.textures[textureID] == null) {
-            //     this.onXMLMinorError("Texture " + textureID + " of " + componentID + " not defined.");
-            //     continue;
-            // }
 
             // Children
             grandGrandChildren = grandChildren[childrenIndex].children
