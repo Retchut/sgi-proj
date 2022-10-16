@@ -450,8 +450,6 @@ export class MySceneGraph {
 
         this.transformations = [];
 
-        var grandChildren = [];
-
         // Any number of transformations.
         for (var i = 0; i < children.length; i++) {
 
@@ -468,33 +466,51 @@ export class MySceneGraph {
             // Checks for repeated IDs.
             if (this.transformations[transformationID] != null)
                 return "ID must be unique for each transformation (conflict: ID = " + transformationID + ")";
+            
+            console.log(children[i].children)
 
-            grandChildren = children[i].children;
+            var composition = children[i].children;
             // Specifications for the current transformation.
 
-            var transfMatrix = mat4.create();
+            var compositionMatrix = mat4.create();
+            mat4.identity(compositionMatrix)
 
-            for (var j = 0; j < grandChildren.length; j++) {
-                console.log(grandChildren[j])
-                switch (grandChildren[j].nodeName) {
-                    case 'translate':
-                        var coordinates = this.parseCoordinates3D(grandChildren[j], "translate transformation for ID " + transformationID);
-                        if (!Array.isArray(coordinates))
-                            return coordinates;
-
-                        transfMatrix = mat4.translate(transfMatrix, transfMatrix, coordinates);
+            for(var j = 0; j < composition.length; j++){
+                var operation = composition[i];
+                
+                let x,y,z;
+                switch (operation.nodeName){
+                    case "translate":
+                        x = this.reader.getString(operation, 'x');
+                        y = this.reader.getString(operation, 'y');
+                        z = this.reader.getString(operation, 'z');
+                        mat4.translate(compositionMatrix,compositionMatrix,vec3.fromValues(x,y,z));
                         break;
-                    case 'scale':
-                        this.onXMLMinorError("To do: Parse scale transformations.");
+                    case "scale":
+                        x = this.reader.getString(operation, 'x');
+                        y = this.reader.getString(operation, 'y');
+                        z = this.reader.getString(operation, 'z');
+                        mat4.scale(compositionMatrix,compositionMatrix,vec3.fromValues(x,y,z));
                         break;
-                    case 'rotate':
-                        // angle
-                        this.onXMLMinorError("To do: Parse rotate transformations.");
+                    case "rotate":
+                        var grandChildren = [];
+                        var axisProp = this.reader.getString(operation, 'axis');
+                        if(axisProp != 'x' && axisProp != 'y' && axisProp != 'z'){
+                            this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid.");
+                        }
+                        let axis = axisProp == 'x' ? [1,0,0] : (axisProp == 'y' ? [0,1,0] : [0,0,1]);
+                        let angle = this.reader.getString(operation, 'angle');
+                        mat4.rotate(compositionMatrix,compositionMatrix, (angle * DEGREE_TO_RAD), axis);
                         break;
+                    default:
+                        this.onXMLMinorError("Operation " + operation.nodeName + " on initial transformation declaration of transformation " + transformationID + " is not valid.");
                 }
             }
-            this.transformations[transformationID] = transfMatrix;
+
+            this.transformations[transformationID] = compositionMatrix;
         }
+
+        console.log(this.transformations)
 
         this.log("Parsed transformations");
         return null;
@@ -735,6 +751,8 @@ export class MySceneGraph {
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var transformation = grandGrandChildren[j];
 
+            var transfMatrix = mat4.create();
+            mat4.identity(transfMatrix)
                 let x,y,z;
                 switch (transformation.nodeName){
                     case "transformationref":
