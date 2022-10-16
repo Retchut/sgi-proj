@@ -466,8 +466,6 @@ export class MySceneGraph {
             // Checks for repeated IDs.
             if (this.transformations[transformationID] != null)
                 return "ID must be unique for each transformation (conflict: ID = " + transformationID + ")";
-            
-            console.log(children[i].children)
 
             var composition = children[i].children;
             // Specifications for the current transformation.
@@ -509,8 +507,6 @@ export class MySceneGraph {
 
             this.transformations[transformationID] = compositionMatrix;
         }
-
-        console.log(this.transformations)
 
         this.log("Parsed transformations");
         return null;
