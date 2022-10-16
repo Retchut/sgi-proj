@@ -762,9 +762,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Transformation " + transformation.nodeName + " of " + componentID + " is not valid.");
                 }
             }
-            console.log(transfMatrix);
             component.transformations.push(transfMatrix);
-            // this.onXMLMinorError("To do: Parse component transformations.");
             
             // Materials
             this.onXMLMinorError("To do: Parse component materials.");
