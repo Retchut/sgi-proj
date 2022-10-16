@@ -1,0 +1,598 @@
+<sxs>
+
+     <!-- SCENE -->
+    <scene root="stScene" axis_length="5"/>
+
+
+     <!-- VIEWS -->
+    <views default="defaultCamera">
+        <perspective id="defaultCamera" near="0.1" far="500" angle="45">
+            <from x="30" y="15" z="30" />
+            <to x="0" y="-2" z="0" />
+        </perspective>
+    </views>
+
+
+     <!-- AMBIENT -->
+    <ambient>
+        <ambient r="0.2" g="0.2" b="0.2" a="1.0" />
+        <background r="0.0" g="0.0" b="0.0" a="1.0" />
+    </ambient>
+
+
+     <!-- LIGHTS -->
+    <lights>
+        <omni id="defaultLight" enabled="1">
+            <location x="9.8" y="11.9" z="10" w="1.0" />
+            <ambient r="0" g="0" b="0" a="1.0" />
+            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
+            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
+        </omni>
+    </lights>
+
+
+     <!-- TEXTURES -->
+    <textures>
+        <texture id="rocksTexture" file="scenes/images/rocks.jpg" />
+        <texture id="vidralTexture" file="scenes/images/vidral.jpg" />
+        <texture id="spaceshipTexture" file="scenes/images/rocks.jpg" />
+        <texture id="mastTexture" file="scenes/images/rocks.jpg" />
+        <texture id="panelTexture" file="scenes/images/rocks.jpg" />
+        <texture id="earthTexture" file="scenes/images/earth.jpg" />
+    </textures>
+
+
+     <!-- MATERIALS -->
+    <materials>
+        <material id="defaultMaterial" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
+            <specular r="0.6" g="0.0" b="0.0" a="1.0" />
+        </material>
+        <material id="metalMaterial" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
+            <specular r="0.6" g="0.0" b="0.0" a="1.0" />
+        </material>
+        <material id="earthMaterial" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
+            <specular r="0.6" g="0.0" b="0.0" a="1.0" />
+        </material>
+        <material id="panelMaterial" shininess="10">
+            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <ambient r="1.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
+            <specular r="0.6" g="0.0" b="0.0" a="1.0" />
+        </material>
+    </materials>
+
+
+     <!-- TRANSFORMATIONS -->
+    <transformations>
+        <transformation id="demoTransform">
+            <scale x="5" y="1" z="5" />
+            <rotate axis="x" angle="-45" />
+            <rotate axis="z" angle="-45" />
+        </transformation>
+        <transformation id="panelRotation">
+            <rotate axis="z" angle="90" />
+        </transformation>
+        <transformation id="leftPanelTrans">
+            <translate x="-0.5" y="0" z="0" />
+        </transformation>
+        <transformation id="rightPanelTrans">
+            <translate x="0.5" y="0" z="0" />
+        </transformation>
+        <transformation id="topCentralTrans">
+            <translate x="0" y="-5" z="0" />
+        </transformation>
+        <transformation id="midCentralTrans">
+            <translate x="0" y="-6" z="0" />
+        </transformation>
+        <transformation id="bottomCentralTrans">
+            <translate x="0" y="-7" z="0" />
+        </transformation>
+        <transformation id="topSupportMastScale">
+            <scale x="0.5" y="0.8" z="0.5" />
+        </transformation> 
+    </transformations>
+
+
+     <!-- PRIMITIVES -->
+    <primitives>
+        <!--Earth Primitive-->
+            <primitive id="earthPrim">
+                <sphere radius="3" slices="30" stacks="30"/>
+            </primitive>
+        <!--Earth Primitive-->
+
+        <!--Big Mast Primitive-->
+            <primitive id="bigMastPrim">
+                <cylinder base="0.10" top="0.10" height="10" slices="20" stacks="20"/>
+            </primitive>
+        <!--Big Mast Primitive-->
+
+        <!--Central Torus Primitive-->
+            <primitive id="centralTorusPrim">
+                <torus inner="1" outer= "4" slices="20" loops="20"/>
+            </primitive>
+        <!--Central Torus Primitive-->
+
+        <!--Top Torus Primitive-->
+            <primitive id="topTorusPrim">
+                <torus inner="1" outer= "2" slices="20" loops="20"/>
+            </primitive>
+        <!--Top Torus Primitive-->
+        
+        <!--Support Mast Primitive-->
+            <primitive id="supportMastPrim">
+                <cylinder base="0.10" top="0.10" height="3" slices="20" stacks="20"/>
+            </primitive>
+        <!--Support Mast Primitive-->
+
+        <!--Sphere Primitive-->
+            <primitive id="spherePrim">
+                <sphere radius="0.5" slices="30" stacks="30"/>
+            </primitive>
+        <!--Sphere Primitive-->
+
+        <!--Panel Primitive-->
+            <primitive id="panelPrim">
+                <rectangle x1="0" y1="0" x2="2" y2="3" />
+            </primitive>
+        <!--Panel Primitive-->
+
+        <!--Flag Primitive-->
+            <primitive id="flagPrim">
+                <triangle x1="0" y1="0" z1="0"
+                          x2="2" y2="2" z2="2"
+                          x3="-1" y3="-1" z3="-1" />
+            </primitive>
+        <!--Flag Primitive-->
+
+        <!-- Primitive's Syntax
+            <rectangle x1="0" y1="0" x2="0" y2="0" />
+            <triangle  x1="ff" y1="ff" z1="ff"
+                       x2="ff" y2="ff" z2="ff"
+                       x3="ff" y3="ff" z3="ff" />
+            <cylinder base="ff" top="ff" height="ff" slices="ii" stacks="ii" />
+            <sphere radius="ff" slices="ii" stacks="ii" />
+            <torus inner="ff" outer="ff" slices="ii" loops="ii" />
+        -->
+    </primitives>
+
+
+     <!-- COMPONENTS -->
+    <components>
+
+        <!-- Scene Component -->
+        <component id = "stScene">
+            <materials>
+                <material id="defaultMaterial" />
+            </materials>
+            
+            <texture id="none">
+
+            <children>
+                <componentref id="earthComp" />
+                <componentref id="stComp" />
+            </children>
+        </component>
+
+
+        <!-- Earth Component -->
+        <component id="earthComp">
+            <transformation>
+                <scale x="4" y="4" z="4" />
+                <translate x="-3" y="2" z="-3" />
+            </transformation>
+
+            <materials>
+                <material id="earthMaterial" />
+            </materials>
+
+            <texture id="earthTexture"/>
+
+            <children>
+                <primitiveref id="spherePrim" />
+            </children>
+        </component>
+
+        <!-- Stanford Torus Component -->
+        <component id="stComp">
+            <transformation>
+                <rotate axis="y" angle="45" />
+                <translate x="2" y="0" z="1" />
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="inherit"/>
+
+            <children>
+                <componentref id="centralMastComp" />
+                <componentref id="centralNaveComp" />
+                <componentref id="topNaveComp" />
+            </children>
+        </component>
+
+        <!-- Central Mast Component -->
+        <component id="centralMastComp">
+            <transformation />
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="inherit"/>
+
+            <children>
+                <componentref id="mastComp" />
+                <componentref id="topSphereComp" />
+                <componentref id="midSphereComp" />
+                <componentref id="bottomSphereComp" />
+                <componentref id="topLeftPanelComp" />
+                <componentref id="topRightPanelComp" />
+                <componentref id="midLeftPanelComp" />
+                <componentref id="midRightPanelComp" />
+                <componentref id="bottomLeftPanelComp" />
+                <componentref id="bottomRightPanelComp" />
+                <componentref id="flagComp" />
+            </children>
+        </component>
+
+        <!-- Mast Component -->
+        <component id="mastComp">
+            <transformation>
+                <rotate axis="x" angle="-90" />
+                <translate x="0" y="-4" z="0" />
+            </transformation>
+            <materials>
+                <material id="metalMaterial" />
+            </materials>
+
+            <texture id="mastTexture"/>
+
+            <children>
+                <primitiveref id="bigMastPrim" />
+            </children>
+        </component>
+
+        <!-- Top Sphere Component -->
+        <component id="topSphereComp">
+            <transformation>
+                <transformationref id="topCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="metalMaterial" />
+            </materials>
+
+            <texture id="spaceshipTexture" />
+
+            <children>
+                <primitiveref id="spherePrim" />
+            </children>
+        </component>
+
+        <!-- Mid Sphere Component -->
+        <component id="midSphereComp">
+            <transformation>
+                <transformationref id="midCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="metalMaterial" />
+            </materials>
+
+            <texture id="spaceshipTexture"/>
+
+            <children>
+                <primitiveref id="spherePrim" />
+            </children>
+        </component>
+
+        <!-- Bottom Sphere Component -->
+        <component id="bottomSphereComp">
+            <transformation>
+                <transformationref id="bottomCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="metalMaterial" />
+            </materials>
+
+            <texture id="spaceshipTexture"/>
+
+            <children>
+                <primitiveref id="spherePrim" />
+            </children>
+        </component>
+
+        <!-- Top Left Panel Component -->
+        <component id="topLeftPanelComp">
+            <transformation>
+                <transformationref id="panelRotation" />
+                <transformationref id="leftPanelTrans" />
+                <transformationref id="topCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="panelMaterial" />
+            </materials>
+
+            <texture id="panelTexture"/>
+
+            <children>
+                <primitiveref id="panelPrim" />
+            </children>
+        </component>
+
+        <!-- Top Right Panel Component -->
+        <component id="topRightPanelComp">
+            <transformation>
+                <transformationref id="panelRotation" />
+                <transformationref id="rightPanelTrans" />
+                <transformationref id="topCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="panelMaterial" />
+            </materials>
+
+            <texture id="panelTexture"/>
+
+            <children>
+                <primitiveref id="panelPrim" />
+            </children>
+        </component>
+
+        <!-- Mid Left Panel Component -->
+        <component id="midLeftPanelComp">
+            <transformation>
+                <transformationref id="panelRotation" />
+                <transformationref id="leftPanelTrans" />
+                <transformationref id="midCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="panelMaterial" />
+            </materials>
+
+            <texture id="panelTexture"/>
+
+            <children>
+                <primitiveref id="panelPrim" />
+            </children>
+        </component>
+
+        <!-- Mid Right Panel Component -->
+        <component id="midRightPanelComp">
+            <transformation>
+                <transformationref id="panelRotation" />
+                <transformationref id="rightPanelTrans" />
+                <transformationref id="midCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="panelMaterial" />
+            </materials>
+
+            <texture id="panelTexture"/>
+
+            <children>
+                <primitiveref id="panelPrim" />
+            </children>
+        </component>
+
+        <!-- Bottom Left Panel Component -->
+        <component id="bottomLeftPanelComp">
+            <transformation>
+                <transformationref id="panelRotation" />
+                <transformationref id="leftPanelTrans" />
+                <transformationref id="bottomCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="panelMaterial" />
+            </materials>
+
+            <texture id="panelTexture"/>
+
+            <children>
+                <primitiveref id="panelPrim" />
+            </children>
+        </component>
+
+        <!-- Bottom Right Panel Component -->
+        <component id="bottomRightPanelComp">
+            <transformation>
+                <transformationref id="panelRotation" />
+                <transformationref id="rightPanelTrans" />
+                <transformationref id="bottomCentralTrans" />
+            </transformation>
+            <materials>
+                <material id="panelMaterial" />
+            </materials>
+
+            <texture id="panelTexture"/>
+
+            <children>
+                <primitiveref id="panelPrim" />
+            </children>
+        </component>
+
+        <!-- Flag Component -->
+        <component id="flagComp">
+            <!-- Set upright & position -->
+            <transformation>
+                <translate x="0" y="-9" z="0" />
+            </transformation>
+
+            <materials>
+                <material id="panelMaterial" />
+            </materials>
+
+            <texture id="panelTexture"/>
+
+            <children>
+                <primitiveref id="flagPrim" />
+            </children>
+        </component>
+
+        <!-- Central Nave Component -->
+        <component id="centralNaveComp">
+            <transformation>
+            </transformation>
+
+            <materials>
+                <material id="metalMaterial" />
+            </materials>
+
+            <texture id="inherit"/>
+
+            <children>
+                <componentref id="centralTorusComp" />
+                <componentref id="firstCentralSupportMastComp" />
+                <componentref id="secondCentralSupportMastComp" />
+                <componentref id="thirdCentralSupportMastComp" />
+            </children>
+        </component>
+
+        <!-- Central Torus Component -->
+        <component id="centralTorusComp">
+            <transformation>
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="spaceshipTexture"/>
+
+            <children>
+                <primitiveref id="centralTorusPrim" />
+            </children>
+        </component>
+
+        <!-- First Central Support Mast Component -->
+        <component id="firstCentralSupportMastComp">
+            <transformation>
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="mastTexture"/>
+
+            <children>
+                <primitiveref id="supportMastPrim" />
+            </children>
+        </component>
+
+        <!-- Second Central Support Mast Component -->
+        <component id="secondCentralSupportMastComp">
+            <transformation>
+                <rotate axis="y" angle="120" />
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="mastTexture"/>
+
+            <children>
+                <primitiveref id="supportMastPrim" />
+            </children>
+        </component>
+
+        <!-- Third Central Support Mast Component -->
+        <component id="thirdCentralSupportMastComp">
+            <transformation>
+                <rotate axis="y" angle="-120" />
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="mastTexture"/>
+
+            <children>
+                <primitiveref id="supportMastPrim" />
+            </children>
+        </component>
+
+        <!-- Top Nave Component -->
+        <component id="topNaveComp">
+            <transformation>
+                <rotate axis="z" angle="45" />
+                <translate x="0" y="3" z="0" />
+            </transformation>
+
+            <materials>
+                <material id="metalMaterial" />
+            </materials>
+
+            <texture id="inherit"/>
+
+            <children>
+                <componentref id="topTorusComp" />
+                <componentref id="firstTopSupportMastComp" />
+                <componentref id="secondTopSupportMastComp" />
+            </children>
+        </component>
+
+        <!-- Top Torus Component -->
+        <component id="topTorusComp">
+            <transformation>
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="spaceshipTexture"/>
+
+            <children>
+                <primitiveref id="topTorusPrim" />
+            </children>
+        </component>
+
+        <!-- First Top Support Mast Component -->
+        <component id="firstTopSupportMastComp">
+            <transformation>
+                <transformationref id="topSupportMastScale">
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="mastTexture"/>
+
+            <children>
+                <primitiveref id="supportMastPrim" />
+            </children>
+        </component>
+
+        <!-- Second Top Support Mast Component -->
+        <component id="secondTopSupportMastComp">
+            <transformation>
+                <transformationref id="topSupportMastScale">
+                <rotate axis="y" angle="180" />
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="mastTexture"/>
+
+            <children>
+                <primitiveref id="supportMastPrim" />
+            </children>
+        </component>
+
+    </components>
+
+</sxs>
