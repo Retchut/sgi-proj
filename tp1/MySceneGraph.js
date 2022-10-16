@@ -728,11 +728,43 @@ export class MySceneGraph {
             var component = {transformations: [], materials:[], texture:[], children:{primitiveRefs:[], componentRefs:[]}}
 
             // Transformations
-            // grandGrandChildren = grandChildren[transformationIndex].children
-            // for (var j = 0; j < grandGrandChildren.length; j++) {
-            //     component.transformations.push(grandGrandChildren[j]);
-            // }
-            this.onXMLMinorError("To do: Parse component transformations.");
+            grandGrandChildren = grandChildren[transformationIndex].children
+            var transfMatrix = mat4.create();
+            mat4.identity(transfMatrix)
+            for (var j = 0; j < grandGrandChildren.length; j++) {
+                var transformation = grandGrandChildren[j];
+
+                if(transformation.nodeName == "transformationref"){
+                    this.onXMLMinorError("TODO: Parse TransformationRef -- How do we store it??");
+                }
+                else if(transformation.nodeName == "translate"){
+                    let x = this.reader.getString(transformation, 'x');
+                    let y = this.reader.getString(transformation, 'y');
+                    let z = this.reader.getString(transformation, 'z');
+                    mat4.translate(transfMatrix,transfMatrix,vec3.fromValues(x,y,z));
+                }
+                else if (transformation.nodeName == "scale"){
+                    let x = this.reader.getString(transformation, 'x');
+                    let y = this.reader.getString(transformation, 'y');
+                    let z = this.reader.getString(transformation, 'z');
+                    mat4.scale(transfMatrix,transfMatrix,vec3.fromValues(x,y,z));
+                }
+                else if (transformation.nodeName == "rotate"){
+                    let axisProp = this.reader.getString(transformation, 'axis');
+                    if(axisProp != 'x' && axisProp != 'y' && axisProp != 'z'){
+                        this.onXMLMinorError("Rotation axis of transformation number " + j + " of " + componentID + " is invalid.");
+                    }
+                    let axis = axisProp == 'x' ? [1,0,0] : (axisProp == 'y' ? [0,1,0] : [0,0,1]);
+                    let angle = this.reader.getString(transformation, 'angle');
+                    mat4.rotate(transfMatrix,transfMatrix, (angle * DEGREE_TO_RAD), axis);
+                }
+                else{
+                    this.onXMLMinorError("Transformation " + transformation.nodeName + " of " + componentID + " is not valid.");
+                }
+            }
+            console.log(transfMatrix);
+            component.transformations.push(transfMatrix);
+            // this.onXMLMinorError("To do: Parse component transformations.");
             
             // Materials
             this.onXMLMinorError("To do: Parse component materials.");
