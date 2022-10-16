@@ -765,10 +765,32 @@ export class MySceneGraph {
             component.transformations.push(transfMatrix);
             
             // Materials
-            this.onXMLMinorError("To do: Parse component materials.");
+            grandGrandChildren = grandChildren[materialsIndex].children
+            for(var j = 0; j < grandGrandChildren.length; j++){
+                var material = grandGrandChildren[j];
+                if(material.nodeName !== 'material'){
+                    this.onXMLMinorError("Material " + material.nodeName + " of " + componentID + " is not valid.");
+                    continue;
+                }
+                var materialID = this.reader.getString(material, 'id');
+                this.onXMLMinorError("Check if material exists before assiging (uncomment line below this, after parsing materials).");
+                // if (this.materials[materialID] == null) {
+                //     this.onXMLMinorError("Material " + materialID + " of " + componentID + " not defined.");
+                //     continue;
+                // }
+                component.materials.push(materialID);
+            }
 
             // Texture
-            this.onXMLMinorError("To do: Parse component textures.");
+            var textureId = this.reader.getString(grandChildren[textureIndex], 'id');
+            if(textureId != "none"){
+                component.texture.push(textureId);
+            }
+            this.onXMLMinorError("Check if material exists before assiging (uncomment line below this, after parsing materials).");
+            // if (this.textures[textureID] == null) {
+            //     this.onXMLMinorError("Texture " + textureID + " of " + componentID + " not defined.");
+            //     continue;
+            // }
 
             // Children
             grandGrandChildren = grandChildren[childrenIndex].children
