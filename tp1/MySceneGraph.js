@@ -457,9 +457,6 @@ export class MySceneGraph {
                 }
             }
             this.materials[materialID] = material;
-
-            //Continue here
-            this.onXMLMinorError("To do: Parse materials.");
         }
 
         this.log("Parsed materials");
