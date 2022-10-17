@@ -1,4 +1,4 @@
-import { CGFappearance, CGFXMLreader } from '../lib/CGF.js';
+import { CGFappearance, CGFtexture, CGFXMLreader } from '../lib/CGF.js';
 import { MyRectangle } from './MyRectangle.js';
 import { MyTriangle } from './MyTriangle.js';
 import { MyCylinder } from './MyCylinder.js';
@@ -398,9 +398,26 @@ export class MySceneGraph {
      * @param {textures block element} texturesNode
      */
     parseTextures(texturesNode) {
+        this.textures = [];
 
-        //For each texture in textures block, check ID and file URL
-        this.onXMLMinorError("To do: Parse textures.");
+        var texturesChildren = texturesNode.children;
+
+        for (var i = 0; i < texturesChildren.length; i++){
+            var textureID = this.reader.getString(texturesChildren[i], 'id');
+            var textureFile = this.reader.getString(texturesChildren[i], 'file');
+            if (textureID == null)
+                return "no ID defined for texture number " + i;
+            if (textureFile == null)
+                return "no file defined for texture number " + i;
+            this.onXMLMinorError("Check if file exists (code below this error)");
+            // var testFile = new File([], textureFile);
+            // if(!testFile.exists){
+            //     return "file " + textureFile + " does not exist";
+            // }
+            var texture = new CGFtexture(this.scene, textureFile);
+            this.textures[textureID] = texture;
+        }
+
         return null;
     }
 
@@ -425,7 +442,7 @@ export class MySceneGraph {
             // Get id of the current material.
             var materialID = this.reader.getString(children[i], 'id');
             if (materialID == null)
-                return "no ID defined for material";
+                return "no ID defined for material number" + i;
 
             // Checks for repeated IDs.
             if (this.materials[materialID] != null)
@@ -483,7 +500,7 @@ export class MySceneGraph {
             // Get id of the current transformation.
             var transformationID = this.reader.getString(children[i], 'id');
             if (transformationID == null)
-                return "no ID defined for transformation";
+                return "no ID defined for transformation number " + i;
 
             // Checks for repeated IDs.
             if (this.transformations[transformationID] != null)
@@ -555,7 +572,7 @@ export class MySceneGraph {
             // Get id of the current primitive.
             var primitiveId = this.reader.getString(children[i], 'id');
             if (primitiveId == null)
-                return "no ID defined for texture";
+                return "no ID defined for primitive number " + i;
 
             // Checks for repeated IDs.
             if (this.primitives[primitiveId] != null)
