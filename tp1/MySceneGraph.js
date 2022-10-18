@@ -237,7 +237,9 @@ export class MySceneGraph {
         this.views = [];
 
         var viewsChildren = viewsNode.children;
-        var defaultView = this.reader.getString(viewsNode, 'default');
+        this.defaultViewID = this.reader.getString(viewsNode, 'default');
+        if(this.defaultViewID == null)
+            return "Default view must be defined";
 
         for(var i = 0; i < viewsChildren.length; i++){
             var view = viewsChildren[i]
@@ -252,6 +254,10 @@ export class MySceneGraph {
                 this.onXMLMinorError("no ID defined for view number " + i);
                 continue;
             }
+            
+            // Checks for repeated IDs.
+            if (this.views[viewID] != null)
+                return "ID must be unique for each view (conflict: ID = " + viewID + ")";
             
             var near = this.reader.getString(view, 'near');
             if (near == null){
@@ -338,7 +344,8 @@ export class MySceneGraph {
 
             this.views[viewID] = viewObj;
         }
-        console.log(this.views)
+        if(this.views[this.defaultViewID] == null)
+            return "Default view must be defined";
 
         return null;
     }
@@ -509,15 +516,24 @@ export class MySceneGraph {
         for (var i = 0; i < texturesChildren.length; i++) {
             var textureID = this.reader.getString(texturesChildren[i], 'id');
             var textureFile = this.reader.getString(texturesChildren[i], 'file');
+            // Checks if texture is null
             if (textureID == null)
                 return "no ID defined for texture number " + i;
+            
+            // Checks for repeated IDs.
+            if (this.textures[textureID] != null)
+                return "ID must be unique for each texture (conflict: ID = " + textureID + ")";
+
+            // Checks if textureFile is null
             if (textureFile == null)
                 return "no file defined for texture number " + i;
+
             this.onXMLMinorError("Check if file exists (code below this error)");
             // var testFile = new File([], textureFile);
             // if(!testFile.exists){
             //     return "file " + textureFile + " does not exist";
             // }
+            
             var texture = new CGFtexture(this.scene, textureFile);
             this.textures[textureID] = texture;
         }
@@ -551,7 +567,7 @@ export class MySceneGraph {
 
             // Checks for repeated IDs.
             if (this.materials[materialID] != null)
-                return "ID must be unique for each light (conflict: ID = " + materialID + ")";
+                return "ID must be unique for each material (conflict: ID = " + materialID + ")";
 
             var grandChildren = children[i].children;
 
