@@ -510,42 +510,40 @@ export class MySceneGraph {
             var composition = children[i].children;
             // Specifications for the current transformation.
 
-            var compositionMatrix = mat4.create();
-            mat4.identity(compositionMatrix)
+            var transfMatrix = mat4.create();
 
             for (var j = 0; j < composition.length; j++) {
                 var operation = composition[j];
-
-                let x, y, z;
                 switch (operation.nodeName) {
                     case "translate":
-                        x = this.reader.getString(operation, 'x');
-                        y = this.reader.getString(operation, 'y');
-                        z = this.reader.getString(operation, 'z');
-                        mat4.translate(compositionMatrix, compositionMatrix, vec3.fromValues(x, y, z));
+                        var coordinates;
+                        coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
+                        if (!Array.isArray(coordinates))
+                            return coordinates;
+                        mat4.translate(transfMatrix, transfMatrix, coordinates);
                         break;
                     case "scale":
-                        x = this.reader.getString(operation, 'x');
-                        y = this.reader.getString(operation, 'y');
-                        z = this.reader.getString(operation, 'z');
-                        mat4.scale(compositionMatrix, compositionMatrix, vec3.fromValues(x, y, z));
+                        var coordinates;
+                        coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
+                        if (!Array.isArray(coordinates))
+                            return coordinates;
+                        mat4.scale(transfMatrix, transfMatrix, coordinates);
                         break;
                     case "rotate":
-                        var grandChildren = [];
                         var axisProp = this.reader.getString(operation, 'axis');
                         if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
                             this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid.");
                         }
-                        let axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
-                        let angle = this.reader.getString(operation, 'angle');
-                        mat4.rotate(compositionMatrix, compositionMatrix, (angle * DEGREE_TO_RAD), axis);
+                        var axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
+                        var angle = this.reader.getFloat(operation, 'angle');
+                        mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
                         break;
                     default:
                         this.onXMLMinorError("Operation " + operation.nodeName + " on initial transformation declaration of transformation " + transformationID + " is not valid.");
                 }
             }
 
-            this.transformations[transformationID] = compositionMatrix;
+            this.transformations[transformationID] = transfMatrix;
         }
 
         this.log("Parsed transformations");
@@ -782,56 +780,50 @@ export class MySceneGraph {
             // Transformations
             grandGrandChildren = grandChildren[transformationIndex].children
             var transfMatrix = mat4.create();
-            mat4.identity(transfMatrix)
             for (var j = 0; j < grandGrandChildren.length; j++) {
-                var transformation = grandGrandChildren[j];
-
-                var transfMatrix = mat4.create();
-                mat4.identity(transfMatrix)
-                let x, y, z;
-                switch (transformation.nodeName) {
+                var operation = grandGrandChildren[j];
+                switch (operation.nodeName) {
                     case "transformationref":
+                        // If there is a transformationref, there can't be any other transformations
+                        console.log(grandGrandChildren.length)
+                        if (grandGrandChildren.length != 1)
+                            return "there can only be one transformationref for transformations in component " + componentID
                         // Get id of the transformation.
-                        var transformationRef = this.reader.getString(transformation, 'id');
-                        if (transformationRef == null) {
-                            this.onXMLMinorError("no ID defined for transformationRef");
-                            continue;
-                        }
+                        var transformationRef = this.reader.getString(operation, 'id');
+                        if (transformationRef == null)
+                            return "no ID defined for transformationRef in component " + componentID;
 
                         // Checks that ID exists.
-                        if (this.transformations[transformationRef] == null) {
-                            this.onXMLMinorError("transformationRef id must be an existing transformation ID");
-                            continue;
-                        }
-                        mat4.multiply(transfMatrix, transfMatrix, this.transformations[transformationRef])
+                        if (this.transformations[transformationRef] == null)
+                            return "transformationRef id in component " + componentId + " must be an existing transformation ID";
+                        
+                        transfMatrix = this.transformations[transformationRef]
                         break;
                     case "translate":
-                        x = this.reader.getString(transformation, 'x');
-                        if (x == null || isNaN(x)) {
-                            this.onXMLMinorError("Unable to parse x coordinate for translation in component with ID = " + componentID);
-                            continue;
-                        }
-                        y = this.reader.getString(transformation, 'y');
-                        z = this.reader.getString(transformation, 'z');
-                        mat4.translate(transfMatrix, transfMatrix, vec3.fromValues(x, y, z));
+                        var coordinates;
+                        coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
+                        if (!Array.isArray(coordinates))
+                            return coordinates;
+                        mat4.translate(transfMatrix, transfMatrix, coordinates);
                         break;
                     case "scale":
-                        x = this.reader.getString(transformation, 'x');
-                        y = this.reader.getString(transformation, 'y');
-                        z = this.reader.getString(transformation, 'z');
-                        mat4.scale(transfMatrix, transfMatrix, vec3.fromValues(x, y, z));
+                        var coordinates;
+                        coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
+                        if (!Array.isArray(coordinates))
+                            return coordinates;
+                        mat4.scale(transfMatrix, transfMatrix, coordinates);
                         break;
                     case "rotate":
-                        let axisProp = this.reader.getString(transformation, 'axis');
+                        var axisProp = this.reader.getString(operation, 'axis');
                         if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
-                            this.onXMLMinorError("Rotation axis of transformation number " + j + " of " + componentID + " is invalid.");
+                            this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + componentID + " is invalid.");
                         }
-                        let axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
-                        let angle = this.reader.getString(transformation, 'angle');
-                        mat4.rotate(transfMatrix, transfMatrix, (angle * DEGREE_TO_RAD), axis);
+                        var axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
+                        var angle = this.reader.getFloat(operation, 'angle');
+                        mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
                         break;
                     default:
-                        this.onXMLMinorError("Transformation " + transformation.nodeName + " of " + componentID + " is not valid.");
+                        this.onXMLMinorError("Operation " + operation.nodeName + " on transformation declaration for component " + componentID + " is invalid.");
                 }
             }
             component.transformation = transfMatrix;
@@ -1016,8 +1008,8 @@ export class MySceneGraph {
         // multiply the current scene transformation matrix by the current component matrix
         // access primitives via id
         let currentComponentMaterial = this.currentMaterial % currentNode.materials.length
-        let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial]: prevAppearenceId);
-        
+        let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
+
         this.scene.multMatrix(currentNode.transformation);
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {
             // preserve current scene transformation matrix
