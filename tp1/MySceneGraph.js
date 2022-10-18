@@ -1,4 +1,4 @@
-import { CGFappearance, CGFtexture, CGFXMLreader } from '../lib/CGF.js';
+import { CGFappearance, CGFcamera, CGFcameraOrtho, CGFtexture, CGFXMLreader } from '../lib/CGF.js';
 import { MyRectangle } from './MyRectangle.js';
 import { MyTriangle } from './MyTriangle.js';
 import { MyCylinder } from './MyCylinder.js';
@@ -234,7 +234,111 @@ export class MySceneGraph {
      * @param {view block element} viewsNode
      */
     parseView(viewsNode) {
-        this.onXMLMinorError("To do: Parse views and create cameras.");
+        this.views = [];
+
+        var viewsChildren = viewsNode.children;
+        var defaultView = this.reader.getString(viewsNode, 'default');
+
+        for(var i = 0; i < viewsChildren.length; i++){
+            var view = viewsChildren[i]
+            
+            if(view.nodeName != "perspective" && view.nodeName != "ortho"){
+                this.onXMLMinorError("unknown perspective tag <" + view.nodeName + "> on view number " + i);
+                continue;
+            }
+
+            var viewID = this.reader.getString(view, 'id');
+            if (viewID == null){
+                this.onXMLMinorError("no ID defined for view number " + i);
+                continue;
+            }
+            
+            var near = this.reader.getString(view, 'near');
+            if (near == null){
+                this.onXMLMinorError("no near attribute defined for view number " + i);
+                continue;
+            }
+
+            var far = this.reader.getString(view, 'far');
+            if (far == null){
+                this.onXMLMinorError("no far attribute defined for view number " + i);
+                continue;
+            }
+
+            var angle = this.reader.getString(view, 'angle');
+            if (angle == null){
+                this.onXMLMinorError("no angle attribute defined for view number " + i);
+                continue;
+            }
+
+            var viewsGrandchildren = viewsChildren[i].children;
+            var from = [];
+            var to = [];
+            var up = [];
+            for (var j = 0; j < viewsGrandchildren.length; j++){
+                var coords = [];
+                switch (viewsGrandchildren[j].nodeName){
+                    case "from":
+                        from = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
+                        if(typeof(from) != Array){
+                            continue;
+                        }
+                        from = vec3.fromValues(from[0], from[1], from[2])
+                        break;
+                    case "to":
+                        to = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
+                        if(typeof(to) != Array){
+                            continue;
+                        }
+                        to = vec3.fromValues(to[0], to[1], to[2])
+                        break;
+                    case "up":
+                        up = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
+                        // error was returned if not defined
+                        // default value is 0,1,0
+                        if(typeof(up) != Array){
+                            up = vec3.fromValues(0,1,0);
+                        }
+                        break;
+                    default:
+                        this.onXMLMinorError("unknown tag <" + viewsGrandchildren[j].nodeName + ">");
+                        continue;
+                }
+            }
+            
+            var viewObj;
+            if(view.nodeName == "perspective"){
+                viewObj = new CGFcamera(angle*DEGREE_TO_RAD, near, far, from, to);
+            }
+            else if (view.nodeName == "ortho"){
+                //<ortho id="ss"  near="ff" far="ff" left="ff" right="ff" top="ff" bottom="ff" >
+                var left = this.reader.getString(view, 'left');
+                if (left == null){
+                    this.onXMLMinorError("no left attribute defined for view number " + i);
+                    continue;
+                }
+                var right = this.reader.getString(view, 'right');
+                if (right == null){
+                    this.onXMLMinorError("no right attribute defined for view number " + i);
+                    continue;
+                }
+                var top = this.reader.getString(view, 'top');
+                if (top == null){
+                    this.onXMLMinorError("no top attribute defined for view number " + i);
+                    continue;
+                }
+                var bottom = this.reader.getString(view, 'bottom');
+                if (bottom == null){
+                    this.onXMLMinorError("no bottom attribute defined for view number " + i);
+                    continue;
+                }
+
+                viewObj = new CGFcameraOrtho(left, right, bottom, top, near, far, from, to, up)
+            }
+
+            this.views[viewID] = viewObj;
+        }
+        console.log(this.views)
 
         return null;
     }
