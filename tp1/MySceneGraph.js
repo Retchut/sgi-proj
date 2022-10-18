@@ -271,12 +271,6 @@ export class MySceneGraph {
                 continue;
             }
 
-            var angle = this.reader.getString(view, 'angle');
-            if (angle == null){
-                this.onXMLMinorError("no angle attribute defined for view number " + i);
-                continue;
-            }
-
             var viewsGrandchildren = viewsChildren[i].children;
             var from = [];
             var to = [];
@@ -314,10 +308,17 @@ export class MySceneGraph {
             
             var viewObj;
             if(view.nodeName == "perspective"){
+                // Get attribute unique to perspective projection cameras
+                var angle = this.reader.getString(view, 'angle');
+                if (angle == null){
+                    this.onXMLMinorError("no angle attribute defined for view number " + i);
+                    continue;
+                }
+
                 viewObj = new CGFcamera(angle*DEGREE_TO_RAD, near, far, from, to);
             }
             else if (view.nodeName == "ortho"){
-                //<ortho id="ss"  near="ff" far="ff" left="ff" right="ff" top="ff" bottom="ff" >
+                // Get attributes unique to orthographic projection cameras
                 var left = this.reader.getString(view, 'left');
                 if (left == null){
                     this.onXMLMinorError("no left attribute defined for view number " + i);
@@ -905,7 +906,6 @@ export class MySceneGraph {
                 switch (operation.nodeName) {
                     case "transformationref":
                         // If there is a transformationref, there can't be any other transformations
-                        console.log(grandGrandChildren.length)
                         if (grandGrandChildren.length != 1)
                             return "there can only be one transformationref for transformations in component " + componentID
                         // Get id of the transformation.
