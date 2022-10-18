@@ -514,7 +514,7 @@ export class MySceneGraph {
             mat4.identity(compositionMatrix)
 
             for (var j = 0; j < composition.length; j++) {
-                var operation = composition[i];
+                var operation = composition[j];
 
                 let x, y, z;
                 switch (operation.nodeName) {
@@ -683,17 +683,17 @@ export class MySceneGraph {
             else if (primitiveType == 'sphere') {
                 // radius
                 var radius = this.reader.getFloat(grandChildren[0], 'radius');
-                if (!(x1 != null && !isNaN(x1)))
+                if (!(radius != null && !isNaN(radius)))
                     return "unable to parse radius for ID = " + primitiveId;
 
                 // slices
                 var slices = this.reader.getInteger(grandChildren[0], 'slices');
-                if (!(y1 != null && !isNaN(y1)))
+                if (!(slices != null && !isNaN(slices)))
                     return "unable to parse slices for ID = " + primitiveId;
 
                 // stacks
                 var stacks = this.reader.getInteger(grandChildren[0], 'stacks');
-                if (!(x2 != null && !isNaN(x2)))
+                if (!(stacks != null && !isNaN(stacks)))
                     return "unable to parse stacks for ID = " + primitiveId;
 
                 var sphere = new MySphere(this.scene, primitiveId, radius, slices, stacks);
@@ -703,22 +703,22 @@ export class MySceneGraph {
             else if (primitiveType == 'torus') {
                 // inner
                 var inner = this.reader.getFloat(grandChildren[0], 'inner');
-                if (!(x1 != null && !isNaN(x1)))
+                if (!(inner != null && !isNaN(inner)))
                     return "unable to parse inner radius for ID = " + primitiveId;
 
                 // outer
                 var outer = this.reader.getFloat(grandChildren[0], 'outer');
-                if (!(y1 != null && !isNaN(y1)))
+                if (!(outer != null && !isNaN(outer)))
                     return "unable to parse outer radius for ID = " + primitiveId;
 
                 // slices
                 var slices = this.reader.getInteger(grandChildren[0], 'slices');
-                if (!(x2 != null && !isNaN(x2)))
+                if (!(slices != null && !isNaN(slices)))
                     return "unable to parse slices for ID = " + primitiveId;
 
                 // loops
                 var loops = this.reader.getInteger(grandChildren[0], 'loops');
-                if (!(x2 != null && !isNaN(x2)))
+                if (!(loops != null && !isNaN(loops)))
                     return "unable to parse stacks for ID = " + primitiveId;
 
                 var torus = new MyTorus(this.scene, primitiveId, inner, outer, slices, loops);
@@ -853,14 +853,14 @@ export class MySceneGraph {
             }
 
             // Texture
-            var textureID = this.reader.getString(grandChildren[textureIndex], 'id');
-            if (textureID != "none") {
-                if (this.textures[textureID] == null) {
-                    this.onXMLMinorError("Texture " + textureID + " of " + componentID + " not defined.");
-                    continue;
-                }
-                component.texture.push(textureID);
-            }
+            // var textureID = this.reader.getString(grandChildren[textureIndex], 'id');
+            // if (textureID != "none") {
+            //     if (this.textures[textureID] == null) {
+            //         this.onXMLMinorError("Texture " + textureID + " of " + componentID + " not defined.");
+            //         continue;
+            //     }
+            //     component.texture.push(textureID);
+            // }
 
             // Children
             grandGrandChildren = grandChildren[childrenIndex].children
