@@ -938,7 +938,7 @@ export class MySceneGraph {
                     
                     // If there is a transformationref, there can't be any other transformations
                     if (grandGrandChildren.length != 1){
-                        this.onXMLMinorError("there can only be one transformationref for transformations in component " + componentID);
+                        this.onXMLMinorError("There can only be one transformationref for transformations in component " + componentID + ". All other transformations in this component were ignored.");
                         break;
                     }
                 }
