@@ -597,7 +597,7 @@ export class MySceneGraph {
             }
             this.materials[materialID] = material;
         }
-
+        
         this.log("Parsed materials");
         return null;
     }
@@ -903,37 +903,43 @@ export class MySceneGraph {
             var transfMatrix = mat4.create();
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var operation = grandGrandChildren[j];
-                switch (operation.nodeName) {
-                    case "transformationref":
-                        // If there is a transformationref, there can't be any other transformations
-                        if (grandGrandChildren.length != 1)
-                            return "there can only be one transformationref for transformations in component " + componentID
-                        // Get id of the transformation.
-                        var transformationRef = this.reader.getString(operation, 'id');
-                        if (transformationRef == null)
-                            return "no ID defined for transformationRef in component " + componentID;
+                if(operation.nodeName === "transformationref"){
+                    // Get id of the transformation.
+                    var transformationRef = this.reader.getString(operation, 'id');
+                    if (transformationRef == null){
+                        this.onXMLMinorError("no ID defined for transformationRef in component " + componentID);
+                        continue;
+                    }
 
-                        // Checks that ID exists.
-                        if (this.transformations[transformationRef] == null)
-                            return "transformationRef id in component " + componentId + " must be an existing transformation ID";
-                        
-                        transfMatrix = this.transformations[transformationRef]
+                    // Checks that ID exists.
+                    if (this.transformations[transformationRef] == null){
+                        this.onXMLMinorError("transformationRef id in component " + componentId + " must be an existing transformation ID");
+                        continue;
+                    }
+
+                    transfMatrix = this.transformations[transformationRef]
+                    
+                    // If there is a transformationref, there can't be any other transformations
+                    if (grandGrandChildren.length != 1){
+                        this.onXMLMinorError("there can only be one transformationref for transformations in component " + componentID);
                         break;
-                    case "translate":
-                        var coordinates;
-                        coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
-                        if (!Array.isArray(coordinates))
-                            return coordinates;
-                        mat4.translate(transfMatrix, transfMatrix, coordinates);
-                        break;
-                    case "scale":
-                        var coordinates;
-                        coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
-                        if (!Array.isArray(coordinates))
-                            return coordinates;
-                        mat4.scale(transfMatrix, transfMatrix, coordinates);
-                        break;
-                    case "rotate":
+                    }
+                }
+                else if (operation.nodeName === "translate"){
+                    var coordinates;
+                    coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
+                    if (!Array.isArray(coordinates))
+                        return coordinates;
+                    mat4.translate(transfMatrix, transfMatrix, coordinates);
+                }
+                else if (operation.nodeName === "scale"){
+                    var coordinates;
+                    coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
+                    if (!Array.isArray(coordinates))
+                        return coordinates;
+                    mat4.scale(transfMatrix, transfMatrix, coordinates);
+                }
+                else if (operation.nodeName === "rotate"){
                         var axisProp = this.reader.getString(operation, 'axis');
                         if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
                             this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + componentID + " is invalid.");
@@ -941,8 +947,8 @@ export class MySceneGraph {
                         var axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
                         var angle = this.reader.getFloat(operation, 'angle');
                         mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
-                        break;
-                    default:
+                }
+                else{
                         this.onXMLMinorError("Operation " + operation.nodeName + " on transformation declaration for component " + componentID + " is invalid.");
                 }
             }
@@ -1009,7 +1015,11 @@ export class MySceneGraph {
             }
             this.components[componentID].children.componentRefs = validComponentRefs;
         }
-        console.log(this.components)
+
+        if(this.components[this.idRoot] == null){
+            return "The root component " + this.idRoot + " is undefined";
+        }
+        
     }
 
 
@@ -1054,7 +1064,6 @@ export class MySceneGraph {
 
         if (!Array.isArray(position))
             return position;
-
 
         // w
         var w = this.reader.getFloat(node, 'w');
@@ -1140,7 +1149,7 @@ export class MySceneGraph {
             this.scene.popMatrix();
         }
         this.materials[materialID].apply();
-        // console.log(currentNode.materials);
+        
         for (var i = 0; i < currentNode.children.primitiveRefs.length; i++) {
             // display the primitive with the transformations already applied
             //this.scene.pushMatrix();
