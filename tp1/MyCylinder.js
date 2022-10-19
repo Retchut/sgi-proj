@@ -85,5 +85,16 @@ export class MyCylinder extends CGFobject {
     setLineMode()
     {
         this.primitiveType=this.scene.gl.LINE_STRIP;
-    };
+    }
+
+    /**
+	 * @method updateTexCoords
+	 * Updates the texture coordinates of the component
+	 * @param length_s - Texture scale factor for the s axis
+	 * @param length_t - Texture scale factor for the t axis
+	 */
+	updateTexCoords(length_s, length_t) {
+		// this.texCoords = [];
+		this.updateTexCoordsGLBuffers();
+	}
 }
