@@ -908,15 +908,26 @@ export class MySceneGraph {
                 nodeNames.push(grandChildren[j].nodeName);
             }
 
-            var transformationIndex = nodeNames.indexOf("transformation");
-            var materialsIndex = nodeNames.indexOf("materials");
-            var textureIndex = nodeNames.indexOf("texture");
-            var childrenIndex = nodeNames.indexOf("children");
+            var indices = {
+                transformationIndex : nodeNames.indexOf("transformation"),
+                materialsIndex : nodeNames.indexOf("materials"),
+                textureIndex : nodeNames.indexOf("texture"),
+                childrenIndex : nodeNames.indexOf("children")
+            }
+            
+            // check if the component object has one of each required tags defined
+            for(const index in indices){
+                // indexOf returns -1 if the object of the searchis not present
+                if(indices[index] == -1){
+                    let indexName = index.slice(0, index.length - 5)
+                    return "Component " + componentID + " has no " + index.slice(0, indexName);
+                }
+            }
 
             var component = { transformation: mat4.create(), materials: [], texture: [], children: { primitiveRefs: [], componentRefs: [] } }
 
             // Transformations
-            grandGrandChildren = grandChildren[transformationIndex].children
+            grandGrandChildren = grandChildren[indices.transformationIndex].children
             var transfMatrix = mat4.create();
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var operation = grandGrandChildren[j];
@@ -972,7 +983,7 @@ export class MySceneGraph {
             component.transformation = transfMatrix;
 
             // Materials
-            grandGrandChildren = grandChildren[materialsIndex].children
+            grandGrandChildren = grandChildren[indices.materialsIndex].children
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var material = grandGrandChildren[j];
                 if (material.nodeName !== 'material') {
@@ -988,7 +999,7 @@ export class MySceneGraph {
             }
 
             // Texture
-            // var textureID = this.reader.getString(grandChildren[textureIndex], 'id');
+            // var textureID = this.reader.getString(grandChildren[indices.textureIndex], 'id');
             // if (textureID != "none") {
             //     if (this.textures[textureID] == null) {
             //         this.onXMLMinorError("Texture " + textureID + " of " + componentID + " not defined.");
@@ -998,7 +1009,7 @@ export class MySceneGraph {
             // }
 
             // Children
-            grandGrandChildren = grandChildren[childrenIndex].children
+            grandGrandChildren = grandChildren[indices.textureIndex].children
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 if (grandGrandChildren[j].nodeName == "primitiveref") {
                     var primitiveId = this.reader.getString(grandGrandChildren[j], 'id');
