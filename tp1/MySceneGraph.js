@@ -976,12 +976,12 @@ export class MySceneGraph {
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var material = grandGrandChildren[j];
                 if (material.nodeName !== 'material') {
-                    this.onXMLMinorError("Material " + material.nodeName + " of " + componentID + " is not valid.");
+                    this.onXMLMinorError("Material tag " + material.nodeName + " of " + componentID + " is not valid.");
                     continue;
                 }
                 var materialID = this.reader.getString(material, 'id');
                 if (materialID != "inherit" && this.materials[materialID] == null) {
-                    this.onXMLMinorError("Material " + materialID + " of " + componentID + " not defined.");
+                    this.onXMLMinorError("Material ID " + materialID + " of " + componentID + " not defined.");
                     continue;
                 }
                 component.materials.push(materialID);
