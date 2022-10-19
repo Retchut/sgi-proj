@@ -775,7 +775,7 @@ export class MySceneGraph {
             var textureIndex = nodeNames.indexOf("texture");
             var childrenIndex = nodeNames.indexOf("children");
 
-            var component = { transformation: mat4.create(), materials: [], texture: [], children: { primitiveRefs: [], componentRefs: [] } }
+            var component = { transformation: mat4.create(), materials: [], texture: {}, children: { primitiveRefs: [], componentRefs: [] } }
 
             // Transformations
             grandGrandChildren = grandChildren[transformationIndex].children
@@ -785,7 +785,6 @@ export class MySceneGraph {
                 switch (operation.nodeName) {
                     case "transformationref":
                         // If there is a transformationref, there can't be any other transformations
-                        console.log(grandGrandChildren.length)
                         if (grandGrandChildren.length != 1)
                             return "there can only be one transformationref for transformations in component " + componentID
                         // Get id of the transformation.
@@ -796,7 +795,7 @@ export class MySceneGraph {
                         // Checks that ID exists.
                         if (this.transformations[transformationRef] == null)
                             return "transformationRef id in component " + componentId + " must be an existing transformation ID";
-                        
+
                         transfMatrix = this.transformations[transformationRef]
                         break;
                     case "translate":
@@ -837,32 +836,42 @@ export class MySceneGraph {
                     continue;
                 }
                 var materialID = this.reader.getString(material, 'id');
-                if (materialID != "inherit" && this.materials[materialID] == null) {
-                    this.onXMLMinorError("Material " + materialID + " of " + componentID + " not defined.");
-                    continue;
-                }
+                if (materialID == null)
+                    return "no ID defined for material in component " + componentID;
+                if (materialID != "inherit" && this.materials[materialID] == null)
+                    return "Material " + materialID + " of " + componentID + " not defined.";
                 component.materials.push(materialID);
             }
 
             // Texture
-            // var textureID = this.reader.getString(grandChildren[textureIndex], 'id');
-            // if (textureID != "none") {
-            //     if (this.textures[textureID] == null) {
-            //         this.onXMLMinorError("Texture " + textureID + " of " + componentID + " not defined.");
-            //         continue;
-            //     }
-            //     component.texture.push(textureID);
-            // }
+            var textureID = this.reader.getString(grandChildren[textureIndex], 'id');
+            if (textureID == null)
+                return "Missing texture id for component " + component;
+            if (textureID != "none" && textureID != "inherit") {
+                if (this.textures[textureID] == null)
+                    return "Texture " + textureID + " of " + componentID + " not defined.";
+                var length_s = this.reader.getFloat(grandChildren[textureIndex], 'length_s');
+                if (length_s == null) {
+                    this.onXMLMinorError("Missing length_s for texture " + textureID + " in component " + componentID);
+                    length_s = 1
+                }
+                var length_t = this.reader.getFloat(grandChildren[textureIndex], 'length_t');
+                if (length_t == null) {
+                    this.onXMLMinorError("Missing length_t for texture " + textureID + " in component " + componentID);
+                    length_t = 1
+                }
+                component.texture.length_s = length_s;
+                component.texture.length_t = length_t;
+            }
+            component.texture.id = textureID
 
             // Children
             grandGrandChildren = grandChildren[childrenIndex].children
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 if (grandGrandChildren[j].nodeName == "primitiveref") {
                     var primitiveId = this.reader.getString(grandGrandChildren[j], 'id');
-                    if (this.primitives[primitiveId] == null) {
-                        this.onXMLMinorError("Primitive " + primitiveId + " of " + componentID + " not defined.");
-                        continue;
-                    }
+                    if (this.primitives[primitiveId] == null)
+                        return "Primitive " + primitiveId + " of " + componentID + " not defined.";
                     component.children.primitiveRefs.push(primitiveId);
                 }
                 else if (grandGrandChildren[j].nodeName == "componentref") {
@@ -1004,30 +1013,37 @@ export class MySceneGraph {
         console.log("   " + message);
     }
 
-    drawComponent(currentNode, prevAppearenceId) {
+    drawComponent(currentNode, prevAppearenceId, prevTexture) {
         // multiply the current scene transformation matrix by the current component matrix
         // access primitives via id
         let currentComponentMaterial = this.currentMaterial % currentNode.materials.length
         let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
+        let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
 
         this.scene.multMatrix(currentNode.transformation);
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {
             // preserve current scene transformation matrix
             this.scene.pushMatrix();
             // recursively visit the next child component
-            this.drawComponent(this.components[currentNode.children.componentRefs[i]], materialID);
+            this.drawComponent(this.components[currentNode.children.componentRefs[i]], materialID, texture);
             // restore scene transformation matrix
             this.scene.popMatrix();
         }
-        this.materials[materialID].apply();
-        // console.log(currentNode.materials);
+        let currentAppearence = this.materials[materialID];
+
+        if (texture.id !== "none")
+            currentAppearence.setTexture(this.textures[texture.id]);
+
+        currentAppearence.apply();
+
+        // console.log(texture.id)
+        // console.log(currentAppearence)
+
         for (var i = 0; i < currentNode.children.primitiveRefs.length; i++) {
             // display the primitive with the transformations already applied
-            //this.scene.pushMatrix();
-            // recursively visit the next child component
+            if (texture.id !== "none")
+                this.primitives[currentNode.children.primitiveRefs[i]].updateTexCoords(texture.length_s, texture.length_t);
             this.primitives[currentNode.children.primitiveRefs[i]].display();
-            // restore scene transformation matrix
-            //this.scene.popMatrix();
         }
     }
 
