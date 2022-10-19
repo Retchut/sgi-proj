@@ -505,6 +505,25 @@ export class MySceneGraph {
         return null;
     }
 
+
+    /**
+     * Checks if the file exists. 
+     * @param {string} path path to the file
+     */
+     fileExists(path){
+        let xmlhttp;
+        if (window.XMLHttpRequest) {
+			xmlhttp = new XMLHttpRequest();                            // For all modern browsers
+		}
+		else if (window.ActiveXObject) {
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");   		// For (older) IE
+		}
+
+        xmlhttp.open('HEAD', path, false);
+        xmlhttp.send();
+        return xmlhttp.status!=404;
+    }
+
     /**
      * Parses the <textures> block. 
      * @param {textures block element} texturesNode
@@ -529,11 +548,9 @@ export class MySceneGraph {
             if (textureFile == null)
                 return "no file defined for texture number " + i;
 
-            this.onXMLMinorError("Check if file exists (code below this error)");
-            // var testFile = new File([], textureFile);
-            // if(!testFile.exists){
-            //     return "file " + textureFile + " does not exist";
-            // }
+            if(!this.fileExists(textureFile)){
+                return "file " + textureFile + " does not exist";
+            }
             
             var texture = new CGFtexture(this.scene, textureFile);
             this.textures[textureID] = texture;
