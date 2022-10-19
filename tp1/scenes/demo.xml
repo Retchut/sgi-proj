@@ -34,7 +34,7 @@
             <specular r="0.6" g="0.0" b="0.0" a="1.0" />
         </material>
         <material id="planetYellowMaterial" shininess="3">
-            <emission r="0.0" g="0.0" b="0.0" a="1.0" />
+            <emission r="0.3" g="0.3" b="0.3" a="1.0" />
             <ambient r="1.0" g="0.78" b="0.17" a="1.0" />
             <diffuse r="0.6" g="0.4" b="0.0" a="1.0" />
             <specular r="0.6" g="0.4" b="0.0" a="1.0" />
@@ -80,6 +80,9 @@
         <primitive id="poleFlag">
             <triangle x1="0" y1="0" z1="1.4" x2="0" y2="0" z2="1.9" x3="1" y3="0" z3="1.65" />
         </primitive>
+        <primitive id="poleFlag2">
+            <triangle x1="0" y1="0" z1="1.9" x2="0" y2="0" z2="1.4" x3="1" y3="0" z3="1.65" />
+        </primitive>
         <primitive id="smallSphere">
             <sphere radius="0.05" slices="10" stacks="10" />
         </primitive>
@@ -93,7 +96,7 @@
             <rectangle x1="-1" y1="-1" x2="1" y2="1" />
         </primitive>
         <primitive id="roof">
-            <triangle x1="-1" y1="0" z1="0" x2="1" y2="0" z2="0" x3="0" y3="1.414" z3="0" />
+            <triangle x1="1" y1="0" z1="0" x2="-1" y2="0" z2="0" x3="0" y3="1.414" z3="0" />
         </primitive>
     </primitives>
 
@@ -222,6 +225,7 @@
             <children>
                 <primitiveref id="poleCylinder" />
                 <primitiveref id="poleFlag" />
+                <primitiveref id="poleFlag2" />
                 <componentref id="poleTop" />
             </children>
         </component>
@@ -297,7 +301,7 @@
                 <rotate axis="y" angle="90" />
             </transformation>
             <materials>
-                <material id="inherit" />
+                <material id="whiteMaterial" />
             </materials>
             <texture id="none" />
             <children>
