@@ -688,18 +688,23 @@ export class MySceneGraph {
         for (var i = 0; i < children.length; i++) {
 
             if (children[i].nodeName != "transformation") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">");
+                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
                 continue;
             }
 
             // Get id of the current transformation.
             var transformationID = this.reader.getString(children[i], 'id');
             if (transformationID == null)
-                return "no ID defined for transformation number " + i;
+            if (materialID == null){
+                this.onXMLMinorError("no ID defined for transformation number " + i + ". The transformation will be ignored.");
+                continue;
+            }
 
             // Checks for repeated IDs.
-            if (this.transformations[transformationID] != null)
-                return "ID must be unique for each transformation (conflict: ID = " + transformationID + ")";
+            if (this.transformations[transformationID] != null){
+                this.onXMLMinorError("ID must be unique for each transformation (conflict: ID = " + transformationID + "). The duplicate will be ignored");
+                continue;
+            }
 
             var composition = children[i].children;
             // Specifications for the current transformation.
@@ -712,28 +717,38 @@ export class MySceneGraph {
                     case "translate":
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
-                        if (!Array.isArray(coordinates))
-                            return coordinates;
+                        if (!Array.isArray(coordinates)){
+                            console.log(coordinates + " Assuming translation of [0,0,0]");
+                            coordinates = vec3.create();
+                        }
                         mat4.translate(transfMatrix, transfMatrix, coordinates);
                         break;
                     case "scale":
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
-                        if (!Array.isArray(coordinates))
-                            return coordinates;
+                        if (!Array.isArray(coordinates)){
+                            console.log(coordinates + " Assuming scaling of [1,1,1].");
+                            coordinates = vec3.fromValues(1,1,1);
+                        }
                         mat4.scale(transfMatrix, transfMatrix, coordinates);
                         break;
                     case "rotate":
                         var axisProp = this.reader.getString(operation, 'axis');
-                        if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
-                            this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid.");
-                        }
                         var axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
                         var angle = this.reader.getFloat(operation, 'angle');
+                        if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
+                            this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid. Assuming rotation of 0 around the x axis.");
+                            angle = 0.0;
+                        }
+                        if(angle == null){
+                            this.onXMLMinorError("no angle property defined for the rotation operation number " + j + ". Assuming rotation of 0 around the x axis");
+                            axis = [1,0,0];
+                            angle = 0.0;
+                        }
                         mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
                         break;
                     default:
-                        this.onXMLMinorError("Operation " + operation.nodeName + " on initial transformation declaration of transformation " + transformationID + " is not valid.");
+                        this.onXMLMinorError("Operation " + operation.nodeName + " on initial transformation declaration of transformation " + transformationID + " is not valid. Ignoring this operation.");
                 }
             }
 
