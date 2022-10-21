@@ -13,16 +13,18 @@ export class MyRectangle extends CGFobject {
 		this.x2 = x2;
 		this.y1 = y1;
 		this.y2 = y2;
+		this.xLength = Math.abs(this.x2 - this.x1);
+		this.yLength = Math.abs(this.y2 - this.y1);
 
 		this.initBuffers();
 	}
-	
+
 	initBuffers() {
-		this.vertices = [	// x1 =-0.5 y1=-1 x2=0.5 y2=1
-			this.x1, this.y1, 0,	//0 (-0.5,-1)
-			this.x2, this.y1, 0,	//1 (0.5, -1)
-			this.x1, this.y2, 0,	//2 (-0.5, 1)
-			this.x2, this.y2, 0		//3 (0.5, 1)
+		this.vertices = [
+			this.x1, this.y1, 0,	//0
+			this.x2, this.y1, 0,	//1
+			this.x1, this.y2, 0,	//2
+			this.x2, this.y2, 0,	//3
 		];
 
 		//Counter-clockwise reference of vertices
@@ -38,16 +40,16 @@ export class MyRectangle extends CGFobject {
 			0, 0, 1,
 			0, 0, 1
 		];
-		
+
 		/*
 		Texture coords (s,t)
 		+----------> s
-        |
-        |
+		|
+		|
 		|
 		v
-        t
-        */
+		t
+		*/
 
 		this.texCoords = [
 			0, 1,
@@ -66,7 +68,12 @@ export class MyRectangle extends CGFobject {
 	 * @param length_t - Texture scale factor for the t axis
 	 */
 	updateTexCoords(length_s, length_t) {
-		// this.texCoords = [];
+		this.texCoords = [
+			0, this.yLength / length_s,
+			this.xLength / length_t, this.yLength / length_s,
+			0, 0,
+			this.xLength / length_t, 0
+		];
 		this.updateTexCoordsGLBuffers();
 	}
 }

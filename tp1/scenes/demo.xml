@@ -144,7 +144,9 @@
             </children>
         </component>
         <component id="planet">
-            <transformation></transformation>
+            <transformation>
+                <transformationref id="demoTransformaaa" />
+            </transformation>
             <materials>
                 <material id="inherit" />
             </materials>

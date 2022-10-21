@@ -241,15 +241,15 @@ export class MySceneGraph {
         var viewIDs = [];
 
         var defaultViewID = this.reader.getString(viewsNode, 'default');
-        if(defaultViewID == null)
+        if (defaultViewID == null)
             return "Missing 'default' attribute on <views> tag";
 
         this.defaultViewID = defaultViewID;
         var viewsChildren = viewsNode.children;
-        if(viewsChildren.length === 0)
+        if (viewsChildren.length === 0)
             return "No views declared in <views>";
 
-        for(var i = 0; i < viewsChildren.length; i++){
+        for (var i = 0; i < viewsChildren.length; i++) {
             var view = viewsChildren[i]
             
             if(view.nodeName != "perspective" && view.nodeName != "ortho"){
@@ -262,7 +262,7 @@ export class MySceneGraph {
                 this.onXMLMinorError("No ID defined for view number " + i + "The camera will be ignored");
                 continue;
             }
-            
+
             // Checks for repeated IDs.
             if (this.views[viewID] != null){
                 this.onXMLMinorError("ID must be unique for each view (conflict: ID = " + viewID + "). The duplicate will be ignored.");
@@ -270,13 +270,13 @@ export class MySceneGraph {
             }
             
             var near = this.reader.getFloat(view, 'near');
-            if (near == null){
+            if (near == null) {
                 this.onXMLMinorError("no near attribute defined for view number " + i + ". Assuming 0.1");
                 near = 0.1;
             }
 
             var far = this.reader.getFloat(view, 'far');
-            if (far == null){
+            if (far == null) {
                 this.onXMLMinorError("no far attribute defined for view number " + i + ". Assuming 999");
                 far = 999;
             }
@@ -286,21 +286,21 @@ export class MySceneGraph {
             var from = vec3.create();
             var to = vec3.create();
             var up = vec3.create();
-            for (var j = 0; j < viewsGrandchildren.length; j++){
+            for (var j = 0; j < viewsGrandchildren.length; j++) {
                 var coords = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
                 // parseCoordinates3D returns a string on error, not an array
-                if(!Array.isArray(coords)){
-                    if(view.nodeName === "ortho" && viewsGrandchildren[j].nodeName === "up"){
+                if (!Array.isArray(coords)) {
+                    if (view.nodeName === "ortho" && viewsGrandchildren[j].nodeName === "up") {
                         this.onXMLMinorError("Ortho camera <up> tag is malformed. Assuming the default value of [0,1,0].")
-                        coords = [0,1,0];
+                        coords = [0, 1, 0];
                     }
-                    else{
+                    else {
                         malformedView = true;
                         this.onXMLMinorError("Error fetching the coordinates for the camera's " + viewsGrandchildren[j].nodeName + " tag. Ignoring camera.")
                     }
                 }
-                
-                switch (viewsGrandchildren[j].nodeName){
+
+                switch (viewsGrandchildren[j].nodeName) {
                     case "from":
                         from = vec3.fromValues(coords[0], coords[1], coords[2])
                         break;
@@ -316,50 +316,50 @@ export class MySceneGraph {
                         break;
                 }
             }
-            
+
             // check if any parameter of the camera was malformed (except the <up> tag)
-            if(malformedView){
+            if (malformedView) {
                 this.onXMLMinorError("The view " + viewID + " is malformed. Ignoring camera.");
                 continue;
             }
-            
+
             var viewObj;
-            if(view.nodeName == "perspective"){
+            if (view.nodeName == "perspective") {
                 // Get attribute unique to perspective projection cameras
                 var angle = this.reader.getFloat(view, 'angle');
-                if (angle == null){
+                if (angle == null) {
                     this.onXMLMinorError("no angle attribute defined for view number " + i + ". Assuming the value of 45º");
                     angle = 45;
                 }
 
-                viewObj = new CGFcamera(angle*DEGREE_TO_RAD, near, far, from, to);
+                viewObj = new CGFcamera(angle * DEGREE_TO_RAD, near, far, from, to);
             }
-            else if (view.nodeName == "ortho"){
+            else if (view.nodeName == "ortho") {
                 // Get attributes unique to orthographic projection cameras
 
                 // check if the <up> ortho camera tag was omitted, and assume default values if so
-                if(vec3.length(up) === 0){
-                    up = vec3.fromValues(0,1,0);
-                    console.log("Ortho camera <up> tag was not specified. Assuming the default value of [0,1,0].")
+                if (vec3.length(up) === 0) {
+                    up = vec3.fromValues(0, 1, 0);
+                    this.onXMLMinorError("Ortho camera <up> tag was not specified. Assuming the default value of [0,1,0].")
                 }
 
                 var left = this.reader.getFloat(view, 'left');
-                if (left == null){
+                if (left == null) {
                     this.onXMLMinorError("no left attribute defined for view number " + i + ". Assuming the value of -5.");
                     left = -5;
                 }
                 var right = this.reader.getFloat(view, 'right');
-                if (right == null){
+                if (right == null) {
                     this.onXMLMinorError("no right attribute defined for view number " + i + ". Assuming the value of 5.");
                     right = 5;
                 }
                 var top = this.reader.getFloat(view, 'top');
-                if (top == null){
+                if (top == null) {
                     this.onXMLMinorError("no top attribute defined for view number " + i + ". Assuming the value of 5.");
                     top = 5;
                 }
                 var bottom = this.reader.getFloat(view, 'bottom');
-                if (bottom == null){
+                if (bottom == null) {
                     this.onXMLMinorError("no bottom attribute defined for view number " + i + ". Assuming the value of -5");
                     bottom = -5;
                 }
@@ -370,7 +370,7 @@ export class MySceneGraph {
             viewIDs.push(viewID);
             this.views[viewID] = viewObj;
         }
-        if(this.views[this.defaultViewID] == null)
+        if (this.views[this.defaultViewID] == null)
             return "Default view " + this.defaultViewID + " is undefined.";
 
         this.scene.viewIDs = viewIDs;
@@ -548,18 +548,18 @@ export class MySceneGraph {
      * Checks if the file exists. 
      * @param {string} path path to the file
      */
-     fileExists(path){
+    fileExists(path) {
         let xmlhttp;
         if (window.XMLHttpRequest) {
-			xmlhttp = new XMLHttpRequest();                            // For all modern browsers
-		}
-		else if (window.ActiveXObject) {
-			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");   		// For (older) IE
-		}
+            xmlhttp = new XMLHttpRequest();                            // For all modern browsers
+        }
+        else if (window.ActiveXObject) {
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");   		// For (older) IE
+        }
 
         xmlhttp.open('HEAD', path, false);
         xmlhttp.send();
-        return xmlhttp.status!=404;
+        return xmlhttp.status != 404;
     }
 
     /**
@@ -574,12 +574,19 @@ export class MySceneGraph {
         for (var i = 0; i < texturesChildren.length; i++) {
             var textureID = this.reader.getString(texturesChildren[i], 'id');
             var textureFile = this.reader.getString(texturesChildren[i], 'file');
+
             // Checks if texture is null
             if (textureID == null){
                 this.onXMLMinorError("No ID defined for texture number " + i + ". The texture will be ignored.");
                 continue;
             }
-            
+
+            // Checks if texture ID is a reserved keyword
+            if (textureID == "inherit" || textureID == "none"){
+                this.onXMLMinorError("Invalid ID for texture number " + i + ": texture IDs cannot be \"inherit\" or \"none\". The texture will be ignored.");
+                continue;
+            }
+
             // Checks for repeated IDs.
             if (this.textures[textureID] != null){
                 this.onXMLMinorError("ID must be unique for each texture (conflict: ID = " + textureID + "). The duplicate will be ignored.");
@@ -596,7 +603,7 @@ export class MySceneGraph {
                 this.onXMLMinorError("file " + textureFile + " of texture number " + i + " does not exist. This texture will be ignored");
                 continue;
             }
-            
+
             var texture = new CGFtexture(this.scene, textureFile);
             this.textures[textureID] = texture;
         }
@@ -630,6 +637,10 @@ export class MySceneGraph {
                 continue;
             }
 
+            // Checks if texture ID is a reserved keyword
+            if (materialID == "inherit")
+                return "Invalid ID for material number " + i + ": material IDs cannot be \"inherit\"";
+
             // Checks for repeated IDs.
             if (this.materials[materialID] != null){
                 this.onXMLMinorError("ID must be unique for each material (conflict: ID = " + materialID + "). The duplicate will be ignored.");
@@ -645,6 +656,7 @@ export class MySceneGraph {
             var grandChildren = children[i].children;
 
             var material = new CGFappearance(this.scene);
+            material.setTextureWrap("REPEAT", "REPEAT");
 
             // emission, ambient, diffuse, specular
             for (var j = 0; j < grandChildren.length; j++) {
@@ -670,7 +682,7 @@ export class MySceneGraph {
             material.setShininess(shininess)
             this.materials[materialID] = material;
         }
-        
+
         this.log("Parsed materials");
         return null;
     }
@@ -1146,14 +1158,14 @@ export class MySceneGraph {
             // We will, however, assume simple transformations (translation of [0,0,0], scaling of [1,1,1], etc...), should the transformations tag of the component contain explicit transformations which are malformed
             // Additionally, we will ignore malformed tags in material, texture and component refs, and render the objects without these.
             var indices = {
-                transformationIndex : nodeNames.indexOf("transformation"),
-                materialsIndex : nodeNames.indexOf("materials"),
-                textureIndex : nodeNames.indexOf("texture"),
-                childrenIndex : nodeNames.indexOf("children")
+                transformationIndex: nodeNames.indexOf("transformation"),
+                materialsIndex: nodeNames.indexOf("materials"),
+                textureIndex: nodeNames.indexOf("texture"),
+                childrenIndex: nodeNames.indexOf("children")
             }
-            
+
             // check if the component object has one of each required tags defined
-            for(const index in indices){
+            for (const index in indices) {
                 // indexOf returns -1 if the object of the searchis not present
                 if(indices[index] == -1){
                     return "Component " + componentID + " has no " + index.slice(0, index.length - 5) + ". Ignoring this component.";
@@ -1167,7 +1179,7 @@ export class MySceneGraph {
             var transfMatrix = mat4.create();
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var operation = grandGrandChildren[j];
-                if(operation.nodeName === "transformationref"){
+                if (operation.nodeName === "transformationref") {
                     // Get id of the transformation.
                     var transformationRef = this.reader.getString(operation, 'id');
                     if (transformationRef == null){
@@ -1179,16 +1191,20 @@ export class MySceneGraph {
                     if (this.transformations[transformationRef] == null){
                         return operation.nodeName + " id in component " + componentId + " must refer to an already defined " + operation.nodeName + ".";
                     }
+                    // if (this.transformations[transformationRef] == null) {
+                    //     this.onXMLMinorError("transformationRef id in component " + componentId + " must be an existing transformation ID");
+                    //     continue;
+                    // }
 
                     transfMatrix = this.transformations[transformationRef]
-                    
+
                     // If there is a transformationref, there can't be any other transformations
-                    if (grandGrandChildren.length != 1){
+                    if (grandGrandChildren.length != 1) {
                         this.onXMLMinorError("There can only be one transformationref for transformations in component " + componentID + ". All other transformations in this component were ignored.");
                         break;
                     }
                 }
-                else if (operation.nodeName === "translate"){
+                else if (operation.nodeName === "translate") {
                     var coordinates;
                     coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
                     if (!Array.isArray(coordinates)){
@@ -1197,7 +1213,7 @@ export class MySceneGraph {
                     }
                     mat4.translate(transfMatrix, transfMatrix, coordinates);
                 }
-                else if (operation.nodeName === "scale"){
+                else if (operation.nodeName === "scale") {
                     var coordinates;
                     coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
                     if (!Array.isArray(coordinates)){
@@ -1221,8 +1237,8 @@ export class MySceneGraph {
                         }
                         mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
                 }
-                else{
-                        this.onXMLMinorError("Operation " + operation.nodeName + " on transformation declaration for component " + componentID + " is invalid.");
+                else {
+                    this.onXMLMinorError("Operation " + operation.nodeName + " on transformation declaration for component " + componentID + " is invalid.");
                 }
             }
             component.transformation = transfMatrix;
@@ -1298,6 +1314,7 @@ export class MySceneGraph {
             this.components[componentID] = component;
         }
 
+        // Check that all component references are valid IDs
         for (const componentID in this.components) {
             var childRefs = this.components[componentID].children.componentRefs;
             var validComponentRefs = [];
@@ -1310,10 +1327,11 @@ export class MySceneGraph {
             this.components[componentID].children.componentRefs = validComponentRefs;
         }
 
-        if(this.components[this.idRoot] == null){
+        // Check that the root component was defined
+        if (this.components[this.idRoot] == null) {
             return "The root component " + this.idRoot + " is undefined";
         }
-        
+        this.log("Parsed components");
     }
 
 
@@ -1427,6 +1445,12 @@ export class MySceneGraph {
         console.log("   " + message);
     }
 
+    /**
+     * Draw a component, recursively drawing its children.
+     * @param currentNode the current node to draw
+     * @param prevAppearenceId the material ID for the parent node
+     * @param prevTexture the texture for the parent node
+     */
     drawComponent(currentNode, prevAppearenceId, prevTexture) {
         // multiply the current scene transformation matrix by the current component matrix
         // access primitives via id
@@ -1447,11 +1471,10 @@ export class MySceneGraph {
 
         if (texture.id !== "none")
             currentAppearence.setTexture(this.textures[texture.id]);
+        else
+            currentAppearence.setTexture(null);
 
         currentAppearence.apply();
-
-        // console.log(texture.id)
-        // console.log(currentAppearence)
 
         for (var i = 0; i < currentNode.children.primitiveRefs.length; i++) {
             // display the primitive with the transformations already applied
