@@ -729,7 +729,7 @@ export class MySceneGraph {
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
                         if (!Array.isArray(coordinates)){
-                            console.log(coordinates + " Assuming translation of [0,0,0]");
+                            this.onXMLMinorError(coordinates + " Assuming translation of [0,0,0]");
                             coordinates = vec3.create();
                         }
                         mat4.translate(transfMatrix, transfMatrix, coordinates);
@@ -738,7 +738,7 @@ export class MySceneGraph {
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
                         if (!Array.isArray(coordinates)){
-                            console.log(coordinates + " Assuming scaling of [1,1,1].");
+                            this.onXMLMinorError(coordinates + " Assuming scaling of [1,1,1].");
                             coordinates = vec3.fromValues(1,1,1);
                         }
                         mat4.scale(transfMatrix, transfMatrix, coordinates);
@@ -1176,6 +1176,7 @@ export class MySceneGraph {
 
             // Transformations
             grandGrandChildren = grandChildren[indices.transformationIndex].children
+            
             var transfMatrix = mat4.create();
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var operation = grandGrandChildren[j];
@@ -1278,14 +1279,17 @@ export class MySceneGraph {
                     return "Texture " + textureID + " used by " + componentID + " is not defined.";
                 }
                 
-                var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], 'length_s');
+                var param = 'length_s';
+                var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], param);
                 if (length_s == null) {
-                    this.onXMLMinorError("Missing length_s for texture " + textureID + " in component " + componentID + ". Assuming 1.");
+                    this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
                     length_s = 1
                 }
-                var length_t = this.reader.getFloat(grandChildren[indices.textureIndex], 'length_t');
+
+                var param = 'length_t';
+                var length_t = this.reader.getFloat(grandChildren[indices.textureIndex], param);
                 if (length_t == null) {
-                    this.onXMLMinorError("Missing length_t for texture " + textureID + " in component " + componentID + ". Assuming 1.");
+                    this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
                     length_t = 1
                 }
                 component.texture.length_s = length_s;
