@@ -461,7 +461,7 @@ export class MySceneGraph {
             if (!(aux != null && !isNaN(aux) && (aux == true || aux == false)))
                 this.onXMLMinorError("unable to parse value component of the 'enable light' field for ID = " + lightId + "; assuming 'value = 1'");
 
-            enableLight = aux || 1;
+            enableLight = aux;
 
             //Add enabled boolean and type name to light info
             global.push(enableLight);
@@ -1277,12 +1277,6 @@ export class MySceneGraph {
         // restore the last preserved scene matrix
         this.scene.popMatrix()
 
-        //To do: Create display loop for transversing the scene graph
-
-        //To test the parsing/creation of the primitives, call the display function directly
-
-        // for (const primitiveID in this.primitives) {
-        //     this.primitives[primitiveID].display()
-        // }
+        // this.scene.interface.handleInput();
     }
 }

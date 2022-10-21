@@ -52,11 +52,20 @@ export class MyInterface extends CGFinterface {
     initLights(){
         let lightIndex = 0;
         this.lights = this.gui.addFolder('Lights');
+        this.lightsVisibility = this.gui.addFolder('Light Visibility');
+
         for (const lightName in this.scene.graph.lights){
             let light = this.scene.lights[lightIndex];
+
             this.lights.add(light, 'enabled').name(lightName).onChange(
                 () => {
-                    light.update()
+                    light.update();
+                }
+            )
+            
+            this.lightsVisibility.add(light, 'visible').name(lightName).onChange(
+                () => {
+                    light.update();
                 }
             )
             lightIndex++;
@@ -65,13 +74,20 @@ export class MyInterface extends CGFinterface {
 
     processKeyDown(event) {
         this.activeKeys[event.code]=true;
+        this.handleKeyDown(event.code);
     };
 
     processKeyUp(event) {
         this.activeKeys[event.code]=false;
     };
 
-    isKeyPressed(keyCode) {
+    isKeyHeld(keyCode) {
         return this.activeKeys[keyCode] || false;
+    }
+
+    handleKeyDown(keyCode){
+        if(keyCode === "KeyM"){
+            this.scene.graph.currentMaterial++;
+        }
     }
 }
