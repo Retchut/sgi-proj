@@ -39,6 +39,10 @@ export class MyInterface extends CGFinterface {
         this.activeKeys={};
     }
 
+    // initCameras(camera){
+    //     this.setActiveCamera(camera)
+    // }
+
     processKeyDown(event) {
         this.activeKeys[event.code]=true;
     };

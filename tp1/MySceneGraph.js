@@ -142,6 +142,7 @@ export class MySceneGraph {
             if ((error = this.parseLights(nodes[index])) != null)
                 return error;
         }
+
         // <textures>
         if ((index = nodeNames.indexOf("textures")) == -1)
             return "tag <textures> missing";
@@ -236,22 +237,26 @@ export class MySceneGraph {
     parseView(viewsNode) {
         this.views = [];
 
+        var defaultViewID = this.reader.getString(viewsNode, 'default');
+        if(defaultViewID == null)
+            return "Missing 'default' attribute on <views> tag";
+
+        this.defaultViewID = defaultViewID;
         var viewsChildren = viewsNode.children;
-        this.defaultViewID = this.reader.getString(viewsNode, 'default');
-        if(this.defaultViewID == null)
-            return "Default view must be defined";
+        if(viewsChildren.length === 0)
+            return "No views declared in <views>";
 
         for(var i = 0; i < viewsChildren.length; i++){
             var view = viewsChildren[i]
             
             if(view.nodeName != "perspective" && view.nodeName != "ortho"){
-                this.onXMLMinorError("unknown perspective tag <" + view.nodeName + "> on view number " + i);
+                this.onXMLMinorError("unknown perspective tag <" + view.nodeName + "> on view number " + i + ". The camera was ignored.");
                 continue;
             }
 
             var viewID = this.reader.getString(view, 'id');
             if (viewID == null){
-                this.onXMLMinorError("no ID defined for view number " + i);
+                this.onXMLMinorError("no ID defined for view number " + i + "The camera was ignored");
                 continue;
             }
             
@@ -259,94 +264,111 @@ export class MySceneGraph {
             if (this.views[viewID] != null)
                 return "ID must be unique for each view (conflict: ID = " + viewID + ")";
             
-            var near = this.reader.getString(view, 'near');
+            var near = this.reader.getFloat(view, 'near');
             if (near == null){
-                this.onXMLMinorError("no near attribute defined for view number " + i);
-                continue;
+                this.onXMLMinorError("no near attribute defined for view number " + i + ". Assuming 0.1");
+                near = 0.1;
             }
 
-            var far = this.reader.getString(view, 'far');
+            var far = this.reader.getFloat(view, 'far');
             if (far == null){
-                this.onXMLMinorError("no far attribute defined for view number " + i);
-                continue;
+                this.onXMLMinorError("no far attribute defined for view number " + i + ". Assuming 999");
+                far = 999;
             }
 
             var viewsGrandchildren = viewsChildren[i].children;
-            var from = [];
-            var to = [];
-            var up = [];
+            var malformedView = false;
+            var from = vec3.create();
+            var to = vec3.create();
+            var up = vec3.create();
             for (var j = 0; j < viewsGrandchildren.length; j++){
-                var coords = [];
+                var coords = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
+                // parseCoordinates3D returns a string on error, not an array
+                if(!Array.isArray(coords)){
+                    if(view.nodeName === "ortho" && viewsGrandchildren[j].nodeName === "up"){
+                        this.onXMLMinorError("Ortho camera <up> tag is malformed. Assuming the default value of [0,1,0].")
+                        coords = [0,1,0];
+                    }
+                    else{
+                        malformedView = true;
+                        this.onXMLMinorError("Error fetching the coordinates for the camera's " + viewsGrandchildren[j].nodeName + " tag. Ignoring camera.")
+                    }
+                }
+                
                 switch (viewsGrandchildren[j].nodeName){
                     case "from":
-                        from = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
-                        if(typeof(from) != Array){
-                            continue;
-                        }
-                        from = vec3.fromValues(from[0], from[1], from[2])
+                        from = vec3.fromValues(coords[0], coords[1], coords[2])
                         break;
                     case "to":
-                        to = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
-                        if(typeof(to) != Array){
-                            continue;
-                        }
-                        to = vec3.fromValues(to[0], to[1], to[2])
+                        to = vec3.fromValues(coords[0], coords[1], coords[2])
                         break;
                     case "up":
-                        up = this.parseCoordinates3D(viewsGrandchildren[j], "view <" + viewsGrandchildren[j].nodeName + "> tag, for view with ID " + viewID);
-                        // error was returned if not defined
-                        // default value is 0,1,0
-                        if(typeof(up) != Array){
-                            up = vec3.fromValues(0,1,0);
-                        }
+                        up = vec3.fromValues(coords[0], coords[1], coords[2])
                         break;
                     default:
                         this.onXMLMinorError("unknown tag <" + viewsGrandchildren[j].nodeName + ">");
-                        continue;
+                        malformedView = true;
+                        break;
                 }
+            }
+            
+            // check if any parameter of the camera was malformed (except the <up> tag)
+            if(malformedView){
+                this.onXMLMinorError("The view " + viewID + " is malformed. Ignoring camera.");
+                continue;
             }
             
             var viewObj;
             if(view.nodeName == "perspective"){
                 // Get attribute unique to perspective projection cameras
-                var angle = this.reader.getString(view, 'angle');
+                var angle = this.reader.getFloat(view, 'angle');
                 if (angle == null){
-                    this.onXMLMinorError("no angle attribute defined for view number " + i);
-                    continue;
+                    this.onXMLMinorError("no angle attribute defined for view number " + i + ". Assuming the value of 45º");
+                    angle = 45;
                 }
 
                 viewObj = new CGFcamera(angle*DEGREE_TO_RAD, near, far, from, to);
             }
             else if (view.nodeName == "ortho"){
                 // Get attributes unique to orthographic projection cameras
-                var left = this.reader.getString(view, 'left');
-                if (left == null){
-                    this.onXMLMinorError("no left attribute defined for view number " + i);
-                    continue;
-                }
-                var right = this.reader.getString(view, 'right');
-                if (right == null){
-                    this.onXMLMinorError("no right attribute defined for view number " + i);
-                    continue;
-                }
-                var top = this.reader.getString(view, 'top');
-                if (top == null){
-                    this.onXMLMinorError("no top attribute defined for view number " + i);
-                    continue;
-                }
-                var bottom = this.reader.getString(view, 'bottom');
-                if (bottom == null){
-                    this.onXMLMinorError("no bottom attribute defined for view number " + i);
-                    continue;
+
+                // check if the <up> ortho camera tag was omitted, and assume default values if so
+                if(vec3.length(up) === 0){
+                    up = vec3.fromValues(0,1,0);
+                    console.log("Ortho camera <up> tag was not specified. Assuming the default value of [0,1,0].")
                 }
 
-                viewObj = new CGFcameraOrtho(left, right, bottom, top, near, far, from, to, up)
+                var left = this.reader.getFloat(view, 'left');
+                if (left == null){
+                    this.onXMLMinorError("no left attribute defined for view number " + i + ". Assuming the value of -5.");
+                    left = -5;
+                }
+                var right = this.reader.getFloat(view, 'right');
+                if (right == null){
+                    this.onXMLMinorError("no right attribute defined for view number " + i + ". Assuming the value of 5.");
+                    right = 5;
+                }
+                var top = this.reader.getFloat(view, 'top');
+                if (top == null){
+                    this.onXMLMinorError("no top attribute defined for view number " + i + ". Assuming the value of 5.");
+                    top = 5;
+                }
+                var bottom = this.reader.getFloat(view, 'bottom');
+                if (bottom == null){
+                    this.onXMLMinorError("no bottom attribute defined for view number " + i + ". Assuming the value of -5");
+                    bottom = -5;
+                }
+
+                viewObj = new CGFcameraOrtho(left, right, bottom, top, near, far, from, to, up);
             }
 
             this.views[viewID] = viewObj;
         }
         if(this.views[this.defaultViewID] == null)
-            return "Default view must be defined";
+            return "Default view " + this.defaultViewID + " is undefined.";
+
+        this.scene.currentViewID = this.defaultViewID
+        // this.scene.defaultCamera = this.views[this.defaultViewID];
 
         return null;
     }
