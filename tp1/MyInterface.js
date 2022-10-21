@@ -52,11 +52,20 @@ export class MyInterface extends CGFinterface {
     initLights(){
         let lightIndex = 0;
         this.lights = this.gui.addFolder('Lights');
+        this.lightsVisibility = this.gui.addFolder('Light Visibility');
+
         for (const lightName in this.scene.graph.lights){
             let light = this.scene.lights[lightIndex];
+
             this.lights.add(light, 'enabled').name(lightName).onChange(
                 () => {
-                    light.update()
+                    light.update();
+                }
+            )
+            
+            this.lightsVisibility.add(light, 'visible').name(lightName).onChange(
+                () => {
+                    light.update();;
                 }
             )
             lightIndex++;
