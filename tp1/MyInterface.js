@@ -45,7 +45,7 @@ export class MyInterface extends CGFinterface {
         this.cameras.add(this.scene, 'currentViewID', this.scene.viewIDs).name('Views').onChange(
             () => {
                 this.scene.camera = this.scene.graph.views[this.scene.currentViewID];
-                this.setActiveCamera(this.scenee.camera);
+                this.setActiveCamera(this.scene.camera);
             }
         )
     }
