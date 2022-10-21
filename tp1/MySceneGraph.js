@@ -370,7 +370,7 @@ export class MySceneGraph {
         }
         if(this.views[this.defaultViewID] == null)
             return "Default view " + this.defaultViewID + " is undefined.";
-
+            raquel
 
         this.scene.viewIDs = viewIDs;
         this.scene.currentViewID = this.defaultViewID;
@@ -448,8 +448,10 @@ export class MySceneGraph {
 
             // Get id of the current light.
             var lightId = this.reader.getString(children[i], 'id');
-            if (lightId == null)
-                return "no ID defined for light";
+            if (lightId == null){
+                this.onXMLMinorError("no ID defined for light number " + i + ". The light was ignored.");
+                continue;
+            }
 
             // Checks for repeated IDs.
             if (this.lights[lightId] != null)
@@ -496,12 +498,16 @@ export class MySceneGraph {
             // Gets the additional attributes of the spot light
             if (children[i].nodeName == "spot") {
                 var angle = this.reader.getFloat(children[i], 'angle');
-                if (!(angle != null && !isNaN(angle)))
-                    return "unable to parse angle of the light for ID = " + lightId;
+                if (!(angle != null && !isNaN(angle))){
+                    this.onXMLMinorError("unable to parse angle of the light for ID = " + lightId + ". Assuming 45º.");
+                    angle = 45;
+                }
 
                 var exponent = this.reader.getFloat(children[i], 'exponent');
-                if (!(exponent != null && !isNaN(exponent)))
-                    return "unable to parse exponent of the light for ID = " + lightId;
+                if (!(exponent != null && !isNaN(exponent))){
+                    this.onXMLMinorError("unable to parse exponent of the light for ID = " + lightId + ". Assuming 1.");
+                    exponent = 1;
+                }
 
                 var targetIndex = nodeNames.indexOf("target");
 
@@ -1046,12 +1052,12 @@ export class MySceneGraph {
                     return "Texture " + textureID + " of " + componentID + " not defined.";
                 var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], 'length_s');
                 if (length_s == null) {
-                    this.onXMLMinorError("Missing length_s for texture " + textureID + " in component " + componentID);
+                    this.onXMLMinorError("Missing length_s for texture " + textureID + " in component " + componentID + ". Assuming 1.");
                     length_s = 1
                 }
                 var length_t = this.reader.getFloat(grandChildren[indices.textureIndex], 'length_t');
                 if (length_t == null) {
-                    this.onXMLMinorError("Missing length_t for texture " + textureID + " in component " + componentID);
+                    this.onXMLMinorError("Missing length_t for texture " + textureID + " in component " + componentID + ". Assuming 1.");
                     length_t = 1
                 }
                 component.texture.length_s = length_s;
