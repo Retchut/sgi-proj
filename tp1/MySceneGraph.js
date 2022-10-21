@@ -71,6 +71,7 @@ export class MySceneGraph {
 
         // As the graph loaded ok, signal the scene so that any additional initialization depending on the graph can take place
         this.scene.onGraphLoaded();
+        this.scene.interface.initCameras();
     }
 
     /**
@@ -236,6 +237,7 @@ export class MySceneGraph {
      */
     parseView(viewsNode) {
         this.views = [];
+        var viewIDs = [];
 
         var defaultViewID = this.reader.getString(viewsNode, 'default');
         if(defaultViewID == null)
@@ -362,12 +364,15 @@ export class MySceneGraph {
                 viewObj = new CGFcameraOrtho(left, right, bottom, top, near, far, from, to, up);
             }
 
+            viewIDs.push(viewID);
             this.views[viewID] = viewObj;
         }
         if(this.views[this.defaultViewID] == null)
             return "Default view " + this.defaultViewID + " is undefined.";
 
-        this.scene.currentViewID = this.defaultViewID
+
+        this.scene.viewIDs = viewIDs;
+        this.scene.currentViewID = this.defaultViewID;
         // this.scene.defaultCamera = this.views[this.defaultViewID];
 
         return null;

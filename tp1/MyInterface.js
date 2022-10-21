@@ -39,9 +39,16 @@ export class MyInterface extends CGFinterface {
         this.activeKeys={};
     }
 
-    // initCameras(camera){
-    //     this.setActiveCamera(camera)
-    // }
+    initCameras(){
+        // this.setActiveCamera(camera)
+        this.cameras = this.gui.addFolder('Cameras');
+        this.cameras.add(this.scene, 'currentViewID', this.scene.viewIDs).name('Views').onChange(
+            () => {
+                this.scene.camera = this.scene.graph.views[this.scene.currentViewID];
+                this.setActiveCamera(this.scenee.camera);
+            }
+        )
+    }
 
     processKeyDown(event) {
         this.activeKeys[event.code]=true;
