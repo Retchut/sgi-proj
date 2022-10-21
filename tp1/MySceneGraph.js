@@ -1278,14 +1278,17 @@ export class MySceneGraph {
                     return "Texture " + textureID + " used by " + componentID + " is not defined.";
                 }
                 
-                var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], 'length_s');
+                var param = 'length_s';
+                var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], param);
                 if (length_s == null) {
-                    this.onXMLMinorError("Missing length_s for texture " + textureID + " in component " + componentID + ". Assuming 1.");
+                    this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
                     length_s = 1
                 }
-                var length_t = this.reader.getFloat(grandChildren[indices.textureIndex], 'length_t');
+
+                var param = 'length_t';
+                var length_t = this.reader.getFloat(grandChildren[indices.textureIndex], param);
                 if (length_t == null) {
-                    this.onXMLMinorError("Missing length_t for texture " + textureID + " in component " + componentID + ". Assuming 1.");
+                    this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
                     length_t = 1
                 }
                 component.texture.length_s = length_s;
