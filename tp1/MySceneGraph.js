@@ -619,24 +619,28 @@ export class MySceneGraph {
         for (var i = 0; i < children.length; i++) {
 
             if (children[i].nodeName != "material") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">");
+                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
                 continue;
             }
 
             // Get id of the current material.
             var materialID = this.reader.getString(children[i], 'id');
-            if (materialID == null)
-                return "no ID defined for material number" + i;
-
-            var shininess = this.reader.getFloat(children[i], 'shininess');
-            if (shininess == null){
-                this.onXMLMinorError("no shininess defined for material number" + i + ". Assuming shininess of 1.");
-                shininess = 1;
+            if (materialID == null){
+                this.onXMLMinorError("no ID defined for material number" + i + ". The material will be ignored.");
+                continue;
             }
 
             // Checks for repeated IDs.
-            if (this.materials[materialID] != null)
-                return "ID must be unique for each material (conflict: ID = " + materialID + ")";
+            if (this.materials[materialID] != null){
+                this.onXMLMinorError("ID must be unique for each material (conflict: ID = " + materialID + "). The duplicate will be ignored");
+                continue;
+            }
+
+            var shininess = this.reader.getFloat(children[i], 'shininess');
+            if (shininess == null){
+                this.onXMLMinorError("no shininess defined for material " + materialID + ". Assuming shininess of 1.");
+                shininess = 1;
+            }
 
             var grandChildren = children[i].children;
 
