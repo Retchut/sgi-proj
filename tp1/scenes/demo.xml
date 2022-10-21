@@ -47,6 +47,7 @@
     <textures>
         <texture id="saturn" file="scenes/images/saturn.png" />
         <texture id="flag" file="scenes/images/flag.jpg" />
+        <texture id="sun" file="scenes/images/sun.png" />
         <texture id="cubemapFront" file="scenes/images/cubemap/front.png"/>
         <texture id="cubemapBack" file="scenes/images/cubemap/back.png" />
         <texture id="cubemapRight" file="scenes/images/cubemap/right.png" />
@@ -87,10 +88,16 @@
             <specular r="0.8" g="0.8" b="0.8" a="1.0" />
         </material>
         <material id="flagMaterial" shininess="3">
-            <emission r="0.3" g="0.3" b="0.3" a="1.0" />
+            <emission r="0.3" g="0.5" b="0.3" a="1.0" />
             <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
             <diffuse r="0.6" g="0.6" b="0.6" a="1.0" />
             <specular r="0.6" g="0.6" b="0.6" a="1.0" />
+        </material>
+        <material id="sunMaterial" shininess="1">
+            <emission r="1.0" g="1.0" b="1.0" a="1.0" />
+            <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
+            <specular r="0.0" g="0.0" b="0.0" a="1.0" />
         </material>
         <material id="cubemapMaterial" shininess="1">
             <emission r="1.0" g="1.0" b="1.0" a="1.0" />
@@ -146,7 +153,7 @@
                 <componentref id="planet2" />
                 <componentref id="planet3" />
                 <componentref id="planet4" />
-                <componentref id="planet5" />
+                <componentref id="sun" />
             </children>
         </component>
         <component id="planetRing">
@@ -275,15 +282,15 @@
                 <componentref id="poleTop" />
             </children>
         </component>
-        <component id="planet5">
+        <component id="sun">
             <transformation>
                 <rotate axis="x" angle="-90" />
                 <scale x="2" y="2" z="2" />
             </transformation>
             <materials>
-                <material id="planetYellowMaterial" />
+                <material id="sunMaterial" />
             </materials>
-            <texture id="none" />
+            <texture id="sun" />
             <children>
                 <componentref id="planet" />
                 <componentref id="flagPole" />
