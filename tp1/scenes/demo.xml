@@ -6,7 +6,7 @@
             <from x="30" y="15" z="30" />
             <to x="0" y="-2" z="0" />
         </perspective>
-        <ortho id="defaultCamera1" near="0.1" far="500" left="10" right="20" top="50" bottom="50" >
+        <ortho id="defaultCameraOrtho" near="0.1" far="500" left="-10" right="10" top="10" bottom="-10" >
             <from x="30" y="15" z="30" />
             <to x="0" y="-2" z="0" />
         </ortho>
