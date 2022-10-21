@@ -1189,7 +1189,7 @@ export class MySceneGraph {
 
                     // Checks that ID exists.
                     if (this.transformations[transformationRef] == null){
-                        return operation.nodeName + " id in component " + componentId + " must refer to an already defined " + operation.nodeName + ".";
+                        return operation.nodeName + " id in component " + componentID + " must refer to an already defined " + operation.nodeName + ".";
                     }
                     // if (this.transformations[transformationRef] == null) {
                     //     this.onXMLMinorError("transformationRef id in component " + componentId + " must be an existing transformation ID");
