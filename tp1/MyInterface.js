@@ -56,6 +56,7 @@ export class MyInterface extends CGFinterface {
 
         for (const lightName in this.scene.graph.lights){
             let light = this.scene.lights[lightIndex];
+            light.setVisible(false);
 
             this.lights.add(light, 'enabled').name(lightName).onChange(
                 () => {
