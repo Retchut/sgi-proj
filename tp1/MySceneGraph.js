@@ -259,7 +259,7 @@ export class MySceneGraph {
 
             var viewID = this.reader.getString(view, 'id');
             if (viewID == null){
-                this.onXMLMinorError("no ID defined for view number " + i + "The camera will be ignored");
+                this.onXMLMinorError("No ID defined for view number " + i + "The camera will be ignored");
                 continue;
             }
             
@@ -311,7 +311,7 @@ export class MySceneGraph {
                         up = vec3.fromValues(coords[0], coords[1], coords[2])
                         break;
                     default:
-                        this.onXMLMinorError("unknown tag <" + viewsGrandchildren[j].nodeName + ">");
+                        this.onXMLMinorError("Unknown tag <" + viewsGrandchildren[j].nodeName + ">");
                         malformedView = true;
                         break;
                 }
@@ -439,7 +439,7 @@ export class MySceneGraph {
 
             //Check type of light
             if (children[i].nodeName != "omni" && children[i].nodeName != "spot") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">");
+                this.onXMLMinorError("Unknown tag <" + children[i].nodeName + ">");
                 continue;
             }
             else {
@@ -450,7 +450,7 @@ export class MySceneGraph {
             // Get id of the current light.
             var lightId = this.reader.getString(children[i], 'id');
             if (lightId == null){
-                this.onXMLMinorError("no ID defined for light number " + i + ". This light will be ignored.");
+                this.onXMLMinorError("No ID defined for light number " + i + ". This light will be ignored.");
                 continue;
             }
 
@@ -576,7 +576,7 @@ export class MySceneGraph {
             var textureFile = this.reader.getString(texturesChildren[i], 'file');
             // Checks if texture is null
             if (textureID == null){
-                this.onXMLMinorError("no ID defined for texture number " + i + ". The texture will be ignored.");
+                this.onXMLMinorError("No ID defined for texture number " + i + ". The texture will be ignored.");
                 continue;
             }
             
@@ -588,7 +588,7 @@ export class MySceneGraph {
 
             // Checks if textureFile is null
             if (textureFile == null){
-                this.onXMLMinorError("no file defined for texture number " + i + ". This texture will be ignored");
+                this.onXMLMinorError("No file defined for texture number " + i + ". This texture will be ignored");
                 continue;
             }
 
@@ -619,14 +619,14 @@ export class MySceneGraph {
         for (var i = 0; i < children.length; i++) {
 
             if (children[i].nodeName != "material") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
+                this.onXMLMinorError("Unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
                 continue;
             }
 
             // Get id of the current material.
             var materialID = this.reader.getString(children[i], 'id');
             if (materialID == null){
-                this.onXMLMinorError("no ID defined for material number" + i + ". The material will be ignored.");
+                this.onXMLMinorError("No ID defined for material number" + i + ". The material will be ignored.");
                 continue;
             }
 
@@ -688,15 +688,14 @@ export class MySceneGraph {
         for (var i = 0; i < children.length; i++) {
 
             if (children[i].nodeName != "transformation") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
+                this.onXMLMinorError("Unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
                 continue;
             }
 
             // Get id of the current transformation.
             var transformationID = this.reader.getString(children[i], 'id');
-            if (transformationID == null)
-            if (materialID == null){
-                this.onXMLMinorError("no ID defined for transformation number " + i + ". The transformation will be ignored.");
+            if (transformationID == null){
+                this.onXMLMinorError("No ID defined for transformation number " + i + ". The transformation will be ignored.");
                 continue;
             }
 
@@ -773,14 +772,14 @@ export class MySceneGraph {
         for (var i = 0; i < children.length; i++) {
 
             if (children[i].nodeName != "primitive") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
+                this.onXMLMinorError("Unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
                 continue;
             }
 
             // Get id of the current primitive.
             var primitiveId = this.reader.getString(children[i], 'id');
             if (primitiveId == null){
-                this.onXMLMinorError("no ID defined for primitive number" + i + ". This primitive will be ignored.");
+                this.onXMLMinorError("No ID defined for primitive number" + i + ". This primitive will be ignored.");
                 continue;
             }
 
@@ -1118,28 +1117,34 @@ export class MySceneGraph {
         for (var i = 0; i < children.length; i++) {
 
             if (children[i].nodeName != "component") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">");
+                this.onXMLMinorError("Unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
                 continue;
             }
 
             // Get id of the current component.
             var componentID = this.reader.getString(children[i], 'id');
-            if (componentID == null)
-                return "no ID defined for componentID";
+            if (componentID == null){
+                this.onXMLMinorError("No ID defined for component number" + i + ". This component will be ignored.");
+                continue;
+            }
 
             // Checks for repeated IDs.
-            if (this.components[componentID] != null)
-                return "ID must be unique for each component (conflict: ID = " + componentID + ")";
+            if (this.components[componentID] != null){
+                this.onXMLMinorError("ID must be unique for each component (conflict: ID = " + componentID + "). The duplicate will be ignored.");
+                continue;
+            }
 
             grandChildren = children[i].children;
-
-            // set component id
 
             nodeNames = [];
             for (var j = 0; j < grandChildren.length; j++) {
                 nodeNames.push(grandChildren[j].nodeName);
             }
 
+            // References to other transformations, materials, textures and components
+            // We will throw a major error an return an error if we come across any broken references
+            // We will, however, assume simple transformations (translation of [0,0,0], scaling of [1,1,1], etc...), should the transformations tag of the component contain explicit transformations which are malformed
+            // Additionally, we will ignore malformed tags in material, texture and component refs, and render the objects without these.
             var indices = {
                 transformationIndex : nodeNames.indexOf("transformation"),
                 materialsIndex : nodeNames.indexOf("materials"),
@@ -1151,7 +1156,7 @@ export class MySceneGraph {
             for(const index in indices){
                 // indexOf returns -1 if the object of the searchis not present
                 if(indices[index] == -1){
-                    return "Component " + componentID + " has no " + index.slice(0, index.length - 5);
+                    return "Component " + componentID + " has no " + index.slice(0, index.length - 5) + ". Ignoring this component.";
                 }
             }
 
@@ -1166,14 +1171,13 @@ export class MySceneGraph {
                     // Get id of the transformation.
                     var transformationRef = this.reader.getString(operation, 'id');
                     if (transformationRef == null){
-                        this.onXMLMinorError("no ID defined for transformationRef in component " + componentID);
+                        this.onXMLMinorError("No ID defined for " + operation.nodeName + " in component " + componentID + ". The material will be ignored.");
                         continue;
                     }
 
                     // Checks that ID exists.
                     if (this.transformations[transformationRef] == null){
-                        this.onXMLMinorError("transformationRef id in component " + componentId + " must be an existing transformation ID");
-                        continue;
+                        return operation.nodeName + " id in component " + componentId + " must refer to an already defined " + operation.nodeName + ".";
                     }
 
                     transfMatrix = this.transformations[transformationRef]
@@ -1187,24 +1191,34 @@ export class MySceneGraph {
                 else if (operation.nodeName === "translate"){
                     var coordinates;
                     coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
-                    if (!Array.isArray(coordinates))
-                        return coordinates;
+                    if (!Array.isArray(coordinates)){
+                        this.onXMLMinorError(coordinates + " Assuming translation of [0,0,0]");
+                        coordinates = vec3.create();
+                    }
                     mat4.translate(transfMatrix, transfMatrix, coordinates);
                 }
                 else if (operation.nodeName === "scale"){
                     var coordinates;
                     coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
-                    if (!Array.isArray(coordinates))
-                        return coordinates;
+                    if (!Array.isArray(coordinates)){
+                        this.onXMLMinorError(coordinates + " Assuming scaling of [1,1,1].");
+                        coordinates = vec3.fromValues(1,1,1);
+                    }
                     mat4.scale(transfMatrix, transfMatrix, coordinates);
                 }
                 else if (operation.nodeName === "rotate"){
                         var axisProp = this.reader.getString(operation, 'axis');
-                        if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
-                            this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + componentID + " is invalid.");
-                        }
                         var axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
                         var angle = this.reader.getFloat(operation, 'angle');
+                        if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
+                            this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid. Assuming rotation of 0 around the x axis.");
+                            angle = 0.0;
+                        }
+                        if(angle == null){
+                            this.onXMLMinorError("no angle property defined for the rotation operation number " + j + ". Assuming rotation of 0 around the x axis");
+                            axis = [1,0,0];
+                            angle = 0.0;
+                        }
                         mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
                 }
                 else{
@@ -1218,28 +1232,36 @@ export class MySceneGraph {
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var material = grandGrandChildren[j];
                 if (material.nodeName !== 'material') {
-                    this.onXMLMinorError("Material tag " + material.nodeName + " of " + componentID + " is not valid.");
+                    this.onXMLMinorError("Unknown tag <" + material.nodeName + "> of " + componentID + " is not valid. Ignoring this tag.");
                     continue;
                 }
+
                 var materialID = this.reader.getString(material, 'id');
                 if (materialID == null) {
-                    this.onXMLMinorError("no ID defined for material in component " + componentID);
+                    this.onXMLMinorError("No ID defined for material number" + i + " in component " + componentID + ". The material will be ignored.");
                     continue;
                 }
+
+                // Checks that ID exists.
                 if (materialID != "inherit" && this.materials[materialID] == null) {
-                    this.onXMLMinorError("Material ID " + materialID + " of " + componentID + " not defined.");
-                    continue;
+                    return "Material ID " + materialID + " of " + componentID + " not defined.";
                 }
+
                 component.materials.push(materialID);
             }
 
             // Texture
             var textureID = this.reader.getString(grandChildren[indices.textureIndex], 'id');
-            if (textureID == null)
-                return "Missing texture id for component " + component;
+            if (textureID == null){
+                this.onXMLMinorError("No ID defined for texture number " + i + " for component " + component + ". This texture will be ignored.");
+                continue;
+            }
+
             if (textureID != "none" && textureID != "inherit") {
-                if (this.textures[textureID] == null)
-                    return "Texture " + textureID + " of " + componentID + " not defined.";
+                if (this.textures[textureID] == null){
+                    return "Texture " + textureID + " used by " + componentID + " is not defined.";
+                }
+                
                 var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], 'length_s');
                 if (length_s == null) {
                     this.onXMLMinorError("Missing length_s for texture " + textureID + " in component " + componentID + ". Assuming 1.");
@@ -1269,7 +1291,7 @@ export class MySceneGraph {
                     component.children.componentRefs.push(componentId);
                 }
                 else {
-                    this.onXMLMinorError("unknown tag <" + grandGrandChildren[i].nodeName + ">");
+                    this.onXMLMinorError("Unknown tag <" + grandGrandChildren[i].nodeName + ">. Ignoring this tag.");
                 }
             }
 
@@ -1281,8 +1303,7 @@ export class MySceneGraph {
             var validComponentRefs = [];
             for (var i = 0; i < childRefs.length; i++) {
                 if (this.components[childRefs[i]] == null) {
-                    this.onXMLMinorError("Component " + childRefs[i] + " referenced by " + componentID + " is undefined.");
-                    continue;
+                    return "Component " + childRefs[i] + " referenced by " + componentID + " is undefined.";
                 }
                 validComponentRefs.push(childRefs[i]);
             }
