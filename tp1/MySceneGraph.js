@@ -265,7 +265,7 @@ export class MySceneGraph {
             
             // Checks for repeated IDs.
             if (this.views[viewID] != null){
-                this.onXMLMinorError("ID must be unique for each view (conflict: ID = " + viewID + "). The duplicate will be ignored");
+                this.onXMLMinorError("ID must be unique for each view (conflict: ID = " + viewID + "). The duplicate will be ignored.");
                 continue;
             }
             
@@ -456,7 +456,7 @@ export class MySceneGraph {
 
             // Checks for repeated IDs.
             if (this.lights[lightId] != null){
-                this.onXMLMinorError("ID must be unique for each light (conflict: ID = " + lightId + "). The duplicate will be ignored");
+                this.onXMLMinorError("ID must be unique for each light (conflict: ID = " + lightId + "). The duplicate will be ignored.");
                 continue;
             }
 
@@ -582,7 +582,7 @@ export class MySceneGraph {
             
             // Checks for repeated IDs.
             if (this.textures[textureID] != null){
-                this.onXMLMinorError("ID must be unique for each texture (conflict: ID = " + textureID + "). The duplicate will be ignored");
+                this.onXMLMinorError("ID must be unique for each texture (conflict: ID = " + textureID + "). The duplicate will be ignored.");
                 continue;
             }
 
@@ -632,7 +632,7 @@ export class MySceneGraph {
 
             // Checks for repeated IDs.
             if (this.materials[materialID] != null){
-                this.onXMLMinorError("ID must be unique for each material (conflict: ID = " + materialID + "). The duplicate will be ignored");
+                this.onXMLMinorError("ID must be unique for each material (conflict: ID = " + materialID + "). The duplicate will be ignored.");
                 continue;
             }
 
@@ -702,7 +702,7 @@ export class MySceneGraph {
 
             // Checks for repeated IDs.
             if (this.transformations[transformationID] != null){
-                this.onXMLMinorError("ID must be unique for each transformation (conflict: ID = " + transformationID + "). The duplicate will be ignored");
+                this.onXMLMinorError("ID must be unique for each transformation (conflict: ID = " + transformationID + "). The duplicate will be ignored.");
                 continue;
             }
 
@@ -773,18 +773,22 @@ export class MySceneGraph {
         for (var i = 0; i < children.length; i++) {
 
             if (children[i].nodeName != "primitive") {
-                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">");
+                this.onXMLMinorError("unknown tag <" + children[i].nodeName + ">. Ignoring this tag.");
                 continue;
             }
 
             // Get id of the current primitive.
             var primitiveId = this.reader.getString(children[i], 'id');
-            if (primitiveId == null)
-                return "no ID defined for primitive number " + i;
+            if (primitiveId == null){
+                this.onXMLMinorError("no ID defined for primitive number" + i + ". This primitive will be ignored.");
+                continue;
+            }
 
             // Checks for repeated IDs.
-            if (this.primitives[primitiveId] != null)
-                return "ID must be unique for each primitive (conflict: ID = " + primitiveId + ")";
+            if (this.primitives[primitiveId] != null){
+                this.onXMLMinorError("ID must be unique for each primitive (conflict: ID = " + primitiveId + "). The duplicate will be ignored.");
+                continue;
+            }
 
             grandChildren = children[i].children;
 
@@ -802,106 +806,227 @@ export class MySceneGraph {
             // Retrieves the primitive coordinates.
             if (primitiveType == 'rectangle') {
                 // x1
-                var x1 = this.reader.getFloat(grandChildren[0], 'x1');
-                if (!(x1 != null && !isNaN(x1)))
-                    return "unable to parse x1 of the primitive coordinates for ID = " + primitiveId;
+                var param = 'x1';
+                var x1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(x1 != null && !isNaN(x1))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // y1
-                var y1 = this.reader.getFloat(grandChildren[0], 'y1');
-                if (!(y1 != null && !isNaN(y1)))
-                    return "unable to parse y1 of the primitive coordinates for ID = " + primitiveId;
+                param = 'y1';
+                var y1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(y1 != null && !isNaN(y1))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // x2
-                var x2 = this.reader.getFloat(grandChildren[0], 'x2');
-                if (!(x2 != null && !isNaN(x2) && x2 > x1))
-                    return "unable to parse x2 of the primitive coordinates for ID = " + primitiveId;
+                param = 'x2';
+                var x2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(x2 != null && !isNaN(x2) && x2 > x1)){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // y2
-                var y2 = this.reader.getFloat(grandChildren[0], 'y2');
-                if (!(y2 != null && !isNaN(y2) && y2 > y1))
-                    return "unable to parse y2 of the primitive coordinates for ID = " + primitiveId;
+                param = 'y2';
+                var y2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(y2 != null && !isNaN(y2) && y2 > y1)){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 var rect = new MyRectangle(this.scene, primitiveId, x1, x2, y1, y2);
                 this.primitives[primitiveId] = rect;
             }
             else if (primitiveType == 'triangle') {
                 // x1
-                var x1 = this.reader.getFloat(grandChildren[0], 'x1');
-                if (!(x1 != null && !isNaN(x1)))
-                    return "unable to parse x1 of the primitive coordinates for ID = " + primitiveId;
+                var param = 'x1';
+                var x1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(x1 != null && !isNaN(x1))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // y1
-                var y1 = this.reader.getFloat(grandChildren[0], 'y1');
-                if (!(y1 != null && !isNaN(y1)))
-                    return "unable to parse y1 of the primitive coordinates for ID = " + primitiveId;
+                param = 'y1';
+                var y1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(y1 != null && !isNaN(y1))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // z1
-                var z1 = this.reader.getFloat(grandChildren[0], 'z1');
-                if (!(z1 != null && !isNaN(z1)))
-                    return "unable to parse z1 of the primitive coordinates for ID = " + primitiveId;
+                param = 'z1';
+                var z1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(z1 != null && !isNaN(z1))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // x2
-                var x2 = this.reader.getFloat(grandChildren[0], 'x2');
-                if (!(x2 != null && !isNaN(x2)))
-                    return "unable to parse x2 of the primitive coordinates for ID = " + primitiveId;
+                param = 'x2';
+                var x2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(x2 != null && !isNaN(x2))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
-                // y1
-                var y2 = this.reader.getFloat(grandChildren[0], 'y2');
-                if (!(y2 != null && !isNaN(y2)))
-                    return "unable to parse y2 of the primitive coordinates for ID = " + primitiveId;
+                // y2
+                param = 'y2';
+                var y2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(y2 != null && !isNaN(y2))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
-                // x1
-                var z2 = this.reader.getFloat(grandChildren[0], 'z2');
-                if (!(z2 != null && !isNaN(z2)))
-                    return "unable to parse z2 of the primitive coordinates for ID = " + primitiveId;
+                // z2
+                param = 'z2';
+                var z2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(z2 != null && !isNaN(z2))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // x3
-                var x3 = this.reader.getFloat(grandChildren[0], 'x3');
-                if (!(x3 != null && !isNaN(x3)))
-                    return "unable to parse x3 of the primitive coordinates for ID = " + primitiveId;
+                param = 'x3';
+                var x3 = this.reader.getFloat(grandChildren[0], param);
+                if (!(x3 != null && !isNaN(x3))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
-                // y1
-                var y3 = this.reader.getFloat(grandChildren[0], 'y3');
-                if (!(y3 != null && !isNaN(y3)))
-                    return "unable to parse y3 of the primitive coordinates for ID = " + primitiveId;
+                // y3
+                param = 'y3';
+                var y3 = this.reader.getFloat(grandChildren[0], param);
+                if (!(y3 != null && !isNaN(y3))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
-                // x1
-                var z3 = this.reader.getFloat(grandChildren[0], 'z3');
-                if (!(z3 != null && !isNaN(z3)))
-                    return "unable to parse z3 of the primitive coordinates for ID = " + primitiveId;
+                // z3
+                param = 'z3';
+                var z3 = this.reader.getFloat(grandChildren[0], param);
+                if (!(z3 != null && !isNaN(z3))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 var triangle = new MyTriangle(this.scene, primitiveId, x1, y1, z1, x2, y2, z2, x3, y3, z3);
                 this.primitives[primitiveId] = triangle;
             }
             else if (primitiveType == 'cylinder') {
-                var base = this.reader.getFloat(grandChildren[0], 'base');
-                var top = this.reader.getFloat(grandChildren[0], 'top');
-                var height = this.reader.getFloat(grandChildren[0], 'height');
+                var param = 'base';
+                var minVal = 0;
+                var reqType = 'float';
+                var base = this.reader.getFloat(grandChildren[0], param);
+                if(isNaN(base)){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(base < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
-                var slices = this.reader.getFloat(grandChildren[0], 'slices');
-                if (slices < 3 || isNaN(slices))
-                    return "Cylinder slices are invalid for cylinder with ID = " + primitiveId;
+                param = 'top';
+                minVal = 0;
+                reqType = 'float';
+                var top = this.reader.getFloat(grandChildren[0], param);
+                if(isNaN(top)){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(top < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
-                var stacks = this.reader.getFloat(grandChildren[0], 'stacks');
+                param = 'height';
+                minVal = 0;
+                reqType = 'integer';
+                var height = this.reader.getFloat(grandChildren[0], param);
+                if(isNaN(height)){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(height <= minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                param = 'slices';
+                minVal = 1;
+                reqType = 'integer';
+                var slices = this.reader.getInteger(grandChildren[0], param);
+                if (isNaN(slices)){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(slices < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                param = 'stacks';
+                minVal = 1;
+                reqType = 'integer';
+                var stacks = this.reader.getInteger(grandChildren[0], param);
+                if(isNaN(stacks)){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(stacks < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 var cylinder = new MyCylinder(this.scene, primitiveId, base, top, height, slices, stacks);
                 this.primitives[primitiveId] = cylinder;
             }
             else if (primitiveType == 'sphere') {
                 // radius
-                var radius = this.reader.getFloat(grandChildren[0], 'radius');
-                if (!(radius != null && !isNaN(radius)))
-                    return "unable to parse radius for ID = " + primitiveId;
+                var param = 'radius';
+                var minVal = 0;
+                var reqType = 'float';
+                var radius = this.reader.getFloat(grandChildren[0], param);
+                if (!(radius != null && !isNaN(radius))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(radius <= minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // slices
-                var slices = this.reader.getInteger(grandChildren[0], 'slices');
-                if (!(slices != null && !isNaN(slices)))
-                    return "unable to parse slices for ID = " + primitiveId;
+                param = 'slices';
+                minVal = 1;
+                reqType = 'integer';
+                var slices = this.reader.getInteger(grandChildren[0], param);
+                if (!(slices != null && !isNaN(slices))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(slices < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // stacks
-                var stacks = this.reader.getInteger(grandChildren[0], 'stacks');
-                if (!(stacks != null && !isNaN(stacks)))
-                    return "unable to parse stacks for ID = " + primitiveId;
+                param = 'stacks';
+                minVal = 1;
+                reqType = 'integer';
+                var stacks = this.reader.getInteger(grandChildren[0], param);
+                if (!(stacks != null && !isNaN(stacks))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(stacks < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 var sphere = new MySphere(this.scene, primitiveId, radius, slices, stacks);
 
@@ -909,24 +1034,60 @@ export class MySceneGraph {
             }
             else if (primitiveType == 'torus') {
                 // inner
-                var inner = this.reader.getFloat(grandChildren[0], 'inner');
-                if (!(inner != null && !isNaN(inner)))
-                    return "unable to parse inner radius for ID = " + primitiveId;
+                var param = 'inner';
+                var minVal = 0;
+                var reqType = 'float';
+                var inner = this.reader.getFloat(grandChildren[0], param);
+                if (!(inner != null && !isNaN(inner))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(inner < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // outer
-                var outer = this.reader.getFloat(grandChildren[0], 'outer');
-                if (!(outer != null && !isNaN(outer)))
-                    return "unable to parse outer radius for ID = " + primitiveId;
+                param = 'outer';
+                minVal = inner;
+                reqType = 'float';
+                var outer = this.reader.getFloat(grandChildren[0], param);
+                if (!(outer != null && !isNaN(outer))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(outer < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // slices
-                var slices = this.reader.getInteger(grandChildren[0], 'slices');
-                if (!(slices != null && !isNaN(slices)))
-                    return "unable to parse slices for ID = " + primitiveId;
+                param = 'slices';
+                minVal = 3;
+                reqType = 'integer';
+                var slices = this.reader.getInteger(grandChildren[0], param);
+                if (!(slices != null && !isNaN(slices))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(slices < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 // loops
-                var loops = this.reader.getInteger(grandChildren[0], 'loops');
-                if (!(loops != null && !isNaN(loops)))
-                    return "unable to parse stacks for ID = " + primitiveId;
+                param = 'loops';
+                minVal = 3;
+                reqType = 'integer';
+                var loops = this.reader.getInteger(grandChildren[0], param);
+                if (!(loops != null && !isNaN(loops))){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if(loops < minVal){
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
 
                 var torus = new MyTorus(this.scene, primitiveId, inner, outer, slices, loops);
                 this.primitives[primitiveId] = torus;
