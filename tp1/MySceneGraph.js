@@ -729,7 +729,7 @@ export class MySceneGraph {
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
                         if (!Array.isArray(coordinates)){
-                            console.log(coordinates + " Assuming translation of [0,0,0]");
+                            this.onXMLMinorError(coordinates + " Assuming translation of [0,0,0]");
                             coordinates = vec3.create();
                         }
                         mat4.translate(transfMatrix, transfMatrix, coordinates);
@@ -738,7 +738,7 @@ export class MySceneGraph {
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
                         if (!Array.isArray(coordinates)){
-                            console.log(coordinates + " Assuming scaling of [1,1,1].");
+                            this.onXMLMinorError(coordinates + " Assuming scaling of [1,1,1].");
                             coordinates = vec3.fromValues(1,1,1);
                         }
                         mat4.scale(transfMatrix, transfMatrix, coordinates);
@@ -1176,6 +1176,7 @@ export class MySceneGraph {
 
             // Transformations
             grandGrandChildren = grandChildren[indices.transformationIndex].children
+            
             var transfMatrix = mat4.create();
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var operation = grandGrandChildren[j];
