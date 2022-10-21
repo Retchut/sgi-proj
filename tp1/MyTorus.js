@@ -87,7 +87,6 @@ export class MyTorus extends CGFobject {
 	 * @param length_t - Texture scale factor for the t axis
 	 */
 	updateTexCoords(length_s, length_t) {
-		// this.texCoords = [];
-		this.updateTexCoordsGLBuffers();
+		return;
 	}
 }
