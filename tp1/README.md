@@ -15,7 +15,7 @@
 - The interface is very user friendly, allowing to change views, toggle lights, and show the lights' positions.
 - Scene
   - The demonstration scene consists of some planets from an alternative universe with different laws of physics. The sun in the middle has some objects on it.
-  - [General View of the Scene]()
+  - [General View of the Scene](scenes/screenshot1.png)
   - [Scene XML](scenes/demo.xml)
 ----
 ## Issues/Problems
