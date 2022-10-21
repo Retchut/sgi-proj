@@ -1255,13 +1255,5 @@ export class MySceneGraph {
 
         // restore the last preserved scene matrix
         this.scene.popMatrix()
-
-        //To do: Create display loop for transversing the scene graph
-
-        //To test the parsing/creation of the primitives, call the display function directly
-
-        // for (const primitiveID in this.primitives) {
-        //     this.primitives[primitiveID].display()
-        // }
     }
 }
