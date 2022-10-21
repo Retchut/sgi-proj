@@ -253,19 +253,21 @@ export class MySceneGraph {
             var view = viewsChildren[i]
             
             if(view.nodeName != "perspective" && view.nodeName != "ortho"){
-                this.onXMLMinorError("unknown perspective tag <" + view.nodeName + "> on view number " + i + ". The camera was ignored.");
+                this.onXMLMinorError("unknown perspective tag <" + view.nodeName + "> on view number " + i + ". The camera will be ignored.");
                 continue;
             }
 
             var viewID = this.reader.getString(view, 'id');
             if (viewID == null){
-                this.onXMLMinorError("no ID defined for view number " + i + "The camera was ignored");
+                this.onXMLMinorError("no ID defined for view number " + i + "The camera will be ignored");
                 continue;
             }
             
             // Checks for repeated IDs.
-            if (this.views[viewID] != null)
-                return "ID must be unique for each view (conflict: ID = " + viewID + ")";
+            if (this.views[viewID] != null){
+                this.onXMLMinorError("ID must be unique for each view (conflict: ID = " + viewID + "). The duplicate will be ignored");
+                continue;
+            }
             
             var near = this.reader.getFloat(view, 'near');
             if (near == null){
@@ -370,7 +372,6 @@ export class MySceneGraph {
         }
         if(this.views[this.defaultViewID] == null)
             return "Default view " + this.defaultViewID + " is undefined.";
-            raquel
 
         this.scene.viewIDs = viewIDs;
         this.scene.currentViewID = this.defaultViewID;
@@ -449,13 +450,15 @@ export class MySceneGraph {
             // Get id of the current light.
             var lightId = this.reader.getString(children[i], 'id');
             if (lightId == null){
-                this.onXMLMinorError("no ID defined for light number " + i + ". The light was ignored.");
+                this.onXMLMinorError("no ID defined for light number " + i + ". This light will be ignored.");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.lights[lightId] != null)
-                return "ID must be unique for each light (conflict: ID = " + lightId + ")";
+            if (this.lights[lightId] != null){
+                this.onXMLMinorError("ID must be unique for each light (conflict: ID = " + lightId + "). The duplicate will be ignored");
+                continue;
+            }
 
             // Light enable/disable
             var enableLight = true;
@@ -572,19 +575,26 @@ export class MySceneGraph {
             var textureID = this.reader.getString(texturesChildren[i], 'id');
             var textureFile = this.reader.getString(texturesChildren[i], 'file');
             // Checks if texture is null
-            if (textureID == null)
-                return "no ID defined for texture number " + i;
+            if (textureID == null){
+                this.onXMLMinorError("no ID defined for texture number " + i + ". The texture will be ignored.");
+                continue;
+            }
             
             // Checks for repeated IDs.
-            if (this.textures[textureID] != null)
-                return "ID must be unique for each texture (conflict: ID = " + textureID + ")";
+            if (this.textures[textureID] != null){
+                this.onXMLMinorError("ID must be unique for each texture (conflict: ID = " + textureID + "). The duplicate will be ignored");
+                continue;
+            }
 
             // Checks if textureFile is null
-            if (textureFile == null)
-                return "no file defined for texture number " + i;
+            if (textureFile == null){
+                this.onXMLMinorError("no file defined for texture number " + i + ". This texture will be ignored");
+                continue;
+            }
 
             if(!this.fileExists(textureFile)){
-                return "file " + textureFile + " does not exist";
+                this.onXMLMinorError("file " + textureFile + " of texture number " + i + " does not exist. This texture will be ignored");
+                continue;
             }
             
             var texture = new CGFtexture(this.scene, textureFile);
