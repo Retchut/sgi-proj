@@ -612,6 +612,12 @@ export class MySceneGraph {
             if (materialID == null)
                 return "no ID defined for material number" + i;
 
+            var shininess = this.reader.getFloat(children[i], 'shininess');
+            if (shininess == null){
+                this.onXMLMinorError("no shininess defined for material number" + i + ". Assuming shininess of 1.");
+                shininess = 1;
+            }
+
             // Checks for repeated IDs.
             if (this.materials[materialID] != null)
                 return "ID must be unique for each material (conflict: ID = " + materialID + ")";
@@ -641,6 +647,7 @@ export class MySceneGraph {
                         break;
                 }
             }
+            material.setShininess(shininess)
             this.materials[materialID] = material;
         }
         
