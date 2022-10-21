@@ -40,6 +40,8 @@
 
     <textures>
         <texture id="demoTexture" file="scenes/other_groups/images/vidral.jpg" />
+        <texture id="saturn" file="scenes/images/saturn.png" />
+        <texture id="flag" file="scenes/images/flag.jpg" />
     </textures>
 
     <materials>
@@ -72,6 +74,12 @@
             <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
             <diffuse r="0.8" g="0.8" b="0.8" a="1.0" />
             <specular r="0.8" g="0.8" b="0.8" a="1.0" />
+        </material>
+        <material id="flagMaterial" shininess="3">
+            <emission r="0.3" g="0.3" b="0.3" a="1.0" />
+            <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
+            <diffuse r="0.6" g="0.6" b="0.6" a="1.0" />
+            <specular r="0.6" g="0.6" b="0.6" a="1.0" />
         </material>
     </materials>
 
@@ -149,7 +157,7 @@
             <materials>
                 <material id="inherit" />
             </materials>
-            <texture id="none" />
+            <texture id="inherit" />
             <children>
                 <primitiveref id="demoSphere" />
             </children>
@@ -159,7 +167,7 @@
             <materials>
                 <material id="inherit" />
             </materials>
-            <texture id="none" />
+            <texture id="inherit" />
             <children>
                 <componentref id="planet" />
                 <componentref id="planetRing" />
@@ -174,7 +182,7 @@
             <materials>
                 <material id="planetYellowMaterial" />
             </materials>
-            <texture id="none" />
+            <texture id="saturn"  length_s="1.0"  length_t="1.0"/>
             <children>
                 <componentref id="ringPlanet" />
             </children>
@@ -231,6 +239,18 @@
                 <primitiveref id="smallSphere" />
             </children>
         </component>
+        <component id="poleFlag">
+            <transformation>
+            </transformation>
+            <materials>
+                <material id="flagMaterial" />
+            </materials>
+            <texture id="flag" length_s="0.5" length_t="1.0"/>
+            <children>
+                <primitiveref id="poleFlag" />
+                <primitiveref id="poleFlag2" />
+            </children>
+        </component>
         <component id="flagPole">
             <transformation>
                 <translate x="0" y="0" z="0.5" />
@@ -241,8 +261,7 @@
             <texture id="none" />
             <children>
                 <primitiveref id="poleCylinder" />
-                <primitiveref id="poleFlag" />
-                <primitiveref id="poleFlag2" />
+                <componentref id="poleFlag" />
                 <componentref id="poleTop" />
             </children>
         </component>
@@ -390,7 +409,7 @@
             <materials>
                 <material id="demoMaterial" />
             </materials>
-            <texture id="none" />
+            <texture id="none"/>
             <children>
                 <componentref id="houseFloor" />
                 <componentref id="houseFrontWall" />
