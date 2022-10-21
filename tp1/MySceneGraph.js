@@ -72,6 +72,7 @@ export class MySceneGraph {
         // As the graph loaded ok, signal the scene so that any additional initialization depending on the graph can take place
         this.scene.onGraphLoaded();
         this.scene.interface.initCameras();
+        this.scene.interface.initLights();
     }
 
     /**
@@ -528,6 +529,7 @@ export class MySceneGraph {
         else if (numLights > 8)
             this.onXMLMinorError("too many lights defined; WebGL imposes a limit of 8 lights");
 
+        this.scene.numLights = numLights;
         this.log("Parsed lights");
         return null;
     }

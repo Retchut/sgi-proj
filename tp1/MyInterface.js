@@ -40,7 +40,6 @@ export class MyInterface extends CGFinterface {
     }
 
     initCameras(){
-        // this.setActiveCamera(camera)
         this.cameras = this.gui.addFolder('Cameras');
         this.cameras.add(this.scene, 'currentViewID', this.scene.viewIDs).name('Views').onChange(
             () => {
@@ -48,6 +47,20 @@ export class MyInterface extends CGFinterface {
                 this.setActiveCamera(this.scene.camera);
             }
         )
+    }
+
+    initLights(){
+        let lightIndex = 0;
+        this.lights = this.gui.addFolder('Lights');
+        for (const lightName in this.scene.graph.lights){
+            let light = this.scene.lights[lightIndex];
+            this.lights.add(light, 'enabled').name(lightName).onChange(
+                () => {
+                    light.update()
+                }
+            )
+            lightIndex++;
+        }
     }
 
     processKeyDown(event) {
