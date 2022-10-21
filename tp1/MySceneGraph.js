@@ -919,8 +919,7 @@ export class MySceneGraph {
             for(const index in indices){
                 // indexOf returns -1 if the object of the searchis not present
                 if(indices[index] == -1){
-                    let indexName = index.slice(0, index.length - 5)
-                    return "Component " + componentID + " has no " + index.slice(0, indexName);
+                    return "Component " + componentID + " has no " + index.slice(0, index.length - 5);
                 }
             }
 
