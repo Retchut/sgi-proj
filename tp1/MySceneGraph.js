@@ -1192,10 +1192,6 @@ export class MySceneGraph {
                     if (this.transformations[transformationRef] == null){
                         return operation.nodeName + " id in component " + componentID + " must refer to an already defined " + operation.nodeName + ".";
                     }
-                    // if (this.transformations[transformationRef] == null) {
-                    //     this.onXMLMinorError("transformationRef id in component " + componentId + " must be an existing transformation ID");
-                    //     continue;
-                    // }
 
                     transfMatrix = this.transformations[transformationRef]
 
@@ -1307,8 +1303,8 @@ export class MySceneGraph {
                     component.children.primitiveRefs.push(primitiveId);
                 }
                 else if (grandGrandChildren[j].nodeName == "componentref") {
-                    var componentId = this.reader.getString(grandGrandChildren[j], 'id');
-                    component.children.componentRefs.push(componentId);
+                    var grandGrandChildID = this.reader.getString(grandGrandChildren[j], 'id');
+                    component.children.componentRefs.push(grandGrandChildID);
                 }
                 else {
                     this.onXMLMinorError("Unknown tag <" + grandGrandChildren[i].nodeName + ">. Ignoring this tag.");
