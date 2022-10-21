@@ -65,7 +65,7 @@ export class MyInterface extends CGFinterface {
             
             this.lightsVisibility.add(light, 'visible').name(lightName).onChange(
                 () => {
-                    light.update();;
+                    light.update();
                 }
             )
             lightIndex++;
@@ -74,13 +74,20 @@ export class MyInterface extends CGFinterface {
 
     processKeyDown(event) {
         this.activeKeys[event.code]=true;
+        this.handleKeyDown(event.code);
     };
 
     processKeyUp(event) {
         this.activeKeys[event.code]=false;
     };
 
-    isKeyPressed(keyCode) {
+    isKeyHeld(keyCode) {
         return this.activeKeys[keyCode] || false;
+    }
+
+    handleKeyDown(keyCode){
+        if(keyCode === "KeyM"){
+            this.scene.graph.currentMaterial++;
+        }
     }
 }

@@ -1255,5 +1255,7 @@ export class MySceneGraph {
 
         // restore the last preserved scene matrix
         this.scene.popMatrix()
+
+        // this.scene.interface.handleInput();
     }
 }
