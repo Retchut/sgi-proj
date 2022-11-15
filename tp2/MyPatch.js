@@ -12,7 +12,7 @@ export class MyPatch extends CGFobject {
         super(scene);
 
         var surface = new CGFnurbsSurface(uDeg, vDeg, controlPoints);
-        this.nurbsObj = new CGFNurbsObject(scene, uDivs, vDivs, surface);
+        this.nurbsObj = new CGFnurbsObject(scene, uDivs, vDivs, surface);
     }
 
     display(){
