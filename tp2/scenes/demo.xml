@@ -186,7 +186,7 @@
         <primitive id="cubemapSide">
             <rectangle x1="-0.5" y1="-0.5" x2="0.5" y2="0.5" />
         </primitive>
-        <primitive id="testRectangle">
+        <primitive id="basicNurbsRectangle">
             <patch degree_u="1" parts_u="20" degree_v="1" parts_v="20">
                 <controlpoint x="-1" y="-1" z="0" />
                 <controlpoint x="-1" y="1" z="0" />
@@ -194,7 +194,7 @@
                 <controlpoint x="1" y="-1" z="0" />
             </patch>
         </primitive>
-        <primitive id="testTent">
+        <primitive id="basicNurbsTent">
             <patch degree_u="2" parts_u="20" degree_v="1" parts_v="20">
                 <controlpoint x="-1" y="0" z="-1" />
                 <controlpoint x="-1" y="0" z="1" />
@@ -225,9 +225,8 @@
                 <componentref id="planet3" />
                 <componentref id="planet4" />
                 <componentref id="sun" /> -->
-                <!-- <primitiveref id="testRectangle" />
-                <primitiveref id="testTent" />
-                <primitiveref id="testRectangle" /> -->
+                <!-- <primitiveref id="basicNurbsRectangle" />
+                <primitiveref id="basicNurbsTent" /> -->
             </children>
         </component>
         <component id="planetRing">
