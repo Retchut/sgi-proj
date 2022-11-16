@@ -10,8 +10,7 @@ import { CGFobject, CGFnurbsObject, CGFnurbsSurface } from '../lib/CGF.js';
 export class MyPatch extends CGFobject {
     constructor(scene, id, uDeg, vDeg, uDivs, vDivs, controlPoints) {
         super(scene);
-        console.log(uDeg, vDeg, uDivs, vDivs, controlPoints);
-
+        
         var surface = new CGFnurbsSurface(uDeg, vDeg, controlPoints);
         this.nurbsObj = new CGFnurbsObject(scene, uDivs, vDivs, surface);
     }

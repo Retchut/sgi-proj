@@ -1181,7 +1181,6 @@ export class MySceneGraph {
 
                 while (controlPoints.length > 0)
                     controlPointsGrouped.push(controlPoints.splice(0, degree_v + 1));
-                console.log("Parser: ", degree_u, degree_v, parts_u, parts_v, controlPointsGrouped);
                 var patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPointsGrouped);
                 this.primitives[primitiveId] = patch;
             }
