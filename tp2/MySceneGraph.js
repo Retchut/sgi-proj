@@ -4,6 +4,7 @@ import { MyTriangle } from './MyTriangle.js';
 import { MyCylinder } from './MyCylinder.js';
 import { MySphere } from './MySphere.js';
 import { MyTorus } from './MyTorus.js';
+import { MyPatch } from './MyPatch.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -1108,7 +1109,7 @@ export class MySceneGraph {
                 var minVal = 1;
                 var reqType = 'integer';
                 var degree_u = this.reader.getInteger(grandChildren[0], param);
-                if (isNaN(slices)) {
+                if (isNaN(degree_u)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1121,7 +1122,7 @@ export class MySceneGraph {
                 minVal = 1;
                 reqType = 'integer';
                 var parts_u = this.reader.getInteger(grandChildren[0], param);
-                if (isNaN(slices)) {
+                if (isNaN(parts_u)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1134,7 +1135,7 @@ export class MySceneGraph {
                 minVal = 1;
                 reqType = 'integer';
                 var degree_v = this.reader.getInteger(grandChildren[0], param);
-                if (isNaN(slices)) {
+                if (isNaN(degree_v)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1147,7 +1148,7 @@ export class MySceneGraph {
                 minVal = 1;
                 reqType = 'integer';
                 var parts_v = this.reader.getInteger(grandChildren[0], param);
-                if (isNaN(slices)) {
+                if (isNaN(parts_v)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1169,10 +1170,19 @@ export class MySceneGraph {
                         this.onXMLMinorError(coordinates + " Assuming coordinates [0,0,0]");
                         coordinates = vec3.create();
                     }
-                    controlPoints.push(coordinates);
+                    controlPoints.push([...coordinates, 1]);
                 }
-                //TODO: Create NURB object
-                var patch = null;
+
+                if (controlPoints.length != (degree_u + 1) * (degree_v + 1)) {
+                    this.onXMLMinorError("Wrong number of control points. Expecting " + (degree_u + 1) * (degree_v + 1) + " control points, got " + controlPoints.length + ".");
+                }
+
+                var controlPointsGrouped = [];
+
+                while (controlPoints.length > 0)
+                    controlPointsGrouped.push(controlPoints.splice(0, degree_v + 1));
+                console.log("Parser: ", degree_u, degree_v, parts_u, parts_v, controlPointsGrouped);
+                var patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPointsGrouped);
                 this.primitives[primitiveId] = patch;
             }
             else {
@@ -1568,12 +1578,12 @@ export class MySceneGraph {
         this.scene.applyViewMatrix();
 
         // preserve the scene current matrix
-        this.scene.pushMatrix()
+        this.scene.pushMatrix();
 
         this.drawComponent(this.components[this.idRoot], null);
 
         // restore the last preserved scene matrix
-        this.scene.popMatrix()
+        this.scene.popMatrix();
 
         // this.scene.interface.handleInput();
     }

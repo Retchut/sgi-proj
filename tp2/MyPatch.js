@@ -8,14 +8,25 @@ import { CGFobject, CGFnurbsObject, CGFnurbsSurface } from '../lib/CGF.js';
 // Barril: superfície cilíndrica cuja geratriz é uma linha curva; na impossibilidade de ser modelada numa única peça, a superfície lateral do barril poderá corresponder à junção de duas ou mais superfícies; os topos do barril devem ser fechados com círculos, também eles modelados com base numa superfície 2D/3D (solução aproximada); utilizar os graus mínimos necessários para “U” e para “V”.
 
 export class MyPatch extends CGFobject {
-    constructor(scene, id, uDeg, vDeg, uDivs, vDivs, controlPoints){
+    constructor(scene, id, uDeg, vDeg, uDivs, vDivs, controlPoints) {
         super(scene);
+        console.log(uDeg, vDeg, uDivs, vDivs, controlPoints);
 
         var surface = new CGFnurbsSurface(uDeg, vDeg, controlPoints);
         this.nurbsObj = new CGFnurbsObject(scene, uDivs, vDivs, surface);
     }
 
-    display(){
+    display() {
         this.nurbsObj.display();
+    }
+
+    /**
+     * @method updateTexCoords
+     * Updates the texture coordinates of the component
+     * @param length_s - Texture scale factor for the s axis
+     * @param length_t - Texture scale factor for the t axis
+     */
+    updateTexCoords(length_s, length_t) {
+        return;
     }
 }
