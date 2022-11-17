@@ -1175,7 +1175,7 @@ export class MySceneGraph {
                 }
             }
 
-            var component = { transformation: mat4.create(), materials: [], texture: {}, children: { primitiveRefs: [], componentRefs: [] }, highlighted : false }
+            var component = { transformation: mat4.create(), materials: [], texture: {}, children: { primitiveRefs: [], componentRefs: [] }, highlighted : {} }
 
             // Transformations
             grandGrandChildren = grandChildren[indices.transformationIndex].children
@@ -1323,7 +1323,12 @@ export class MySceneGraph {
                 var highlightedScale = this.reader.getFloat(highlightedProp, 'scale_h');
                 
                 this.onXMLMinorError("TODO: Parse actual highlighted parameter values");
-                component.highlighted = true;
+                component.highlighted = {
+                    r : highlightedR,
+                    g : highlightedG,
+                    b : highlightedB,
+                    scale : highlightedScale
+                };
             }
 
             this.components[componentID] = component;
@@ -1474,9 +1479,16 @@ export class MySceneGraph {
         let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
 
         this.onXMLMinorError("TODO: draw highlighted object correctly and fix shader");
-        let isHighlighted = (currentNode.highlighted)
-        if(isHighlighted)
+        let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
+        if(isHighlighted){
+            this.scene.shaders[this.selectedShader].setUniformsValues({
+                scaleFactor : currentNode.highlighted.scale,
+                colorR : currentNode.highlighted.r,
+                colorG : currentNode.highlighted.g,
+                colorB : currentNode.highlighted.b
+            })
 		    this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
+        }
 
         this.scene.multMatrix(currentNode.transformation);
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {

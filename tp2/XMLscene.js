@@ -98,7 +98,13 @@ export class XMLscene extends CGFscene {
         this.shaders = [
             new CGFshader(this.gl, 'scenes/shaders/simplePulsing.vert', 'scenes/shaders/simplePulsing.frag')
         ];
-        this.shaders[0].setUniformsValues({ timeFactor : 0, scaleFactor : this.graph.shaderScale });
+        this.shaders[0].setUniformsValues({
+            timeFactor : 0,
+            scaleFactor : this.graph.shaderScale,
+            colorR : 0.0,
+            colorG : 0.0,
+            colorB : 0.0
+        });
     }
 
     setDefaultAppearance() {

@@ -299,7 +299,7 @@
                 <componentref id="blueTree7"/>
                 <componentref id="blueTree8"/>
             </children>
-            <highlighted r="99" g="33" b="33" scale_h="5" />
+            <highlighted r="0" g="1" b="0" scale_h="5" />
         </component>
         <component id="poleTop">
             <transformation>
