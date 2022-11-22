@@ -1481,12 +1481,15 @@ export class MySceneGraph {
         this.onXMLMinorError("TODO: draw highlighted object correctly and fix shader");
         let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
         if(isHighlighted){
+            const matColor = (texture.id === "none") ? this.materials[materialID].ambient : vec4.create();
+            if (texture.id !== "none"){
+                this.textures[texture.id].bind(1);
+            }
             this.scene.shaders[this.selectedShader].setUniformsValues({
+                matColor : matColor,
                 scaleFactor : currentNode.highlighted.scale,
-                colorR : currentNode.highlighted.r,
-                colorG : currentNode.highlighted.g,
-                colorB : currentNode.highlighted.b
-            })
+                colorFactors : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
+            });
 		    this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
         }
 
@@ -1533,7 +1536,7 @@ export class MySceneGraph {
 
         // preserve the scene current matrix
         this.scene.pushMatrix()
-
+        
         this.drawComponent(this.components[this.idRoot], null);
 
         // restore the last preserved scene matrix

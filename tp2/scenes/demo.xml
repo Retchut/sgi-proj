@@ -72,7 +72,7 @@
         </material>
         <material id="planetBlueMaterial" shininess="3">
             <emission r="0.0" g="0.0" b="0.0" a="1.0" />
-            <ambient r="0.0" g="0.76" b="1.0" a="1.0" />
+            <ambient r="0.0" g="0.45" b="1.0" a="1.0" />
             <diffuse r="0.0" g="0.45" b="0.6" a="1.0" />
             <specular r="0.0" g="0.45" b="0.6" a="1.0" />
         </material>
@@ -299,7 +299,7 @@
                 <componentref id="blueTree7"/>
                 <componentref id="blueTree8"/>
             </children>
-            <highlighted r="0" g="1" b="0" scale_h="5" />
+            <highlighted r="0" g="1" b="1" scale_h="1" />
         </component>
         <component id="poleTop">
             <transformation>

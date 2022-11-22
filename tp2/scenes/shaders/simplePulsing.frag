@@ -23,11 +23,24 @@ uniform lightProperties uLight[NUMBER_OF_LIGHTS];
 varying vec2 vTextureCoord; // vertex coord from fragment shader
 
 uniform sampler2D uSampler;
-uniform float colorR;
-uniform float colorG;
-uniform float colorB;
+uniform sampler2D uSampler1;
+uniform float timeFactor;
+uniform vec3 colorFactors;
+uniform vec4 matColor;
 
 void main() {
-	// vec4 color = texture2D(uSampler, vTextureCoord);
-	gl_FragColor = vec4(colorR, colorG, colorB, 1);
+    // get standard color (if the object has a texture, matColor is (0,0,0,0))
+    vec4 fragcolor = matColor;
+    if(matColor == vec4(0,0,0,0)){
+        fragcolor = texture2D(uSampler1, vTextureCoord);
+    }
+
+    vec3 finalColorFactor = colorFactors * 0.6 * sin(timeFactor);
+    vec3 finalColor = vec3(
+        fragcolor.x * finalColorFactor.x,
+        fragcolor.y * finalColorFactor.y,
+        fragcolor.z * finalColorFactor.z
+    );
+
+    gl_FragColor = vec4(finalColor, 1);
 }
