@@ -220,13 +220,13 @@
             <texture id="none" />
             <children>
                 <componentref id="cubemap" />
-                <!-- <componentref id="planet1" />
+                <componentref id="planet1" />
                 <componentref id="planet2" />
                 <componentref id="planet3" />
                 <componentref id="planet4" />
-                <componentref id="sun" /> -->
-                <!-- <primitiveref id="basicNurbsRectangle" />
-                <primitiveref id="basicNurbsTent" /> -->
+                <componentref id="sun" />
+                <!-- <primitiveref id="basicNurbsRectangle" /> -->
+                <!-- <primitiveref id="basicNurbsTent" /> -->
             </children>
         </component>
         <component id="planetRing">
