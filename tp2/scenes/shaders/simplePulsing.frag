@@ -26,12 +26,15 @@ uniform sampler2D uSampler;
 uniform sampler2D uSampler1;
 uniform float timeFactor;
 uniform vec3 colorFactors;
-uniform vec4 matColor;
+uniform bool hasTexture;
+uniform vec4 ambientColor;
+uniform vec4 diffuseColor;
+uniform vec4 specularColor;
 
 void main() {
     // get standard color (if the object has a texture, matColor is (0,0,0,0))
-    vec4 fragcolor = matColor;
-    if(matColor == vec4(0,0,0,0)){
+    vec4 fragcolor = diffuseColor;
+    if(hasTexture){
         fragcolor = texture2D(uSampler1, vTextureCoord);
     }
 

@@ -13,7 +13,7 @@ uniform float scaleFactor; // additional variables passed in setUniformValues in
 uniform float timeFactor;
 
 void main() {
-    vec3 offset = aVertexNormal * scaleFactor * 0.1 * sin(timeFactor);
+    vec3 offset = aVertexNormal * scaleFactor * 0.01 * sin(timeFactor);
 	
 	vTextureCoord = aTextureCoord;
 
