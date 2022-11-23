@@ -1,4 +1,4 @@
-import { CGFscene } from '../lib/CGF.js';
+import { CGFscene, CGFshader } from '../lib/CGF.js';
 import { CGFaxis,CGFcamera } from '../lib/CGF.js';
 
 
@@ -94,6 +94,18 @@ export class XMLscene extends CGFscene {
         }
     }
 
+    initShaders(){
+        this.shaders = [
+            new CGFshader(this.gl, 'scenes/shaders/simplePulsing.vert', 'scenes/shaders/simplePulsing.frag')
+        ];
+        this.shaders[0].setUniformsValues({
+            timeFactor : 0,
+            scaleFactor : this.graph.shaderScale,
+            factors : vec3.create(),
+            matColor : vec4.create()
+        });
+    }
+
     setDefaultAppearance() {
         this.setAmbient(0.2, 0.4, 0.8, 1.0);
         this.setDiffuse(0.2, 0.4, 0.8, 1.0);
@@ -111,10 +123,20 @@ export class XMLscene extends CGFscene {
         this.setGlobalAmbientLight(this.graph.ambient[0], this.graph.ambient[1], this.graph.ambient[2], this.graph.ambient[3]);
 
         this.initLights();
+        this.initShaders();
 
         this.initXMLCameras();
 
         this.sceneInited = true;
+    }
+
+    /**
+     * Method called periodically, used when it is necessary to update some internal state independent of the rendering display of the scene.
+     * @param {Number} currTime
+     */
+    update(currTime){
+        if(this.sceneInited)
+            this.shaders[0].setUniformsValues({ timeFactor: currTime / 100 % 100 });
     }
 
     /**

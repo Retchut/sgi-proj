@@ -42,6 +42,9 @@ export class MySceneGraph {
         this.axisCoords['y'] = [0, 1, 0];
         this.axisCoords['z'] = [0, 0, 1];
 
+        this.selectedShader = 0;
+        this.shaderScale = 1;
+
         // File reading 
         this.reader = new CGFXMLreader();
 
@@ -1253,7 +1256,7 @@ export class MySceneGraph {
                 }
             }
 
-            var component = { transformation: mat4.create(), materials: [], texture: {}, children: { primitiveRefs: [], componentRefs: [] } }
+            var component = { transformation: mat4.create(), materials: [], texture: {}, children: { primitiveRefs: [], componentRefs: [] }, highlighted : {} }
 
             // Transformations
             grandGrandChildren = grandChildren[indices.transformationIndex].children
@@ -1390,6 +1393,23 @@ export class MySceneGraph {
                 else {
                     this.onXMLMinorError("Unknown tag <" + grandGrandChildren[i].nodeName + ">. Ignoring this tag.");
                 }
+            }
+
+            var highlightedIndex = nodeNames.indexOf("highlighted");
+            if(highlightedIndex !== -1){
+                let highlightedProp = grandChildren[highlightedIndex];
+                var highlightedR = this.reader.getFloat(highlightedProp, 'r');
+                var highlightedG = this.reader.getFloat(highlightedProp, 'g');
+                var highlightedB = this.reader.getFloat(highlightedProp, 'b');
+                var highlightedScale = this.reader.getFloat(highlightedProp, 'scale_h');
+                
+                this.onXMLMinorError("TODO: Parse actual highlighted parameter values");
+                component.highlighted = {
+                    r : highlightedR,
+                    g : highlightedG,
+                    b : highlightedB,
+                    scale : highlightedScale
+                };
             }
 
             this.components[componentID] = component;
@@ -1539,6 +1559,21 @@ export class MySceneGraph {
         let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
         let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
 
+        this.onXMLMinorError("TODO: draw highlighted object correctly and fix shader");
+        let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
+        if(isHighlighted){
+            const matColor = (texture.id === "none") ? this.materials[materialID].ambient : vec4.create();
+            if (texture.id !== "none"){
+                this.textures[texture.id].bind(1);
+            }
+            this.scene.shaders[this.selectedShader].setUniformsValues({
+                matColor : matColor,
+                scaleFactor : currentNode.highlighted.scale,
+                colorFactors : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
+            });
+		    this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
+        }
+
         this.scene.multMatrix(currentNode.transformation);
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {
             // preserve current scene transformation matrix
@@ -1556,6 +1591,10 @@ export class MySceneGraph {
             currentAppearence.setTexture(null);
 
         currentAppearence.apply();
+
+        this.onXMLMinorError("TODO (maybe): Resetting active shader here");
+        if(isHighlighted)
+		    this.scene.setActiveShader(this.scene.defaultShader);
 
         for (var i = 0; i < currentNode.children.primitiveRefs.length; i++) {
             // display the primitive with the transformations already applied
@@ -1578,7 +1617,7 @@ export class MySceneGraph {
 
         // preserve the scene current matrix
         this.scene.pushMatrix();
-
+        
         this.drawComponent(this.components[this.idRoot], null);
 
         // restore the last preserved scene matrix
