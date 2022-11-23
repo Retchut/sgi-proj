@@ -190,17 +190,17 @@
             <patch degree_u="1" parts_u="20" degree_v="1" parts_v="20">
                 <controlpoint x="-1" y="-1" z="0" />
                 <controlpoint x="-1" y="1" z="0" />
-                <controlpoint x="1" y="1" z="0" />
                 <controlpoint x="1" y="-1" z="0" />
+                <controlpoint x="1" y="1" z="0" />
             </patch>
         </primitive>
         <primitive id="basicNurbsTent">
-            <patch degree_u="2" parts_u="20" degree_v="1" parts_v="20">
+            <patch degree_u="1" parts_u="20" degree_v="2" parts_v="20">
                 <controlpoint x="-1" y="0" z="-1" />
-                <controlpoint x="-1" y="0" z="1" />
                 <controlpoint x="0" y="4" z="-1" />
-                <controlpoint x="0" y="4" z="1" />
                 <controlpoint x="1" y="0" z="-1" />
+                <controlpoint x="-1" y="0" z="1" />
+                <controlpoint x="0" y="4" z="1" />
                 <controlpoint x="1" y="0" z="1" />
             </patch>
         </primitive>
@@ -225,8 +225,8 @@
                 <componentref id="planet3" />
                 <componentref id="planet4" />
                 <componentref id="sun" /> -->
-                <!-- <primitiveref id="basicNurbsRectangle" />
-                <primitiveref id="basicNurbsTent" /> -->
+                <primitiveref id="basicNurbsRectangle" />
+                <primitiveref id="basicNurbsTent" />
             </children>
         </component>
         <component id="planetRing">
