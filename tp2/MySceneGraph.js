@@ -1481,12 +1481,15 @@ export class MySceneGraph {
         this.onXMLMinorError("TODO: draw highlighted object correctly and fix shader");
         let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
         if(isHighlighted){
-            const matColor = (texture.id === "none") ? this.materials[materialID].ambient : vec4.create();
-            if (texture.id !== "none"){
+            const hasTexture = (texture.id !== "none");
+            if (hasTexture) {
                 this.textures[texture.id].bind(1);
             }
             this.scene.shaders[this.selectedShader].setUniformsValues({
-                matColor : matColor,
+                hasTexture : hasTexture,
+                ambientColor : this.materials[materialID].ambient,
+                diffuseColor : this.materials[materialID].diffuse,
+                specularColor : this.materials[materialID].specular,
                 scaleFactor : currentNode.highlighted.scale,
                 colorFactors : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
             });
