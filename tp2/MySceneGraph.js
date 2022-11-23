@@ -17,7 +17,8 @@ var TEXTURES_INDEX = 4;
 var MATERIALS_INDEX = 5;
 var TRANSFORMATIONS_INDEX = 6;
 var PRIMITIVES_INDEX = 7;
-var COMPONENTS_INDEX = 8;
+var ANIMATIONS_INDEX = 8;
+var COMPONENTS_INDEX = 9;
 
 /**
  * MySceneGraph class, representing the scene graph.
@@ -194,6 +195,18 @@ export class MySceneGraph {
 
             //Parse primitives block
             if ((error = this.parsePrimitives(nodes[index])) != null)
+                return error;
+        }
+
+        // <animations>
+        if ((index = nodeNames.indexOf("animations")) == -1)
+            return "tag <animations> missing";
+        else {
+            if (index != ANIMATIONS_INDEX)
+                this.onXMLMinorError("tag <animations> out of order");
+
+            //Parse primitives block
+            if ((error = this.parseAnimations(nodes[index])) != null)
                 return error;
         }
 
@@ -1197,9 +1210,130 @@ export class MySceneGraph {
     }
 
     /**
-   * Parses the <components> block.
-   * @param {components block element} componentsNode
-   */
+     * Parses the <primitives> block.
+     * @param {primitives block element} primitivesNode
+     */
+    parseAnimations(animationsNode) {
+        this.animations = [];
+        var animationTags = animationsNode.children;
+
+        // Iterate the <keyframeanim> tags
+        for (var i = 0; i < animationTags.length; i++) {
+            var animationTag = animationTags[i];
+
+            if (animationTag.nodeName != "keyframeanim") {
+                this.onXMLMinorError("Unknown tag <" + animationTag.nodeName + ">. Ignoring this tag.");
+                continue;
+            }
+
+            // Get id of the current animation.
+            var animationId = this.reader.getString(animationTag, 'id');
+            if (animationId == null) {
+                this.onXMLMinorError("No ID defined for animation number" + i + ". This animation will be ignored.");
+                continue;
+            }
+
+            // Checks for repeated IDs.
+            if (this.animations[animationId] != null) {
+                this.onXMLMinorError("ID must be unique for each animation (conflict: ID = " + animationId + "). The duplicate will be ignored.");
+                continue;
+            }
+
+            var keyframeTags = animationTag.children;
+
+            // Iterate the <keyframe> tags
+            for (var j = 0; j < keyframeTags.length; j++) {
+                var keyframeTag = keyframeTags[j];
+
+                // Get instant of the current keyframe.
+                var instant = this.reader.getFloat(keyframeTag, 'instant');
+                if (instant == null || isNaN(instant)) {
+                    this.onXMLMinorError("No instant defined for keyframe number " + j + " in animation with ID = " + animationId + ". This keyframe will be ignored.");
+                    continue;
+                }
+
+                var transformationTags = keyframeTag.children;
+
+                if (transformationTags.length != 5 || transformationTags[0].nodeName != "translation" ||
+                    transformationTags[1].nodeName != "rotation" || transformationTags[2].nodeName != "rotation" ||
+                    transformationTags[3].nodeName != "rotation" || transformationTags[4].nodeName != "scale") {
+                    this.onXMLMinorError("Invalid transformations defined for keyframe number " + j + " in animation with ID = " + animationId + ". This keyframe will be ignored.");
+                    continue;
+                }
+
+                var translation = this.parseCoordinates3D(transformationTags[0], "translation transformation for ID " + animationId);
+                if (!Array.isArray(translation)) {
+                    this.onXMLMinorError(translation + " Assuming translation of [0,0,0]");
+                    translation = vec3.create();
+                }
+
+                var rotation = [0, 0, 0];
+                var angle = 0;
+                if (this.reader.getString(transformationTags[1], 'axis') != "z") {
+                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationId + ". Rotations must follow the z, y, x axis order. Assuming 0 for the z axis");
+                }
+                else {
+                    angle = this.reader.getFloat(transformationTags[1], 'angle');
+                    if (angle == null || isNaN(angle)) {
+                        this.onXMLMinorError("No angle defined for rotation in z axis for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    }
+                    else rotation[2] = angle;
+                }
+
+                if (this.reader.getString(transformationTags[2], 'axis') != "y") {
+                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationId + ". Rotations must follow the z, y, x axis order. Assuming 0 for the y axis");
+                }
+                else {
+                    angle = this.reader.getFloat(transformationTags[2], 'angle');
+                    if (angle == null || isNaN(angle)) {
+                        this.onXMLMinorError("No angle defined for rotation in y axis for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    }
+                    else rotation[1] = angle;
+                }
+
+                if (this.reader.getString(transformationTags[3], 'axis') != "x") {
+                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationId + ". Rotations must follow the z, y, x axis order. Assuming 0 for the x axis");
+                }
+                else {
+                    angle = this.reader.getFloat(transformationTags[3], 'angle');
+                    if (angle == null || isNaN(angle)) {
+                        this.onXMLMinorError("No angle defined for rotation in x axis for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    }
+                    else rotation[0] = angle;
+                }
+                var scaling = [0, 0, 0];
+                var coordinate = this.reader.getFloat(transformationTags[4], 'sx');
+                if (coordinate == null || isNaN(coordinate)) {
+                    this.onXMLMinorError("Unable to parse sx of the scaling for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    coordinate = 0;
+                }
+                scaling[0] = coordinate;
+
+                coordinate = this.reader.getFloat(transformationTags[4], 'sy');
+                if (coordinate == null || isNaN(coordinate)) {
+                    this.onXMLMinorError("Unable to parse sy of the scaling for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    coordinate = 0;
+                }
+                scaling[1] = coordinate;
+
+                coordinate = this.reader.getFloat(transformationTags[4], 'sz');
+                if (coordinate == null || isNaN(coordinate)) {
+                    this.onXMLMinorError("Unable to parse sz of the scaling for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    coordinate = 0;
+                }
+                scaling[2] = coordinate;
+
+                console.log(translation);
+                console.log(rotation);
+                console.log(scaling);
+            }
+        }
+    }
+
+    /**
+     * Parses the <components> block.
+     * @param {components block element} componentsNode
+     */
     parseComponents(componentsNode) {
         var children = componentsNode.children;
 
