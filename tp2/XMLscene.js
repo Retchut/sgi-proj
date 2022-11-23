@@ -137,6 +137,7 @@ export class XMLscene extends CGFscene {
     update(currTime){
         if(this.sceneInited)
             this.shaders[0].setUniformsValues({ timeFactor: currTime / 100 % 100 });
+            // this.shaders[0].setUniformsValues({ timeFactor: (currTime % 100) / 100 });
     }
 
     /**
