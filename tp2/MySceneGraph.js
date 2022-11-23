@@ -4,6 +4,7 @@ import { MyTriangle } from './MyTriangle.js';
 import { MyCylinder } from './MyCylinder.js';
 import { MySphere } from './MySphere.js';
 import { MyTorus } from './MyTorus.js';
+import { MyPatch } from './MyPatch.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -254,24 +255,24 @@ export class MySceneGraph {
 
         for (var i = 0; i < viewsChildren.length; i++) {
             var view = viewsChildren[i]
-            
-            if(view.nodeName != "perspective" && view.nodeName != "ortho"){
+
+            if (view.nodeName != "perspective" && view.nodeName != "ortho") {
                 this.onXMLMinorError("unknown perspective tag <" + view.nodeName + "> on view number " + i + ". The camera will be ignored.");
                 continue;
             }
 
             var viewID = this.reader.getString(view, 'id');
-            if (viewID == null){
+            if (viewID == null) {
                 this.onXMLMinorError("No ID defined for view number " + i + "The camera will be ignored");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.views[viewID] != null){
+            if (this.views[viewID] != null) {
                 this.onXMLMinorError("ID must be unique for each view (conflict: ID = " + viewID + "). The duplicate will be ignored.");
                 continue;
             }
-            
+
             var near = this.reader.getFloat(view, 'near');
             if (near == null) {
                 this.onXMLMinorError("no near attribute defined for view number " + i + ". Assuming 0.1");
@@ -452,13 +453,13 @@ export class MySceneGraph {
 
             // Get id of the current light.
             var lightId = this.reader.getString(children[i], 'id');
-            if (lightId == null){
+            if (lightId == null) {
                 this.onXMLMinorError("No ID defined for light number " + i + ". This light will be ignored.");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.lights[lightId] != null){
+            if (this.lights[lightId] != null) {
                 this.onXMLMinorError("ID must be unique for each light (conflict: ID = " + lightId + "). The duplicate will be ignored.");
                 continue;
             }
@@ -504,13 +505,13 @@ export class MySceneGraph {
             // Gets the additional attributes of the spot light
             if (children[i].nodeName == "spot") {
                 var angle = this.reader.getFloat(children[i], 'angle');
-                if (!(angle != null && !isNaN(angle))){
+                if (!(angle != null && !isNaN(angle))) {
                     this.onXMLMinorError("unable to parse angle of the light for ID = " + lightId + ". Assuming 45º.");
                     angle = 45;
                 }
 
                 var exponent = this.reader.getFloat(children[i], 'exponent');
-                if (!(exponent != null && !isNaN(exponent))){
+                if (!(exponent != null && !isNaN(exponent))) {
                     this.onXMLMinorError("unable to parse exponent of the light for ID = " + lightId + ". Assuming 1.");
                     exponent = 1;
                 }
@@ -579,30 +580,30 @@ export class MySceneGraph {
             var textureFile = this.reader.getString(texturesChildren[i], 'file');
 
             // Checks if texture is null
-            if (textureID == null){
+            if (textureID == null) {
                 this.onXMLMinorError("No ID defined for texture number " + i + ". The texture will be ignored.");
                 continue;
             }
 
             // Checks if texture ID is a reserved keyword
-            if (textureID == "inherit" || textureID == "none"){
+            if (textureID == "inherit" || textureID == "none") {
                 this.onXMLMinorError("Invalid ID for texture number " + i + ": texture IDs cannot be \"inherit\" or \"none\". The texture will be ignored.");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.textures[textureID] != null){
+            if (this.textures[textureID] != null) {
                 this.onXMLMinorError("ID must be unique for each texture (conflict: ID = " + textureID + "). The duplicate will be ignored.");
                 continue;
             }
 
             // Checks if textureFile is null
-            if (textureFile == null){
+            if (textureFile == null) {
                 this.onXMLMinorError("No file defined for texture number " + i + ". This texture will be ignored");
                 continue;
             }
 
-            if(!this.fileExists(textureFile)){
+            if (!this.fileExists(textureFile)) {
                 this.onXMLMinorError("file " + textureFile + " of texture number " + i + " does not exist. This texture will be ignored");
                 continue;
             }
@@ -635,7 +636,7 @@ export class MySceneGraph {
 
             // Get id of the current material.
             var materialID = this.reader.getString(children[i], 'id');
-            if (materialID == null){
+            if (materialID == null) {
                 this.onXMLMinorError("No ID defined for material number" + i + ". The material will be ignored.");
                 continue;
             }
@@ -645,13 +646,13 @@ export class MySceneGraph {
                 return "Invalid ID for material number " + i + ": material IDs cannot be \"inherit\"";
 
             // Checks for repeated IDs.
-            if (this.materials[materialID] != null){
+            if (this.materials[materialID] != null) {
                 this.onXMLMinorError("ID must be unique for each material (conflict: ID = " + materialID + "). The duplicate will be ignored.");
                 continue;
             }
 
             var shininess = this.reader.getFloat(children[i], 'shininess');
-            if (shininess == null){
+            if (shininess == null) {
                 this.onXMLMinorError("no shininess defined for material " + materialID + ". Assuming shininess of 1.");
                 shininess = 1;
             }
@@ -709,13 +710,13 @@ export class MySceneGraph {
 
             // Get id of the current transformation.
             var transformationID = this.reader.getString(children[i], 'id');
-            if (transformationID == null){
+            if (transformationID == null) {
                 this.onXMLMinorError("No ID defined for transformation number " + i + ". The transformation will be ignored.");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.transformations[transformationID] != null){
+            if (this.transformations[transformationID] != null) {
                 this.onXMLMinorError("ID must be unique for each transformation (conflict: ID = " + transformationID + "). The duplicate will be ignored.");
                 continue;
             }
@@ -731,7 +732,7 @@ export class MySceneGraph {
                     case "translate":
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
-                        if (!Array.isArray(coordinates)){
+                        if (!Array.isArray(coordinates)) {
                             this.onXMLMinorError(coordinates + " Assuming translation of [0,0,0]");
                             coordinates = vec3.create();
                         }
@@ -740,9 +741,9 @@ export class MySceneGraph {
                     case "scale":
                         var coordinates;
                         coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + transformationID);
-                        if (!Array.isArray(coordinates)){
+                        if (!Array.isArray(coordinates)) {
                             this.onXMLMinorError(coordinates + " Assuming scaling of [1,1,1].");
-                            coordinates = vec3.fromValues(1,1,1);
+                            coordinates = vec3.fromValues(1, 1, 1);
                         }
                         mat4.scale(transfMatrix, transfMatrix, coordinates);
                         break;
@@ -754,9 +755,9 @@ export class MySceneGraph {
                             this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid. Assuming rotation of 0 around the x axis.");
                             angle = 0.0;
                         }
-                        if(angle == null){
+                        if (angle == null) {
                             this.onXMLMinorError("no angle property defined for the rotation operation number " + j + ". Assuming rotation of 0 around the x axis");
-                            axis = [1,0,0];
+                            axis = [1, 0, 0];
                             angle = 0.0;
                         }
                         mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
@@ -793,13 +794,13 @@ export class MySceneGraph {
 
             // Get id of the current primitive.
             var primitiveId = this.reader.getString(children[i], 'id');
-            if (primitiveId == null){
+            if (primitiveId == null) {
                 this.onXMLMinorError("No ID defined for primitive number" + i + ". This primitive will be ignored.");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.primitives[primitiveId] != null){
+            if (this.primitives[primitiveId] != null) {
                 this.onXMLMinorError("ID must be unique for each primitive (conflict: ID = " + primitiveId + "). The duplicate will be ignored.");
                 continue;
             }
@@ -810,8 +811,8 @@ export class MySceneGraph {
             if (grandChildren.length != 1 ||
                 (grandChildren[0].nodeName != 'rectangle' && grandChildren[0].nodeName != 'triangle' &&
                     grandChildren[0].nodeName != 'cylinder' && grandChildren[0].nodeName != 'sphere' &&
-                    grandChildren[0].nodeName != 'torus')) {
-                return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere or torus)"
+                    grandChildren[0].nodeName != 'torus' && grandChildren[0].nodeName != 'patch')) {
+                return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere, torus or patch)"
             }
 
             // Specifications for the current primitive.
@@ -822,7 +823,7 @@ export class MySceneGraph {
                 // x1
                 var param = 'x1';
                 var x1 = this.reader.getFloat(grandChildren[0], param);
-                if (!(x1 != null && !isNaN(x1))){
+                if (!(x1 != null && !isNaN(x1))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -830,7 +831,7 @@ export class MySceneGraph {
                 // y1
                 param = 'y1';
                 var y1 = this.reader.getFloat(grandChildren[0], param);
-                if (!(y1 != null && !isNaN(y1))){
+                if (!(y1 != null && !isNaN(y1))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -838,7 +839,7 @@ export class MySceneGraph {
                 // x2
                 param = 'x2';
                 var x2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(x2 != null && !isNaN(x2) && x2 > x1)){
+                if (!(x2 != null && !isNaN(x2) && x2 > x1)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -846,7 +847,7 @@ export class MySceneGraph {
                 // y2
                 param = 'y2';
                 var y2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(y2 != null && !isNaN(y2) && y2 > y1)){
+                if (!(y2 != null && !isNaN(y2) && y2 > y1)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -858,7 +859,7 @@ export class MySceneGraph {
                 // x1
                 var param = 'x1';
                 var x1 = this.reader.getFloat(grandChildren[0], param);
-                if (!(x1 != null && !isNaN(x1))){
+                if (!(x1 != null && !isNaN(x1))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -866,7 +867,7 @@ export class MySceneGraph {
                 // y1
                 param = 'y1';
                 var y1 = this.reader.getFloat(grandChildren[0], param);
-                if (!(y1 != null && !isNaN(y1))){
+                if (!(y1 != null && !isNaN(y1))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -874,7 +875,7 @@ export class MySceneGraph {
                 // z1
                 param = 'z1';
                 var z1 = this.reader.getFloat(grandChildren[0], param);
-                if (!(z1 != null && !isNaN(z1))){
+                if (!(z1 != null && !isNaN(z1))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -882,7 +883,7 @@ export class MySceneGraph {
                 // x2
                 param = 'x2';
                 var x2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(x2 != null && !isNaN(x2))){
+                if (!(x2 != null && !isNaN(x2))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -890,7 +891,7 @@ export class MySceneGraph {
                 // y2
                 param = 'y2';
                 var y2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(y2 != null && !isNaN(y2))){
+                if (!(y2 != null && !isNaN(y2))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -898,7 +899,7 @@ export class MySceneGraph {
                 // z2
                 param = 'z2';
                 var z2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(z2 != null && !isNaN(z2))){
+                if (!(z2 != null && !isNaN(z2))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -906,7 +907,7 @@ export class MySceneGraph {
                 // x3
                 param = 'x3';
                 var x3 = this.reader.getFloat(grandChildren[0], param);
-                if (!(x3 != null && !isNaN(x3))){
+                if (!(x3 != null && !isNaN(x3))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -914,7 +915,7 @@ export class MySceneGraph {
                 // y3
                 param = 'y3';
                 var y3 = this.reader.getFloat(grandChildren[0], param);
-                if (!(y3 != null && !isNaN(y3))){
+                if (!(y3 != null && !isNaN(y3))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -922,7 +923,7 @@ export class MySceneGraph {
                 // z3
                 param = 'z3';
                 var z3 = this.reader.getFloat(grandChildren[0], param);
-                if (!(z3 != null && !isNaN(z3))){
+                if (!(z3 != null && !isNaN(z3))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -935,11 +936,11 @@ export class MySceneGraph {
                 var minVal = 0;
                 var reqType = 'float';
                 var base = this.reader.getFloat(grandChildren[0], param);
-                if(isNaN(base)){
+                if (isNaN(base)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(base < minVal){
+                if (base < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -948,11 +949,11 @@ export class MySceneGraph {
                 minVal = 0;
                 reqType = 'float';
                 var top = this.reader.getFloat(grandChildren[0], param);
-                if(isNaN(top)){
+                if (isNaN(top)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(top < minVal){
+                if (top < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -961,11 +962,11 @@ export class MySceneGraph {
                 minVal = 0;
                 reqType = 'integer';
                 var height = this.reader.getFloat(grandChildren[0], param);
-                if(isNaN(height)){
+                if (isNaN(height)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(height <= minVal){
+                if (height <= minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -974,11 +975,11 @@ export class MySceneGraph {
                 minVal = 1;
                 reqType = 'integer';
                 var slices = this.reader.getInteger(grandChildren[0], param);
-                if (isNaN(slices)){
+                if (isNaN(slices)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(slices < minVal){
+                if (slices < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -987,11 +988,11 @@ export class MySceneGraph {
                 minVal = 1;
                 reqType = 'integer';
                 var stacks = this.reader.getInteger(grandChildren[0], param);
-                if(isNaN(stacks)){
+                if (isNaN(stacks)) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(stacks < minVal){
+                if (stacks < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1005,11 +1006,11 @@ export class MySceneGraph {
                 var minVal = 0;
                 var reqType = 'float';
                 var radius = this.reader.getFloat(grandChildren[0], param);
-                if (!(radius != null && !isNaN(radius))){
+                if (!(radius != null && !isNaN(radius))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(radius <= minVal){
+                if (radius <= minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1019,11 +1020,11 @@ export class MySceneGraph {
                 minVal = 1;
                 reqType = 'integer';
                 var slices = this.reader.getInteger(grandChildren[0], param);
-                if (!(slices != null && !isNaN(slices))){
+                if (!(slices != null && !isNaN(slices))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(slices < minVal){
+                if (slices < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1033,11 +1034,11 @@ export class MySceneGraph {
                 minVal = 1;
                 reqType = 'integer';
                 var stacks = this.reader.getInteger(grandChildren[0], param);
-                if (!(stacks != null && !isNaN(stacks))){
+                if (!(stacks != null && !isNaN(stacks))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(stacks < minVal){
+                if (stacks < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1052,11 +1053,11 @@ export class MySceneGraph {
                 var minVal = 0;
                 var reqType = 'float';
                 var inner = this.reader.getFloat(grandChildren[0], param);
-                if (!(inner != null && !isNaN(inner))){
+                if (!(inner != null && !isNaN(inner))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(inner < minVal){
+                if (inner < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1066,11 +1067,11 @@ export class MySceneGraph {
                 minVal = inner;
                 reqType = 'float';
                 var outer = this.reader.getFloat(grandChildren[0], param);
-                if (!(outer != null && !isNaN(outer))){
+                if (!(outer != null && !isNaN(outer))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(outer < minVal){
+                if (outer < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1080,11 +1081,11 @@ export class MySceneGraph {
                 minVal = 3;
                 reqType = 'integer';
                 var slices = this.reader.getInteger(grandChildren[0], param);
-                if (!(slices != null && !isNaN(slices))){
+                if (!(slices != null && !isNaN(slices))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(slices < minVal){
+                if (slices < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1094,17 +1095,97 @@ export class MySceneGraph {
                 minVal = 3;
                 reqType = 'integer';
                 var loops = this.reader.getInteger(grandChildren[0], param);
-                if (!(loops != null && !isNaN(loops))){
+                if (!(loops != null && !isNaN(loops))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                if(loops < minVal){
+                if (loops < minVal) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
                     continue;
                 }
 
                 var torus = new MyTorus(this.scene, primitiveId, inner, outer, slices, loops);
                 this.primitives[primitiveId] = torus;
+            }
+            else if (primitiveType == 'patch') {
+                var param = 'degree_u';
+                var minVal = 1;
+                var reqType = 'integer';
+                var degree_u = this.reader.getInteger(grandChildren[0], param);
+                if (isNaN(degree_u)) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if (degree_u < minVal) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                param = 'parts_u';
+                minVal = 1;
+                reqType = 'integer';
+                var parts_u = this.reader.getInteger(grandChildren[0], param);
+                if (isNaN(parts_u)) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if (parts_u < minVal) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                param = 'degree_v';
+                minVal = 1;
+                reqType = 'integer';
+                var degree_v = this.reader.getInteger(grandChildren[0], param);
+                if (isNaN(degree_v)) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if (degree_v < minVal) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                param = 'parts_v';
+                minVal = 1;
+                reqType = 'integer';
+                var parts_v = this.reader.getInteger(grandChildren[0], param);
+                if (isNaN(parts_v)) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                if (parts_v < minVal) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This value must be at least " + minVal + " and of type " + reqType + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                var controlPointsTag = grandChildren[0].children;
+                var controlPoints = []
+
+                for (var j = 0; j < controlPointsTag.length; j++) {
+                    if (controlPointsTag[j].nodeName != "controlpoint") {
+                        this.onXMLMinorError("Invalid tag " + controlPointsTag[j].nodeName + " in primitive ID = " + primitiveId + ". This primitive will be ignored.");
+                        continue;
+                    }
+                    var coordinates = this.parseCoordinates3D(controlPointsTag[j], "control point for patch with ID " + primitiveId);
+                    if (!Array.isArray(coordinates)) {
+                        this.onXMLMinorError(coordinates + " Assuming coordinates [0,0,0]");
+                        coordinates = vec3.create();
+                    }
+                    controlPoints.push([...coordinates, 1]);
+                }
+
+                if (controlPoints.length != (degree_u + 1) * (degree_v + 1)) {
+                    this.onXMLMinorError("Wrong number of control points. Expecting " + (degree_u + 1) * (degree_v + 1) + " control points, got " + controlPoints.length + ".");
+                }
+
+                var controlPointsGrouped = [];
+
+                while (controlPoints.length > 0)
+                    controlPointsGrouped.push(controlPoints.splice(0, degree_v + 1));
+                var patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPointsGrouped);
+                this.primitives[primitiveId] = patch;
             }
             else {
                 console.warn("To do: Parse other primitives.");
@@ -1138,13 +1219,13 @@ export class MySceneGraph {
 
             // Get id of the current component.
             var componentID = this.reader.getString(children[i], 'id');
-            if (componentID == null){
+            if (componentID == null) {
                 this.onXMLMinorError("No ID defined for component number" + i + ". This component will be ignored.");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.components[componentID] != null){
+            if (this.components[componentID] != null) {
                 this.onXMLMinorError("ID must be unique for each component (conflict: ID = " + componentID + "). The duplicate will be ignored.");
                 continue;
             }
@@ -1170,7 +1251,7 @@ export class MySceneGraph {
             // check if the component object has one of each required tags defined
             for (const index in indices) {
                 // indexOf returns -1 if the object of the searchis not present
-                if(indices[index] == -1){
+                if (indices[index] == -1) {
                     return "Component " + componentID + " has no " + index.slice(0, index.length - 5) + ". Ignoring this component.";
                 }
             }
@@ -1179,20 +1260,20 @@ export class MySceneGraph {
 
             // Transformations
             grandGrandChildren = grandChildren[indices.transformationIndex].children
-            
+
             var transfMatrix = mat4.create();
             for (var j = 0; j < grandGrandChildren.length; j++) {
                 var operation = grandGrandChildren[j];
                 if (operation.nodeName === "transformationref") {
                     // Get id of the transformation.
                     var transformationRef = this.reader.getString(operation, 'id');
-                    if (transformationRef == null){
+                    if (transformationRef == null) {
                         this.onXMLMinorError("No ID defined for " + operation.nodeName + " in component " + componentID + ". The material will be ignored.");
                         continue;
                     }
 
                     // Checks that ID exists.
-                    if (this.transformations[transformationRef] == null){
+                    if (this.transformations[transformationRef] == null) {
                         return operation.nodeName + " id in component " + componentID + " must refer to an already defined " + operation.nodeName + ".";
                     }
 
@@ -1207,7 +1288,7 @@ export class MySceneGraph {
                 else if (operation.nodeName === "translate") {
                     var coordinates;
                     coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
-                    if (!Array.isArray(coordinates)){
+                    if (!Array.isArray(coordinates)) {
                         this.onXMLMinorError(coordinates + " Assuming translation of [0,0,0]");
                         coordinates = vec3.create();
                     }
@@ -1216,26 +1297,26 @@ export class MySceneGraph {
                 else if (operation.nodeName === "scale") {
                     var coordinates;
                     coordinates = this.parseCoordinates3D(operation, "translate transformation for ID " + componentID);
-                    if (!Array.isArray(coordinates)){
+                    if (!Array.isArray(coordinates)) {
                         this.onXMLMinorError(coordinates + " Assuming scaling of [1,1,1].");
-                        coordinates = vec3.fromValues(1,1,1);
+                        coordinates = vec3.fromValues(1, 1, 1);
                     }
                     mat4.scale(transfMatrix, transfMatrix, coordinates);
                 }
-                else if (operation.nodeName === "rotate"){
-                        var axisProp = this.reader.getString(operation, 'axis');
-                        var axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
-                        var angle = this.reader.getFloat(operation, 'angle');
-                        if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
-                            this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid. Assuming rotation of 0 around the x axis.");
-                            angle = 0.0;
-                        }
-                        if(angle == null){
-                            this.onXMLMinorError("no angle property defined for the rotation operation number " + j + ". Assuming rotation of 0 around the x axis");
-                            axis = [1,0,0];
-                            angle = 0.0;
-                        }
-                        mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
+                else if (operation.nodeName === "rotate") {
+                    var axisProp = this.reader.getString(operation, 'axis');
+                    var axis = axisProp == 'x' ? [1, 0, 0] : (axisProp == 'y' ? [0, 1, 0] : [0, 0, 1]);
+                    var angle = this.reader.getFloat(operation, 'angle');
+                    if (axisProp != 'x' && axisProp != 'y' && axisProp != 'z') {
+                        this.onXMLMinorError("Rotation axis of operation number " + j + " of transformation " + transformationID + " is invalid. Assuming rotation of 0 around the x axis.");
+                        angle = 0.0;
+                    }
+                    if (angle == null) {
+                        this.onXMLMinorError("no angle property defined for the rotation operation number " + j + ". Assuming rotation of 0 around the x axis");
+                        axis = [1, 0, 0];
+                        angle = 0.0;
+                    }
+                    mat4.rotate(transfMatrix, transfMatrix, angle * DEGREE_TO_RAD, axis);
                 }
                 else {
                     this.onXMLMinorError("Operation " + operation.nodeName + " on transformation declaration for component " + componentID + " is invalid.");
@@ -1268,16 +1349,16 @@ export class MySceneGraph {
 
             // Texture
             var textureID = this.reader.getString(grandChildren[indices.textureIndex], 'id');
-            if (textureID == null){
+            if (textureID == null) {
                 this.onXMLMinorError("No ID defined for texture number " + i + " for component " + component + ". This texture will be ignored.");
                 continue;
             }
 
             if (textureID != "none" && textureID != "inherit") {
-                if (this.textures[textureID] == null){
+                if (this.textures[textureID] == null) {
                     return "Texture " + textureID + " used by " + componentID + " is not defined.";
                 }
-                
+
                 var param = 'length_s';
                 var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], param);
                 if (length_s == null) {
@@ -1538,12 +1619,12 @@ export class MySceneGraph {
         this.scene.applyViewMatrix();
 
         // preserve the scene current matrix
-        this.scene.pushMatrix()
+        this.scene.pushMatrix();
         
         this.drawComponent(this.components[this.idRoot], null);
 
         // restore the last preserved scene matrix
-        this.scene.popMatrix()
+        this.scene.popMatrix();
 
         // this.scene.interface.handleInput();
     }

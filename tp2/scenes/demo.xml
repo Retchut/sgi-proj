@@ -72,7 +72,7 @@
         </material>
         <material id="planetBlueMaterial" shininess="3">
             <emission r="0.0" g="0.0" b="0.0" a="1.0" />
-            <ambient r="0.0" g="0.45" b="1.0" a="1.0" />
+            <ambient r="0.0" g="0.76" b="1.0" a="1.0" />
             <diffuse r="0.0" g="0.45" b="0.6" a="1.0" />
             <specular r="0.0" g="0.45" b="0.6" a="1.0" />
         </material>
@@ -186,6 +186,29 @@
         <primitive id="cubemapSide">
             <rectangle x1="-0.5" y1="-0.5" x2="0.5" y2="0.5" />
         </primitive>
+        <primitive id="basicNurbsRectangle">
+            <patch degree_u="1" parts_u="20" degree_v="1" parts_v="20">
+                <controlpoint x="-1" y="-1" z="0" />
+                <controlpoint x="-1" y="1" z="0" />
+                <controlpoint x="1" y="-1" z="0" />
+                <controlpoint x="1" y="1" z="0" />
+            </patch>
+        </primitive>
+        <primitive id="basicNurbsTent">
+            <patch degree_u="1" parts_u="20" degree_v="2" parts_v="20">
+                <controlpoint x="-1" y="0" z="-1" />
+                <controlpoint x="0" y="4" z="-1" />
+                <controlpoint x="1" y="0" z="-1" />
+                <controlpoint x="-1" y="0" z="1" />
+                <controlpoint x="0" y="4" z="1" />
+                <controlpoint x="1" y="0" z="1" />
+            </patch>
+        </primitive>
+        <!-- <primitive id="testBarrel">
+            <patch degree_u="2" parts_u="20" degree_v="1" parts_v="20">
+
+            </patch>
+        </primitive> -->
     </primitives>
 
     <components>
@@ -197,11 +220,13 @@
             <texture id="none" />
             <children>
                 <componentref id="cubemap" />
-                <componentref id="planet1" />
+                <!-- <componentref id="planet1" />
                 <componentref id="planet2" />
                 <componentref id="planet3" />
                 <componentref id="planet4" />
-                <componentref id="sun" />
+                <componentref id="sun" /> -->
+                <primitiveref id="basicNurbsRectangle" />
+                <primitiveref id="basicNurbsTent" />
             </children>
         </component>
         <component id="planetRing">
@@ -299,7 +324,6 @@
                 <componentref id="blueTree7"/>
                 <componentref id="blueTree8"/>
             </children>
-            <highlighted r="0" g="1" b="1" scale_h="1" />
         </component>
         <component id="poleTop">
             <transformation>
