@@ -5,6 +5,7 @@ import { MyCylinder } from './MyCylinder.js';
 import { MySphere } from './MySphere.js';
 import { MyTorus } from './MyTorus.js';
 import { MyPatch } from './MyPatch.js';
+import { MyKeyframeAnimation } from './MyKeyframeAnimation.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -1240,6 +1241,7 @@ export class MySceneGraph {
             }
 
             var keyframeTags = animationTag.children;
+            var keyframes = [];
 
             // Iterate the <keyframe> tags
             for (var j = 0; j < keyframeTags.length; j++) {
@@ -1249,6 +1251,11 @@ export class MySceneGraph {
                 var instant = this.reader.getFloat(keyframeTag, 'instant');
                 if (instant == null || isNaN(instant)) {
                     this.onXMLMinorError("No instant defined for keyframe number " + j + " in animation with ID = " + animationId + ". This keyframe will be ignored.");
+                    continue;
+                }
+
+                if (keyframes.length != 0 && keyframes[keyframes.length - 1].instant >= instant) {
+                    this.onXMLMinorError("Invalid instant defined for keyframe number " + j + " in animation with ID = " + animationId + ". Keyframes must be declared in ascending time order. This keyframe will be ignored.");
                     continue;
                 }
 
@@ -1323,10 +1330,11 @@ export class MySceneGraph {
                 }
                 scaling[2] = coordinate;
 
-                console.log(translation);
-                console.log(rotation);
-                console.log(scaling);
+                keyframes.push({
+                    instant, translation, rotation, scaling,
+                });
             }
+            this.animations.push(new MyKeyframeAnimation(this.scene, keyframes));
         }
     }
 
@@ -1390,7 +1398,7 @@ export class MySceneGraph {
                 }
             }
 
-            var component = { transformation: mat4.create(), materials: [], texture: {}, children: { primitiveRefs: [], componentRefs: [] }, highlighted : {} }
+            var component = { transformation: mat4.create(), materials: [], texture: {}, children: { primitiveRefs: [], componentRefs: [] }, highlighted: {}, animation: null }
 
             // Transformations
             grandGrandChildren = grandChildren[indices.transformationIndex].children
@@ -1484,30 +1492,32 @@ export class MySceneGraph {
             // Texture
             var textureID = this.reader.getString(grandChildren[indices.textureIndex], 'id');
             if (textureID == null) {
-                this.onXMLMinorError("No ID defined for texture number " + i + " for component " + component + ". This texture will be ignored.");
-                continue;
+                this.onXMLMinorError("No ID defined for texture in component " + componentID + ". Assuming no texture.");
+                textureID = "none";
             }
 
             if (textureID != "none" && textureID != "inherit") {
                 if (this.textures[textureID] == null) {
-                    return "Texture " + textureID + " used by " + componentID + " is not defined.";
+                    this.onXMLMinorError("Texture " + textureID + " used by " + componentID + " is not defined. Assuming no texture.");
+                    textureID = "none";
                 }
+                else {
+                    var param = 'length_s';
+                    var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], param);
+                    if (length_s == null) {
+                        this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
+                        length_s = 1
+                    }
 
-                var param = 'length_s';
-                var length_s = this.reader.getFloat(grandChildren[indices.textureIndex], param);
-                if (length_s == null) {
-                    this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
-                    length_s = 1
+                    var param = 'length_t';
+                    var length_t = this.reader.getFloat(grandChildren[indices.textureIndex], param);
+                    if (length_t == null) {
+                        this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
+                        length_t = 1
+                    }
+                    component.texture.length_s = length_s;
+                    component.texture.length_t = length_t;
                 }
-
-                var param = 'length_t';
-                var length_t = this.reader.getFloat(grandChildren[indices.textureIndex], param);
-                if (length_t == null) {
-                    this.onXMLMinorError("Unable to parse " + param + " for texture with ID = " + textureID + " of component " + componentID + ". Assuming 1.");
-                    length_t = 1
-                }
-                component.texture.length_s = length_s;
-                component.texture.length_t = length_t;
             }
             component.texture.id = textureID
 
@@ -1529,20 +1539,35 @@ export class MySceneGraph {
                 }
             }
 
-            var highlightedIndex = nodeNames.indexOf("highlighted");
-            if(highlightedIndex !== -1){
-                let highlightedProp = grandChildren[highlightedIndex];
+            // Animation
+            indices.animationIndex = nodeNames.indexOf("animation");
+            if (indices.animationIndex != -1) {
+                var animationID = this.reader.getString(grandChildren[indices.animationIndex], 'id');
+                if (animationID == null) {
+                    this.onXMLMinorError("No ID defined for animation in component " + componentID + ". Assuming no animation.");
+                }
+                else if (this.textures[animationID] == null) {
+                    this.onXMLMinorError("Animation " + animationID + " used by " + componentID + " is not defined.");
+                }
+                else {
+                    component.animation = animationID;
+                }
+            }
+
+            indices.animationIndex = nodeNames.indexOf("highlighted");
+            if (indices.animationIndex !== -1) {
+                let highlightedProp = grandChildren[indices.animationIndex];
                 var highlightedR = this.reader.getFloat(highlightedProp, 'r');
                 var highlightedG = this.reader.getFloat(highlightedProp, 'g');
                 var highlightedB = this.reader.getFloat(highlightedProp, 'b');
                 var highlightedScale = this.reader.getFloat(highlightedProp, 'scale_h');
-                
+
                 this.onXMLMinorError("TODO: Parse actual highlighted parameter values");
                 component.highlighted = {
-                    r : highlightedR,
-                    g : highlightedG,
-                    b : highlightedB,
-                    scale : highlightedScale
+                    r: highlightedR,
+                    g: highlightedG,
+                    b: highlightedB,
+                    scale: highlightedScale
                 };
             }
 
@@ -1693,19 +1718,19 @@ export class MySceneGraph {
         let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
         let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
 
-        this.onXMLMinorError("TODO: draw highlighted object correctly and fix shader");
+        // this.onXMLMinorError("TODO: draw highlighted object correctly and fix shader");
         let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
-        if(isHighlighted){
+        if (isHighlighted) {
             const matColor = (texture.id === "none") ? this.materials[materialID].ambient : vec4.create();
-            if (texture.id !== "none"){
+            if (texture.id !== "none") {
                 this.textures[texture.id].bind(1);
             }
             this.scene.shaders[this.selectedShader].setUniformsValues({
-                matColor : matColor,
-                scaleFactor : currentNode.highlighted.scale,
-                colorFactors : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
+                matColor: matColor,
+                scaleFactor: currentNode.highlighted.scale,
+                colorFactors: vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
             });
-		    this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
+            this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
         }
 
         this.scene.multMatrix(currentNode.transformation);
@@ -1726,9 +1751,9 @@ export class MySceneGraph {
 
         currentAppearence.apply();
 
-        this.onXMLMinorError("TODO (maybe): Resetting active shader here");
-        if(isHighlighted)
-		    this.scene.setActiveShader(this.scene.defaultShader);
+        // this.onXMLMinorError("TODO (maybe): Resetting active shader here");
+        if (isHighlighted)
+            this.scene.setActiveShader(this.scene.defaultShader);
 
         for (var i = 0; i < currentNode.children.primitiveRefs.length; i++) {
             // display the primitive with the transformations already applied
@@ -1751,7 +1776,7 @@ export class MySceneGraph {
 
         // preserve the scene current matrix
         this.scene.pushMatrix();
-        
+
         this.drawComponent(this.components[this.idRoot], null);
 
         // restore the last preserved scene matrix
