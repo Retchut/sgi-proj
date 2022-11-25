@@ -6,7 +6,7 @@
             <from x="20" y="15" z="20" />
             <to x="0" y="0" z="0" />
         </perspective>
-        <ortho id="defaultCameraOrtho" near="0.1" far="500" left="-10" right="10" top="10" bottom="-10" >
+        <ortho id="defaultCameraOrtho" near="0.1" far="500" left="-10" right="10" top="10" bottom="-10">
             <from x="-30" y="15" z="-30" />
             <to x="0" y="0" z="0" />
         </ortho>
@@ -49,7 +49,7 @@
         <texture id="flag" file="scenes/images/flag.jpg" />
         <texture id="sun" file="scenes/images/sun.png" />
         <texture id="blueFire" file="scenes/images/bluefire.png" />
-        <texture id="cubemapFront" file="scenes/images/cubemap/front.png"/>
+        <texture id="cubemapFront" file="scenes/images/cubemap/front.png" />
         <texture id="cubemapBack" file="scenes/images/cubemap/back.png" />
         <texture id="cubemapRight" file="scenes/images/cubemap/right.png" />
         <texture id="cubemapLeft" file="scenes/images/cubemap/left.png" />
@@ -204,11 +204,37 @@
                 <controlpoint x="1" y="0" z="1" />
             </patch>
         </primitive>
-        <!-- <primitive id="testBarrel">
-            <patch degree_u="2" parts_u="20" degree_v="1" parts_v="20">
+        <primitive id="barrelSide">
+            <patch degree_u="2" parts_u="30" degree_v="3" parts_v="30">
+                <controlpoint x="-1" y="-1.414" z="0" />
+                <controlpoint x="-1" y="-1.414" z="-1.414" />
+                <controlpoint x="1" y="-1.414" z="-1.414" />
+                <controlpoint x="1" y="-1.414" z="0" />
 
+                <controlpoint x="-1.6" y="0" z="0" />
+                <controlpoint x="-1.6" y="0" z="-2.263" />
+                <controlpoint x="1.6" y="0" z="-2.263" />
+                <controlpoint x="1.6" y="0" z="0" />
+
+                <controlpoint x="-1" y="1.414" z="0" />
+                <controlpoint x="-1" y="1.414" z="-1.414" />
+                <controlpoint x="1" y="1.414" z="-1.414" />
+                <controlpoint x="1" y="1.414" z="0" />
             </patch>
-        </primitive> -->
+        </primitive>
+        <primitive id="barrelBase">
+            <patch degree_u="1" parts_u="1" degree_v="3" parts_v="30">
+                <controlpoint x="-1" y="1.414" z="0" />
+                <controlpoint x="-1" y="1.414" z="-1.414" />
+                <controlpoint x="1" y="1.414" z="-1.414" />
+                <controlpoint x="1" y="1.414" z="0" />
+
+                <controlpoint x="-1" y="1.414" z="0" />
+                <controlpoint x="-1" y="1.414" z="1.414" />
+                <controlpoint x="1" y="1.414" z="1.414" />
+                <controlpoint x="1" y="1.414" z="0" />
+            </patch>
+        </primitive>
     </primitives>
 
     <animations>
@@ -256,6 +282,36 @@
                 <scale sx="1" sy="1" sz="1" />
             </keyframe>
         </keyframeanim>
+        <keyframeanim id="myanimation">
+            <keyframe instant="5">
+                <translation x="0" y="0" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1.0" sy="1.0" sz="1.0" />
+            </keyframe>
+            <keyframe instant="10">
+                <translation x="0" y="0" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="90" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="15">
+                <translation x="0" y="20" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="180" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1.2" sy="1.2" sz="1.2" />
+            </keyframe>
+            <keyframe instant="20">
+                <translation x="0" y="0" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1.0" sy="1.0" sz="1.0" />
+            </keyframe>
+        </keyframeanim>
     </animations>
 
     <components>
@@ -272,6 +328,7 @@
                 <componentref id="planet3" />
                 <componentref id="planet4" />
                 <componentref id="sun" />
+                <!-- <componentref id="barrelHighlighted" /> -->
                 <!-- <primitiveref id="basicNurbsRectangle" />
                 <primitiveref id="basicNurbsTent" /> -->
             </children>
@@ -309,7 +366,7 @@
             <materials>
                 <material id="planetYellowMaterial" />
             </materials>
-            <texture id="saturn" length_s="1.0"  length_t="1.0"/>
+            <texture id="saturn" length_s="1.0" length_t="1.0" />
             <children>
                 <componentref id="ringPlanet" />
             </children>
@@ -376,12 +433,11 @@
             </children>
         </component>
         <component id="poleFlag">
-            <transformation>
-            </transformation>
+            <transformation></transformation>
             <materials>
                 <material id="flagMaterial" />
             </materials>
-            <texture id="flag" length_s="0.5" length_t="1.0"/>
+            <texture id="flag" length_s="0.5" length_t="1.0" />
             <children>
                 <primitiveref id="poleFlag" />
                 <primitiveref id="poleFlag2" />
@@ -414,6 +470,7 @@
                 <primitiveref id="planet" />
                 <componentref id="flagPole" />
                 <componentref id="house" />
+                <componentref id="barrelGroup" />
             </children>
             <animation id="test1" />
         </component>
@@ -546,7 +603,7 @@
             <materials>
                 <material id="basicMaterial" />
             </materials>
-            <texture id="none"/>
+            <texture id="none" />
             <children>
                 <componentref id="houseFloor" />
                 <componentref id="houseFrontWall" />
@@ -561,7 +618,7 @@
         </component>
         <component id="blueTree1">
             <transformation>
-                <transformationref id="blueTreeTransf1"/>
+                <transformationref id="blueTreeTransf1" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -573,7 +630,7 @@
         </component>
         <component id="blueTree2">
             <transformation>
-                <transformationref id="blueTreeTransf2"/>
+                <transformationref id="blueTreeTransf2" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -585,7 +642,7 @@
         </component>
         <component id="blueTree3">
             <transformation>
-                <transformationref id="blueTreeTransf3"/>
+                <transformationref id="blueTreeTransf3" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -597,7 +654,7 @@
         </component>
         <component id="blueTree4">
             <transformation>
-                <transformationref id="blueTreeTransf4"/>
+                <transformationref id="blueTreeTransf4" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -609,7 +666,7 @@
         </component>
         <component id="blueTree5">
             <transformation>
-                <transformationref id="blueTreeTransf5"/>
+                <transformationref id="blueTreeTransf5" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -621,7 +678,7 @@
         </component>
         <component id="blueTree6">
             <transformation>
-                <transformationref id="blueTreeTransf6"/>
+                <transformationref id="blueTreeTransf6" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -633,7 +690,7 @@
         </component>
         <component id="blueTree7">
             <transformation>
-                <transformationref id="blueTreeTransf7"/>
+                <transformationref id="blueTreeTransf7" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -645,7 +702,7 @@
         </component>
         <component id="blueTree8">
             <transformation>
-                <transformationref id="blueTreeTransf8"/>
+                <transformationref id="blueTreeTransf8" />
             </transformation>
             <texture id="inherit" />
             <materials>
@@ -670,7 +727,7 @@
         </component>
         <component id="discoTop">
             <transformation>
-                <scale x="0.8" y="0.8" z="0.8"/>
+                <scale x="0.8" y="0.8" z="0.8" />
                 <translate x="0" y="0" z="4.5" />
                 <!-- <translate x="0" y="5" z="50" /> -->
             </transformation>
@@ -684,7 +741,7 @@
         </component>
         <component id="log">
             <transformation>
-                <scale x="0.1" y="0.1" z="1" /> 
+                <scale x="0.1" y="0.1" z="1" />
             </transformation>
             <materials>
                 <material id="logMaterial" />
@@ -761,7 +818,7 @@
             <children>
                 <primitiveref id="cubemapSide" />
             </children>
-        </component>        
+        </component>
         <component id="cubemapTop">
             <transformation>
                 <translate x="0" y="0.5" z="0" />
@@ -786,6 +843,242 @@
             <texture id="cubemapBottom" length_s="1" length_t="1" />
             <children>
                 <primitiveref id="cubemapSide" />
+            </children>
+        </component>
+        <component id="barrel">
+            <transformation>
+                <translate x="0" y="1.07" z="0" />
+                <scale x="0.05" y="0.05" z="0.05" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="saturn" length_s="1.0" length_t="1.0" />
+
+            <children>
+                <componentref id="barrelTop" />
+                <componentref id="barrelBottom" />
+            </children>
+        </component>
+        <component id="barrelHighlighted">
+            <transformation>
+                <scale x="0.5" y="0.5" z="0.5" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="saturn" length_s="1.0" length_t="1.0" />
+
+            <children>
+                <componentref id="barrelTopHighlighted" />
+                <componentref id="barrelBottomHighlighted" />
+            </children>
+        </component>
+        <component id="barrelTopHighlighted">
+            <transformation></transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="inherit" length_s="1.0" length_t="1.0" />
+
+            <children>
+                <primitiveref id="barrelSide" />
+                <primitiveref id="barrelBase" />
+            </children>
+
+            <highlighted r="0.7" g="0.7" b="0.0" scale_h="1.25" />
+        </component>
+        <component id="barrelBottomHighlighted">
+            <transformation>
+                <rotate axis="x" angle="180" />
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="inherit" length_s="1.0" length_t="1.0" />
+
+            <children>
+                <primitiveref id="barrelSide" />
+                <primitiveref id="barrelBase" />
+            </children>
+
+            <highlighted r="0.7" g="0.7" b="0.0" scale_h="1.25" />
+        </component>
+        <component id="barrelTop">
+            <transformation></transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="inherit" length_s="1.0" length_t="1.0" />
+
+            <children>
+                <primitiveref id="barrelSide" />
+                <primitiveref id="barrelBase" />
+            </children>
+        </component>
+        <component id="barrelBottom">
+            <transformation>
+                <rotate axis="x" angle="180" />
+            </transformation>
+
+            <materials>
+                <material id="inherit" />
+            </materials>
+
+            <texture id="inherit" length_s="1.0" length_t="1.0" />
+
+            <children>
+                <primitiveref id="barrelSide" />
+                <primitiveref id="barrelBase" />
+            </children>
+        </component>
+        <component id="barrel1">
+            <transformation>
+                <rotate axis="x" angle="-12" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrel" />
+            </children>
+        </component>
+        <component id="barrel2">
+            <transformation>
+                <rotate axis="x" angle="-4" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrel" />
+            </children>
+        </component>
+        <component id="barrel3">
+            <transformation>
+                <rotate axis="x" angle="4" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrel" />
+            </children>
+        </component><component id="barrel4">
+            <transformation>
+                <rotate axis="x" angle="12" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrel" />
+            </children>
+        </component>
+        <component id="barrelLine">
+            <transformation>
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrel1" />
+                <componentref id="barrel2" />
+                <componentref id="barrel3" />
+                <componentref id="barrel4" />
+            </children>
+        </component>
+        <component id="barrelLine1">
+            <transformation>
+                <rotate axis="z" angle="-8" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrelLine" />
+            </children>
+        </component>
+        <component id="barrelLine2">
+            <transformation>
+                <rotate axis="z" angle="8" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrelLine" />
+            </children>
+        </component>
+        <component id="barrelLine3">
+            <transformation>
+                <rotate axis="z" angle="16" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrelLine" />
+            </children>
+        </component>
+        <component id="barrelGroup">
+            <transformation>
+                <rotate axis="x" angle="65" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrelLine" />
+                <componentref id="barrelLine1" />
+                <componentref id="barrelLine2" />
+                <componentref id="barrelLine3" />
             </children>
         </component>
     </components>
