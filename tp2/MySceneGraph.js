@@ -1403,7 +1403,6 @@ export class MySceneGraph {
                 var highlightedB = this.reader.getFloat(highlightedProp, 'b');
                 var highlightedScale = this.reader.getFloat(highlightedProp, 'scale_h');
                 
-                this.onXMLMinorError("TODO: Parse actual highlighted parameter values");
                 component.highlighted = {
                     r : highlightedR,
                     g : highlightedG,
@@ -1558,6 +1557,7 @@ export class MySceneGraph {
         let currentComponentMaterial = this.currentMaterial % currentNode.materials.length
         let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
         let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
+        let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
 
         this.scene.multMatrix(currentNode.transformation);
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {
@@ -1576,9 +1576,7 @@ export class MySceneGraph {
             currentAppearence.setTexture(null);
 
         currentAppearence.apply();
-
-        this.onXMLMinorError("TODO: draw highlighted object correctly and fix shader");
-        let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
+        
         if(isHighlighted){
             const hasTexture = (texture.id !== "none");
             if (hasTexture) {
@@ -1589,8 +1587,8 @@ export class MySceneGraph {
                 ambientColor : this.materials[materialID].ambient,
                 diffuseColor : this.materials[materialID].diffuse,
                 specularColor : this.materials[materialID].specular,
-                scaleFactor : currentNode.highlighted.scale,
-                colorFactors : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
+                shaderScaleFactor : currentNode.highlighted.scale,
+                highlightColor : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
             });
             this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
         }
@@ -1602,7 +1600,6 @@ export class MySceneGraph {
             this.primitives[currentNode.children.primitiveRefs[i]].display();
         }
 
-        this.onXMLMinorError("TODO (maybe): Resetting active shader here");
         if(isHighlighted)
 		    this.scene.setActiveShader(this.scene.defaultShader);
     }

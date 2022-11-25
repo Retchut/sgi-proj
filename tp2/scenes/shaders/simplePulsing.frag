@@ -24,8 +24,8 @@ varying vec2 vTextureCoord; // vertex coord from fragment shader
 
 uniform sampler2D uSampler;
 uniform sampler2D uSampler1;
-uniform float timeFactor;
-uniform vec3 colorFactors;
+uniform float shaderTimeFactor;
+uniform vec3 highlightColor;
 uniform bool hasTexture;
 uniform vec4 ambientColor;
 uniform vec4 diffuseColor;
@@ -38,12 +38,12 @@ void main() {
         fragcolor = texture2D(uSampler1, vTextureCoord);
     }
 
-    vec3 finalColorFactor = colorFactors * 0.6 * sin(timeFactor);
-    vec3 finalColor = vec3(
-        fragcolor.x * finalColorFactor.x,
-        fragcolor.y * finalColorFactor.y,
-        fragcolor.z * finalColorFactor.z
-    );
+    float absTimeFactor = abs(sin(shaderTimeFactor));
+    float interpX = mix(fragcolor.x, highlightColor.x, absTimeFactor);
+    float interpY = mix(fragcolor.y, highlightColor.y, absTimeFactor);
+    float interpZ = mix(fragcolor.z, highlightColor.z, absTimeFactor);
+
+    vec3 finalColor = vec3(interpX, interpY, interpZ);
 
     gl_FragColor = vec4(finalColor, 1);
 }

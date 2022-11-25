@@ -99,8 +99,8 @@ export class XMLscene extends CGFscene {
             new CGFshader(this.gl, 'scenes/shaders/simplePulsing.vert', 'scenes/shaders/simplePulsing.frag')
         ];
         this.shaders[0].setUniformsValues({
-            timeFactor : 0,
-            scaleFactor : this.graph.shaderScale,
+            shaderTimeFactor : 0,
+            shaderScaleFactor : this.graph.shaderScale,
             factors : vec3.create(),
             matColor : vec4.create()
         });
@@ -136,7 +136,7 @@ export class XMLscene extends CGFscene {
      */
     update(currTime){
         if(this.sceneInited)
-            this.shaders[0].setUniformsValues({ timeFactor: currTime / 100 % 100 });
+            this.shaders[0].setUniformsValues({ shaderTimeFactor: currTime / 1000 % 100 });
             // this.shaders[0].setUniformsValues({ timeFactor: (currTime % 100) / 100 });
     }
 
