@@ -279,17 +279,47 @@
     <animations>
         <keyframeanim id="cometAnim">
             <keyframe instant="0">
-                <translation x="5" y="5" z="0" />
+                <translation x="0" y="0" z="0" />
                 <rotation axis="z" angle="0" />
                 <rotation axis="y" angle="0" />
                 <rotation axis="x" angle="0" />
                 <scale sx="1" sy="1" sz="1" />
             </keyframe>
             <keyframe instant="4">
-                <translation x="-10" y="1" z="1" />
+                <translation x="-8.5" y="-4.5" z="3" />
                 <rotation axis="z" angle="0" />
                 <rotation axis="y" angle="0" />
                 <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="5">
+                <translation x="20" y="20" z="-30" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+        </keyframeanim>
+        <keyframeanim id="planet2Anim">
+            <keyframe instant="0">
+                <translation x="0" y="0" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="4">
+                <translation x="0" y="0" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="6">
+                <translation x="-50" y="-50" z="50" />
+                <rotation axis="z" angle="90" />
+                <rotation axis="y" angle="180" />
+                <rotation axis="x" angle="180" />
                 <scale sx="1" sy="1" sz="1" />
             </keyframe>
         </keyframeanim>
@@ -377,12 +407,12 @@
             </materials>
             <texture id="none" />
             <children>
-                <!-- <componentref id="cubemap" />  -->
-                <!-- <componentref id="planet1" />  -->
-                <componentref id="planet2" /> 
-                <!-- <componentref id="planet3" />  -->
-                <!-- <componentref id="planet4" />  -->
-                <!-- <componentref id="sun" />  -->
+                <componentref id="cubemap" />
+                <componentref id="planet1" />
+                <componentref id="planet2" />
+                <componentref id="planet3" />
+                <componentref id="planet4" />
+                <componentref id="sun" />
                 <!-- <componentref id="barrelHighlighted" /> -->
                 <!-- <primitiveref id="basicNurbsRectangle" /> -->
                 <componentref id="comet" />
@@ -440,6 +470,7 @@
             <children>
                 <componentref id="ringPlanet" />
             </children>
+            <animation id="planet2Anim" />
         </component>
         <component id="planet3">
             <transformation>
@@ -465,14 +496,14 @@
             <texture id="none" />
             <children>
                 <primitiveref id="planet" />
-                <componentref id="blueTree1"/>
-                <componentref id="blueTree2"/>
-                <componentref id="blueTree3"/>
-                <componentref id="blueTree4"/>
-                <componentref id="blueTree5"/>
-                <componentref id="blueTree6"/>
-                <componentref id="blueTree7"/>
-                <componentref id="blueTree8"/>
+                <componentref id="blueTree1" />
+                <componentref id="blueTree2" />
+                <componentref id="blueTree3" />
+                <componentref id="blueTree4" />
+                <componentref id="blueTree5" />
+                <componentref id="blueTree6" />
+                <componentref id="blueTree7" />
+                <componentref id="blueTree8" />
             </children>
         </component>
         <component id="poleTop">
@@ -1075,7 +1106,8 @@
             <children>
                 <componentref id="barrel" />
             </children>
-        </component><component id="barrel4">
+        </component>
+        <component id="barrel4">
             <transformation>
                 <rotate axis="x" angle="12" />
             </transformation>
@@ -1091,8 +1123,7 @@
             </children>
         </component>
         <component id="barrelLine">
-            <transformation>
-            </transformation>
+            <transformation></transformation>
 
             <materials>
                 <material id="planetYellowMaterial" />
@@ -1208,8 +1239,8 @@
         <component id="comet">
             <transformation>
                 <translate x="7" y="5" z="-3" />
-                <rotate axis="z" angle="30" />
-                <rotate axis="y" angle="10" />
+                <!-- <rotate axis="z" angle="30" />
+                <rotate axis="y" angle="10" /> -->
             </transformation>
 
             <materials>
