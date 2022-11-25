@@ -47,7 +47,7 @@ export class MyInterface extends CGFinterface {
     }
 
     initCameras(){
-        this.cameras = this.gui.addFolder('Cameras');
+        this.cameras = this.gui.addFolder('Camera Controls');
         this.cameras.add(this.scene, 'currentViewID', this.scene.viewIDs).name('Views').onChange(
             () => {
                 this.scene.camera = this.scene.graph.views[this.scene.currentViewID];
@@ -58,7 +58,7 @@ export class MyInterface extends CGFinterface {
 
     initLights(){
         let lightIndex = 0;
-        this.lights = this.gui.addFolder('Lights');
+        this.lights = this.gui.addFolder('Toggle Lights');
         this.lightsVisibility = this.gui.addFolder('Light Visibility');
 
         for (const lightName in this.scene.graph.lights){
@@ -81,13 +81,13 @@ export class MyInterface extends CGFinterface {
     }
 
     initShaders(){
-        this.shaderFolder = this.gui.addFolder('Shaders');
+        this.shaderFolder = this.gui.addFolder('Shader Controls');
         this.shaderToggle = this.shaderFolder.add(this.scene.shadersController, 'shadersActive').name("Toggle Shader");
         this.shaderFreeze = this.shaderFolder.add(this.scene.shadersController, 'freezeShader').name("Freeze Shader");
     }
 
     initAnimations(){
-        this.animationFolder = this.gui.addFolder('Animations');
+        this.animationFolder = this.gui.addFolder('Animation Controls');
         this.animationFreeze = this.animationFolder.add(this.scene.animationsController, 'freezeAnimations').name("Freeze Animations");
     }
 
