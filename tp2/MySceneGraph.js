@@ -1554,10 +1554,10 @@ export class MySceneGraph {
     drawComponent(currentNode, prevAppearenceId, prevTexture) {
         // multiply the current scene transformation matrix by the current component matrix
         // access primitives via id
-        let currentComponentMaterial = this.currentMaterial % currentNode.materials.length
-        let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
-        let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
-        let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
+        const currentComponentMaterial = this.currentMaterial % currentNode.materials.length
+        const materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
+        const texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
+        const isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
 
         this.scene.multMatrix(currentNode.transformation);
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {
@@ -1568,13 +1568,12 @@ export class MySceneGraph {
             // restore scene transformation matrix
             this.scene.popMatrix();
         }
-        let currentAppearence = this.materials[materialID];
 
+        const currentAppearence = this.materials[materialID];
         if (texture.id !== "none")
             currentAppearence.setTexture(this.textures[texture.id]);
         else
             currentAppearence.setTexture(null);
-
         currentAppearence.apply();
         
         if(isHighlighted){
