@@ -114,6 +114,12 @@
             <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
             <specular r="0.0" g="0.0" b="0.0" a="1.0" />
         </material>
+        <material id="cometMaterial" shininess="1">
+            <emission r="0.2" g="0.2" b="0.2" a="1.0" />
+            <ambient r="0.6" g="0.2" b="0.2" a="1.0" />
+            <diffuse r="0.9" g="0.0" b="0.3" a="1.0" />
+            <specular r="0.5" g="0.5" b="0.5" a="1.0" />
+        </material>
         <material id="cubemapMaterial" shininess="1">
             <emission r="1.0" g="1.0" b="1.0" a="1.0" />
             <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
@@ -167,6 +173,9 @@
         <primitive id="smallSphere">
             <sphere radius="0.05" slices="10" stacks="10" />
         </primitive>
+        <primitive id="mediumSphere">
+            <sphere radius="0.3" slices="10" stacks="10" />
+        </primitive>
         <primitive id="planet">
             <sphere radius="1" slices="100" stacks="100" />
         </primitive>
@@ -204,6 +213,34 @@
                 <controlpoint x="-1" y="0" z="1" />
                 <controlpoint x="0" y="4" z="1" />
                 <controlpoint x="1" y="0" z="1" />
+            </patch>
+        </primitive>
+        <primitive id="cometTailTop">
+            <patch degree_u="1" parts_u="20" degree_v="2" parts_v="20">
+                <controlpoint x="0" y="-0.2" z="-0.2" />
+                <controlpoint x="-4" y="0" z="-0.2" />
+                <controlpoint x="0" y="0.2" z="-0.2" />
+                <controlpoint x="0" y="-0.2" z="0.2" />
+                <controlpoint x="-4" y="0" z="0.2" />
+                <controlpoint x="0" y="0.2" z="0.2" />
+            </patch>
+        </primitive>
+        <primitive id="cometTailSides">
+            <patch degree_u="1" parts_u="20" degree_v="2" parts_v="20">
+                <controlpoint x="0" y="-0.2" z="-0.2" />
+                <controlpoint x="-4" y="-0,2" z="0" />
+                <controlpoint x="0" y="-0.2" z="0.2" />
+                <controlpoint x="0" y="0.2" z="-0.2" />
+                <controlpoint x="-4" y="0.2" z="0" />
+                <controlpoint x="0" y="0.2" z="0.2" />
+
+
+                <controlpoint x="0" y="-0.2" z="-0.2" />
+                <controlpoint x="-4" y="0" z="-0.2" />
+                <controlpoint x="0" y="0.2" z="-0.2" />
+                <controlpoint x="0" y="-0.2" z="0.2" />
+                <controlpoint x="-4" y="0" z="0.2" />
+                <controlpoint x="0" y="0.2" z="0.2" />
             </patch>
         </primitive>
         <primitive id="barrelSide">
@@ -324,15 +361,15 @@
             </materials>
             <texture id="none" />
             <children>
-                <componentref id="cubemap" />
+                <!-- <componentref id="cubemap" />
                 <componentref id="planet1" />
                 <componentref id="planet2" />
                 <componentref id="planet3" />
                 <componentref id="planet4" />
                 <componentref id="sun" />
-                <componentref id="barrelHighlighted" />
-                <!-- <primitiveref id="basicNurbsRectangle" />
-                <primitiveref id="basicNurbsTent" /> -->
+                <componentref id="barrelHighlighted" /> -->
+                <!-- <primitiveref id="basicNurbsRectangle" /> -->
+                <componentref id="comet" />
             </children>
         </component>
         <component id="planetRing">
@@ -1134,6 +1171,41 @@
                 <componentref id="barrelHighlightedLeft" />
                 <componentref id="barrelHighlightedRight" />
             </children>
+        </component>
+        <component id="cometHead">
+            <transformation>
+                <translate x="-2" y="0" z="0" />
+            </transformation>
+
+            <materials>
+                <material id="cometMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <primitiveref id="mediumSphere" />
+            </children>
+
+            <highlighted r="1.0" g="0.0" b="0.3" scale_h="1.5" />
+        </component>
+        <component id="comet">
+            <transformation>
+            </transformation>
+
+            <materials>
+                <material id="cometMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="cometHead" />
+                <primitiveref id="cometTailTop" />
+                <primitiveref id="cometTailSides" />
+            </children>
+
+            <highlighted r="1.0" g="0.0" b="0.3" scale_h="1.5" />
         </component>
     </components>
 </sxs>
