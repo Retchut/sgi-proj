@@ -251,6 +251,7 @@
                 <primitiveref id="planet" />
                 <componentref id="planetRing" />
             </children>
+            <highlighted r="0.7" g="0.7" b="0.0" scale_h="1.25" />
         </component>
         <component id="planet1">
             <transformation>
