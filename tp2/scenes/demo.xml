@@ -212,7 +212,50 @@
     </primitives>
 
     <animations>
-        
+        <keyframeanim id="test1">
+            <keyframe instant="0">
+                <translation x="0" y="0" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="2.5">
+                <translation x="0" y="0" z="2" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="5">
+                <translation x="0" y="0" z="4" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="7.5">
+                <translation x="0" y="0" z="6" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="10">
+                <translation x="0" y="0" z="8" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="12.5">
+                <translation x="0" y="0" z="10" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+        </keyframeanim>
     </animations>
 
     <components>
@@ -328,7 +371,7 @@
                 <componentref id="blueTree7"/>
                 <componentref id="blueTree8"/>
             </children>
-            <highlighted r="0" g="1" b="1" scale_h="1" />
+            <highlighted r="0.0" g="1.0" b="1.0" scale_h="1.0" />
         </component>
         <component id="poleTop">
             <transformation>
@@ -382,6 +425,7 @@
                 <componentref id="flagPole" />
                 <componentref id="house" />
             </children>
+            <animation id="test1" />
         </component>
         <component id="houseFloor">
             <transformation>

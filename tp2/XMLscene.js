@@ -135,9 +135,22 @@ export class XMLscene extends CGFscene {
      * @param {Number} currTime
      */
     update(currTime){
-        if(this.sceneInited)
+        if(this.sceneInited){
+            let elapsedTime;
+
+            if(this.runTime == null) 
+                elapsedTime = 0;
+            else 
+                elapsedTime = currTime - this.runTime;
+
+            this.runTime = currTime;
+
             this.shaders[0].setUniformsValues({ timeFactor: currTime / 100 % 100 });
             // this.shaders[0].setUniformsValues({ timeFactor: (currTime % 100) / 100 });
+
+            for (const anim in this.graph.animations)
+                this.graph.animations[anim].update(elapsedTime / 1000);
+        }
     }
 
     /**

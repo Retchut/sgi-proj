@@ -5,6 +5,11 @@
 export class MyAnimation {
     constructor(scene) {
         this.scene = scene;
+        
+        this.startTime;
+        this.endTime;
+        this.timeElapsed = 0;
+        this.animationTransfMatrix = mat4.create();
     }
 
     /** 

@@ -6,6 +6,7 @@ import { MySphere } from './MySphere.js';
 import { MyTorus } from './MyTorus.js';
 import { MyPatch } from './MyPatch.js';
 import { MyKeyframeAnimation } from './MyKeyframeAnimation.js';
+import { MyKeyframe } from './MyKeyframe.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -1228,15 +1229,15 @@ export class MySceneGraph {
             }
 
             // Get id of the current animation.
-            var animationId = this.reader.getString(animationTag, 'id');
-            if (animationId == null) {
+            var animationID = this.reader.getString(animationTag, 'id');
+            if (animationID == null) {
                 this.onXMLMinorError("No ID defined for animation number" + i + ". This animation will be ignored.");
                 continue;
             }
 
             // Checks for repeated IDs.
-            if (this.animations[animationId] != null) {
-                this.onXMLMinorError("ID must be unique for each animation (conflict: ID = " + animationId + "). The duplicate will be ignored.");
+            if (this.animations[animationID] != null) {
+                this.onXMLMinorError("ID must be unique for each animation (conflict: ID = " + animationID + "). The duplicate will be ignored.");
                 continue;
             }
 
@@ -1250,12 +1251,12 @@ export class MySceneGraph {
                 // Get instant of the current keyframe.
                 var instant = this.reader.getFloat(keyframeTag, 'instant');
                 if (instant == null || isNaN(instant)) {
-                    this.onXMLMinorError("No instant defined for keyframe number " + j + " in animation with ID = " + animationId + ". This keyframe will be ignored.");
+                    this.onXMLMinorError("No instant defined for keyframe number " + j + " in animation with ID = " + animationID + ". This keyframe will be ignored.");
                     continue;
                 }
-
+                
                 if (keyframes.length != 0 && keyframes[keyframes.length - 1].instant >= instant) {
-                    this.onXMLMinorError("Invalid instant defined for keyframe number " + j + " in animation with ID = " + animationId + ". Keyframes must be declared in ascending time order. This keyframe will be ignored.");
+                    this.onXMLMinorError("Invalid instant defined for keyframe number " + j + " in animation with ID = " + animationID + ". Keyframes must be declared in ascending time order. This keyframe will be ignored.");
                     continue;
                 }
 
@@ -1264,11 +1265,11 @@ export class MySceneGraph {
                 if (transformationTags.length != 5 || transformationTags[0].nodeName != "translation" ||
                     transformationTags[1].nodeName != "rotation" || transformationTags[2].nodeName != "rotation" ||
                     transformationTags[3].nodeName != "rotation" || transformationTags[4].nodeName != "scale") {
-                    this.onXMLMinorError("Invalid transformations defined for keyframe number " + j + " in animation with ID = " + animationId + ". This keyframe will be ignored.");
+                    this.onXMLMinorError("Invalid transformations defined for keyframe number " + j + " in animation with ID = " + animationID + ". This keyframe will be ignored.");
                     continue;
                 }
 
-                var translation = this.parseCoordinates3D(transformationTags[0], "translation transformation for ID " + animationId);
+                var translation = this.parseCoordinates3D(transformationTags[0], "translation transformation for ID " + animationID);
                 if (!Array.isArray(translation)) {
                     this.onXMLMinorError(translation + " Assuming translation of [0,0,0]");
                     translation = vec3.create();
@@ -1277,65 +1278,66 @@ export class MySceneGraph {
                 var rotation = [0, 0, 0];
                 var angle = 0;
                 if (this.reader.getString(transformationTags[1], 'axis') != "z") {
-                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationId + ". Rotations must follow the z, y, x axis order. Assuming 0 for the z axis");
+                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationID + ". Rotations must follow the z, y, x axis order. Assuming 0 for the z axis");
                 }
                 else {
                     angle = this.reader.getFloat(transformationTags[1], 'angle');
                     if (angle == null || isNaN(angle)) {
-                        this.onXMLMinorError("No angle defined for rotation in z axis for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                        this.onXMLMinorError("No angle defined for rotation in z axis for keyframe number " + j + " in animation with ID = " + animationID + ". Assuming 0.");
                     }
                     else rotation[2] = angle;
                 }
 
                 if (this.reader.getString(transformationTags[2], 'axis') != "y") {
-                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationId + ". Rotations must follow the z, y, x axis order. Assuming 0 for the y axis");
+                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationID + ". Rotations must follow the z, y, x axis order. Assuming 0 for the y axis");
                 }
                 else {
                     angle = this.reader.getFloat(transformationTags[2], 'angle');
                     if (angle == null || isNaN(angle)) {
-                        this.onXMLMinorError("No angle defined for rotation in y axis for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                        this.onXMLMinorError("No angle defined for rotation in y axis for keyframe number " + j + " in animation with ID = " + animationID + ". Assuming 0.");
                     }
                     else rotation[1] = angle;
                 }
 
                 if (this.reader.getString(transformationTags[3], 'axis') != "x") {
-                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationId + ". Rotations must follow the z, y, x axis order. Assuming 0 for the x axis");
+                    this.onXMLMinorError("Invalid rotation axis for keyframe number " + j + " in animation with ID = " + animationID + ". Rotations must follow the z, y, x axis order. Assuming 0 for the x axis");
                 }
                 else {
                     angle = this.reader.getFloat(transformationTags[3], 'angle');
                     if (angle == null || isNaN(angle)) {
-                        this.onXMLMinorError("No angle defined for rotation in x axis for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                        this.onXMLMinorError("No angle defined for rotation in x axis for keyframe number " + j + " in animation with ID = " + animationID + ". Assuming 0.");
                     }
                     else rotation[0] = angle;
                 }
                 var scaling = [0, 0, 0];
                 var coordinate = this.reader.getFloat(transformationTags[4], 'sx');
                 if (coordinate == null || isNaN(coordinate)) {
-                    this.onXMLMinorError("Unable to parse sx of the scaling for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    this.onXMLMinorError("Unable to parse sx of the scaling for keyframe number " + j + " in animation with ID = " + animationID + ". Assuming 0.");
                     coordinate = 0;
                 }
                 scaling[0] = coordinate;
 
                 coordinate = this.reader.getFloat(transformationTags[4], 'sy');
                 if (coordinate == null || isNaN(coordinate)) {
-                    this.onXMLMinorError("Unable to parse sy of the scaling for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    this.onXMLMinorError("Unable to parse sy of the scaling for keyframe number " + j + " in animation with ID = " + animationID + ". Assuming 0.");
                     coordinate = 0;
                 }
                 scaling[1] = coordinate;
 
                 coordinate = this.reader.getFloat(transformationTags[4], 'sz');
                 if (coordinate == null || isNaN(coordinate)) {
-                    this.onXMLMinorError("Unable to parse sz of the scaling for keyframe number " + j + " in animation with ID = " + animationId + ". Assuming 0.");
+                    this.onXMLMinorError("Unable to parse sz of the scaling for keyframe number " + j + " in animation with ID = " + animationID + ". Assuming 0.");
                     coordinate = 0;
                 }
                 scaling[2] = coordinate;
 
-                keyframes.push({
-                    instant, translation, rotation, scaling,
-                });
+                keyframes.push(new MyKeyframe(instant, translation, rotation, scaling));
             }
-            this.animations.push(new MyKeyframeAnimation(this.scene, keyframes));
+            var animation = new MyKeyframeAnimation(this.scene, keyframes);
+            animation.initAnimationTime();
+            this.animations[animationID] = animation;
         }
+        this.log("Parsed animations")
     }
 
     /**
@@ -1387,7 +1389,7 @@ export class MySceneGraph {
                 transformationIndex: nodeNames.indexOf("transformation"),
                 materialsIndex: nodeNames.indexOf("materials"),
                 textureIndex: nodeNames.indexOf("texture"),
-                childrenIndex: nodeNames.indexOf("children")
+                childrenIndex: nodeNames.indexOf("children"),
             }
 
             // check if the component object has one of each required tags defined
@@ -1540,13 +1542,13 @@ export class MySceneGraph {
             }
 
             // Animation
-            indices.animationIndex = nodeNames.indexOf("animation");
-            if (indices.animationIndex != -1) {
-                var animationID = this.reader.getString(grandChildren[indices.animationIndex], 'id');
-                if (animationID == null) {
+            const animationIndex = nodeNames.indexOf("animation");
+            if (animationIndex !== -1) {
+                var animationID = this.reader.getString(grandChildren[animationIndex], 'id');
+                if (animationID === null) {
                     this.onXMLMinorError("No ID defined for animation in component " + componentID + ". Assuming no animation.");
                 }
-                else if (this.textures[animationID] == null) {
+                else if (this.animations[animationID] === null) {
                     this.onXMLMinorError("Animation " + animationID + " used by " + componentID + " is not defined.");
                 }
                 else {
@@ -1554,9 +1556,9 @@ export class MySceneGraph {
                 }
             }
 
-            indices.animationIndex = nodeNames.indexOf("highlighted");
-            if (indices.animationIndex !== -1) {
-                let highlightedProp = grandChildren[indices.animationIndex];
+            const highlightedIndex = nodeNames.indexOf("highlighted");
+            if(highlightedIndex !== -1){
+                let highlightedProp = grandChildren[highlightedIndex];
                 var highlightedR = this.reader.getFloat(highlightedProp, 'r');
                 var highlightedG = this.reader.getFloat(highlightedProp, 'g');
                 var highlightedB = this.reader.getFloat(highlightedProp, 'b');
@@ -1718,6 +1720,13 @@ export class MySceneGraph {
         let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
 
         this.scene.multMatrix(currentNode.transformation);
+        if(currentNode.animation !== null){
+            if(this.animations[currentNode.animation].apply() !== 0){
+                this.onXMLMinorError("Error animating component with id " + currentNode.id);
+            }
+        }
+        
+
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {
             // preserve current scene transformation matrix
             this.scene.pushMatrix();
