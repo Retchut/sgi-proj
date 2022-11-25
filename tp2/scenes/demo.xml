@@ -165,7 +165,7 @@
         <primitive id="smallSphere">
             <sphere radius="0.05" slices="10" stacks="10" />
         </primitive>
-        <primitive id="basicSphere">
+        <primitive id="planet">
             <sphere radius="1" slices="100" stacks="100" />
         </primitive>
         <primitive id="basicTorus">
@@ -241,17 +241,6 @@
                 <primitiveref id="basicTorus" />
             </children>
         </component>
-        <component id="planet">
-            <transformation>
-            </transformation>
-            <materials>
-                <material id="inherit" />
-            </materials>
-            <texture id="inherit" />
-            <children>
-                <primitiveref id="basicSphere" />
-            </children>
-        </component>
         <component id="ringPlanet">
             <transformation></transformation>
             <materials>
@@ -259,7 +248,7 @@
             </materials>
             <texture id="inherit" />
             <children>
-                <componentref id="planet" />
+                <primitiveref id="planet" />
                 <componentref id="planetRing" />
             </children>
         </component>
@@ -301,8 +290,9 @@
             </materials>
             <texture id="none" />
             <children>
-                <componentref id="planet" />
+                <primitiveref id="planet" />
             </children>
+            <highlighted r="1.0" g="0.0" b="0.0" scale_h="1.1" />
         </component>
         <component id="planet4">
             <transformation>
@@ -314,7 +304,7 @@
             </materials>
             <texture id="none" />
             <children>
-                <componentref id="planet" />
+                <primitiveref id="planet" />
                 <componentref id="blueTree1"/>
                 <componentref id="blueTree2"/>
                 <componentref id="blueTree3"/>
@@ -324,7 +314,6 @@
                 <componentref id="blueTree7"/>
                 <componentref id="blueTree8"/>
             </children>
-            <highlighted r="0" g="1" b="1" scale_h="1" />
         </component>
         <component id="poleTop">
             <transformation>
@@ -374,7 +363,7 @@
             </materials>
             <texture id="sun" length_s="1" length_t="1" />
             <children>
-                <componentref id="planet" />
+                <primitiveref id="planet" />
                 <componentref id="flagPole" />
                 <componentref id="house" />
             </children>
