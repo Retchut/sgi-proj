@@ -80,6 +80,7 @@ export class MySceneGraph {
         this.scene.onGraphLoaded();
         this.scene.interface.initCameras();
         this.scene.interface.initLights();
+        this.scene.interface.initShaders();
     }
 
     /**
@@ -1742,7 +1743,7 @@ export class MySceneGraph {
         const currentComponentMaterial = this.currentMaterial % currentNode.materials.length
         const materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
         const texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
-        const isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
+        const isHighlighted = (Object.keys(currentNode.highlighted).length > 0) && this.scene.shadersController.shadersActive;
 
         this.scene.multMatrix(currentNode.transformation);
         if(currentNode.animation !== null){
@@ -1815,7 +1816,5 @@ export class MySceneGraph {
 
         // restore the last preserved scene matrix
         this.scene.popMatrix();
-
-        // this.scene.interface.handleInput();
     }
 }

@@ -98,7 +98,10 @@ export class XMLscene extends CGFscene {
         this.shaders = [
             new CGFshader(this.gl, 'scenes/shaders/simplePulsing.vert', 'scenes/shaders/simplePulsing.frag')
         ];
-        this.shaders[0].setUniformsValues({
+        this.selectedShader = 0;
+        // dat.gui does not let us work with primitive values, so we have to wrap the boolean inside an object
+        this.shadersController = { shadersActive : true, shadersPaused : false };
+        this.shaders[this.selectedShader].setUniformsValues({
             shaderTimeFactor : 0,
             shaderScaleFactor : this.graph.shaderScale,
             factors : vec3.create(),
@@ -145,10 +148,11 @@ export class XMLscene extends CGFscene {
 
             this.runTime = currTime;
 
-            this.shaders[0].setUniformsValues({ shaderTimeFactor: currTime / 1000 % 100 });
-
             for (const anim in this.graph.animations)
                 this.graph.animations[anim].update(elapsedTime / 1000);
+
+            if(this.shadersController.shadersActive && !this.shadersController.shadersPaused)
+                this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTime / 1000 % 100 });
         }
     }
 
