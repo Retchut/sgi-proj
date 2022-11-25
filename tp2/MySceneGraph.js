@@ -1559,10 +1559,34 @@ export class MySceneGraph {
             const highlightedIndex = nodeNames.indexOf("highlighted");
             if(highlightedIndex !== -1){
                 let highlightedProp = grandChildren[highlightedIndex];
-                var highlightedR = this.reader.getFloat(highlightedProp, 'r');
-                var highlightedG = this.reader.getFloat(highlightedProp, 'g');
-                var highlightedB = this.reader.getFloat(highlightedProp, 'b');
-                var highlightedScale = this.reader.getFloat(highlightedProp, 'scale_h');
+
+                var param = 'r';
+                var highlightedR = this.reader.getFloat(highlightedProp, param);
+                if (highlightedR == null) {
+                    this.onXMLMinorError("Unable to parse " + param + " for highlighted tag of component " + componentID + ". Assuming 1.0.");
+                    highlightedR = 1.0;
+                }
+
+                var param = 'g';
+                var highlightedG = this.reader.getFloat(highlightedProp, param);
+                if (highlightedG == null) {
+                    this.onXMLMinorError("Unable to parse " + param + " for highlighted tag of component " + componentID + ". Assuming 1.0.");
+                    highlightedG = 1.0;
+                }
+
+                var param = 'b';
+                var highlightedB = this.reader.getFloat(highlightedProp, param);
+                if (highlightedB == null) {
+                    this.onXMLMinorError("Unable to parse " + param + " for highlighted tag of component " + componentID + ". Assuming 1.0.");
+                    highlightedB = 1.0;
+                }
+
+                var param = 'scale_h';
+                var highlightedScale = this.reader.getFloat(highlightedProp, param);
+                if (highlightedScale == null) {
+                    this.onXMLMinorError("Unable to parse " + param + " for highlighted tag of component " + componentID + ". Assuming 1.0.");
+                    highlightedScale = 1.0;
+                }
                 
                 component.highlighted = {
                     r: highlightedR,
