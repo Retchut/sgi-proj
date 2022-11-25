@@ -279,14 +279,14 @@
     <animations>
         <keyframeanim id="cometAnim">
             <keyframe instant="0">
-                <translation x="-10" y="0" z="0" />
+                <translation x="0" y="0" z="0" />
                 <rotation axis="z" angle="0" />
                 <rotation axis="y" angle="0" />
                 <rotation axis="x" angle="0" />
                 <scale sx="1" sy="1" sz="1" />
             </keyframe>
             <keyframe instant="4">
-                <translation x="0" y="0" z="10" />
+                <translation x="-9.5" y="-4.5" z="3" />
                 <rotation axis="z" angle="0" />
                 <rotation axis="y" angle="0" />
                 <rotation axis="x" angle="0" />
@@ -1208,8 +1208,8 @@
         <component id="comet">
             <transformation>
                 <translate x="7" y="5" z="-3" />
-                <rotate axis="z" angle="30" />
-                <rotate axis="y" angle="10" />
+                <!-- <rotate axis="z" angle="30" />
+                <rotate axis="y" angle="10" /> -->
             </transformation>
 
             <materials>
