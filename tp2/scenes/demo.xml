@@ -46,6 +46,8 @@
 
     <textures>
         <texture id="saturn" file="scenes/images/saturn.png" />
+        <texture id="barrel" file="scenes/images/barrel.png" />
+        <texture id="barrelDanger" file="scenes/images/barrelDanger.png" />
         <texture id="flag" file="scenes/images/flag.jpg" />
         <texture id="sun" file="scenes/images/sun.png" />
         <texture id="blueFire" file="scenes/images/bluefire.png" />
@@ -323,12 +325,12 @@
             <texture id="none" />
             <children>
                 <componentref id="cubemap" />
-                <componentref id="planet1" />
+                <!-- <componentref id="planet1" />
                 <componentref id="planet2" />
                 <componentref id="planet3" />
-                <componentref id="planet4" />
+                <componentref id="planet4" /> -->
                 <componentref id="sun" />
-                <!-- <componentref id="barrelHighlighted" /> -->
+                <componentref id="barrelHighlighted" />
                 <!-- <primitiveref id="basicNurbsRectangle" />
                 <primitiveref id="basicNurbsTent" /> -->
             </children>
@@ -471,6 +473,7 @@
                 <componentref id="flagPole" />
                 <componentref id="house" />
                 <componentref id="barrelGroup" />
+                <componentref id="smallBarrelGroupHighlighted" />
             </children>
             <animation id="test1" />
         </component>
@@ -855,7 +858,7 @@
                 <material id="planetYellowMaterial" />
             </materials>
 
-            <texture id="saturn" length_s="1.0" length_t="1.0" />
+            <texture id="barrel" length_s="1.0" length_t="1.0" />
 
             <children>
                 <componentref id="barrelTop" />
@@ -864,21 +867,22 @@
         </component>
         <component id="barrelHighlighted">
             <transformation>
-                <scale x="0.5" y="0.5" z="0.5" />
+                <translate x="0" y="1.07" z="0" />
+                <scale x="0.05" y="0.05" z="0.05" />
             </transformation>
 
             <materials>
                 <material id="planetYellowMaterial" />
             </materials>
 
-            <texture id="saturn" length_s="1.0" length_t="1.0" />
+            <texture id="barrelDanger" length_s="1.0" length_t="1.0" />
 
             <children>
-                <componentref id="barrelTopHighlighted" />
-                <componentref id="barrelBottomHighlighted" />
+                <componentref id="barrelLidTopHighlighted" />
+                <componentref id="barrelLidBottomHighlighted" />
             </children>
         </component>
-        <component id="barrelTopHighlighted">
+        <component id="barrelLidTopHighlighted">
             <transformation></transformation>
 
             <materials>
@@ -892,9 +896,9 @@
                 <primitiveref id="barrelBase" />
             </children>
 
-            <highlighted r="0.7" g="0.7" b="0.0" scale_h="1.25" />
+            <highlighted r="1.0" g="0.2" b="0.0" scale_h="1.25" />
         </component>
-        <component id="barrelBottomHighlighted">
+        <component id="barrelLidBottomHighlighted">
             <transformation>
                 <rotate axis="x" angle="180" />
             </transformation>
@@ -910,7 +914,7 @@
                 <primitiveref id="barrelBase" />
             </children>
 
-            <highlighted r="0.7" g="0.7" b="0.0" scale_h="1.25" />
+            <highlighted r="1.0" g="0.2" b="0.0" scale_h="1.25" />
         </component>
         <component id="barrelTop">
             <transformation></transformation>
@@ -940,6 +944,38 @@
             <children>
                 <primitiveref id="barrelSide" />
                 <primitiveref id="barrelBase" />
+            </children>
+        </component>
+        <component id="barrelHighlightedLeft">
+            <transformation>
+                <rotate axis="x" angle="-12" />
+                <rotate axis="z" angle="-4" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrelHighlighted" />
+            </children>
+        </component>
+        <component id="barrelHighlightedRight">
+            <transformation>
+                <rotate axis="x" angle="-8" />
+                <rotate axis="z" angle="8" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrelHighlighted" />
             </children>
         </component>
         <component id="barrel1">
@@ -1079,6 +1115,24 @@
                 <componentref id="barrelLine1" />
                 <componentref id="barrelLine2" />
                 <componentref id="barrelLine3" />
+            </children>
+        </component>
+        <component id="smallBarrelGroupHighlighted">
+            <transformation>
+                <rotate axis="x" angle="65" />
+                <rotate axis="z" angle="30" />
+            </transformation>
+
+            <materials>
+                <material id="planetYellowMaterial" />
+            </materials>
+
+            <texture id="none" />
+
+            <children>
+                <componentref id="barrelHighlighted" />
+                <componentref id="barrelHighlightedLeft" />
+                <componentref id="barrelHighlightedRight" />
             </children>
         </component>
     </components>
