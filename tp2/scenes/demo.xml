@@ -277,7 +277,23 @@
     </primitives>
 
     <animations>
-        <keyframeanim id="test1">
+        <keyframeanim id="cometAnim">
+            <keyframe instant="0">
+                <translation x="-10" y="0" z="0" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+            <keyframe instant="4">
+                <translation x="0" y="0" z="10" />
+                <rotation axis="z" angle="0" />
+                <rotation axis="y" angle="0" />
+                <rotation axis="x" angle="0" />
+                <scale sx="1" sy="1" sz="1" />
+            </keyframe>
+        </keyframeanim>
+        <keyframeanim id="sunFloat">
             <keyframe instant="0">
                 <translation x="0" y="0" z="0" />
                 <rotation axis="z" angle="0" />
@@ -361,13 +377,13 @@
             </materials>
             <texture id="none" />
             <children>
-                <!-- <componentref id="cubemap" />
-                <componentref id="planet1" />
-                <componentref id="planet2" />
-                <componentref id="planet3" />
-                <componentref id="planet4" />
-                <componentref id="sun" />
-                <componentref id="barrelHighlighted" /> -->
+                <!-- <componentref id="cubemap" />  -->
+                <!-- <componentref id="planet1" />  -->
+                <componentref id="planet2" /> 
+                <!-- <componentref id="planet3" />  -->
+                <!-- <componentref id="planet4" />  -->
+                <!-- <componentref id="sun" />  -->
+                <!-- <componentref id="barrelHighlighted" /> -->
                 <!-- <primitiveref id="basicNurbsRectangle" /> -->
                 <componentref id="comet" />
             </children>
@@ -512,7 +528,7 @@
                 <componentref id="barrelGroup" />
                 <componentref id="smallBarrelGroupHighlighted" />
             </children>
-            <animation id="test1" />
+            <animation id="sunFloat" />
         </component>
         <component id="houseFloor">
             <transformation>
@@ -1209,6 +1225,7 @@
             </children>
 
             <highlighted r="1.0" g="0.0" b="0.3" scale_h="1.5" />
+            <animation id="cometAnim" />
         </component>
     </components>
 </sxs>
