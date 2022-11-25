@@ -1191,8 +1191,9 @@
         </component>
         <component id="comet">
             <transformation>
+                <translate x="7" y="5" z="-3" />
                 <rotate axis="z" angle="30" />
-                <rotate axis="y" angle="-40" />
+                <rotate axis="y" angle="10" />
             </transformation>
 
             <materials>
