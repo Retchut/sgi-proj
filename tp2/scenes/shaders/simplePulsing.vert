@@ -9,15 +9,16 @@ varying vec2 vTextureCoord; // output position coordinate for current vertex on 
 // uniform sampler2D uSampler1; // texture passed by scene
 // uniform sampler2D uSampler2; // texture passed by us
 
-uniform float scaleFactor; // additional variables passed in setUniformValues input object
-uniform float timeFactor;
+uniform float shaderScaleFactor; // additional variables passed in setUniformValues input object
+uniform float shaderTimeFactor;
 
 void main() {
-    vec3 offset = aVertexNormal * scaleFactor * 0.01 * sin(timeFactor);
+    float absTimeFactor = abs(sin(shaderTimeFactor));
+    vec3 offset = aVertexNormal * shaderScaleFactor * absTimeFactor;
+    // vec3 offset = vec3(0,0,0);
 	
 	vTextureCoord = aTextureCoord;
 
 	// gl_Position = uPMatrix * uMVMatrix* vec4(aVertexPosition, 1.0);
 	gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition+offset, 1.0);
 }
-

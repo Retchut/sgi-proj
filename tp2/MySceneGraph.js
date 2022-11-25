@@ -1563,7 +1563,7 @@ export class MySceneGraph {
                 var highlightedG = this.reader.getFloat(highlightedProp, 'g');
                 var highlightedB = this.reader.getFloat(highlightedProp, 'b');
                 var highlightedScale = this.reader.getFloat(highlightedProp, 'scale_h');
-
+                
                 component.highlighted = {
                     r: highlightedR,
                     g: highlightedG,
@@ -1715,9 +1715,10 @@ export class MySceneGraph {
     drawComponent(currentNode, prevAppearenceId, prevTexture) {
         // multiply the current scene transformation matrix by the current component matrix
         // access primitives via id
-        let currentComponentMaterial = this.currentMaterial % currentNode.materials.length
-        let materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
-        let texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
+        const currentComponentMaterial = this.currentMaterial % currentNode.materials.length
+        const materialID = (currentNode.materials[currentComponentMaterial] !== "inherit" ? currentNode.materials[currentComponentMaterial] : prevAppearenceId);
+        const texture = (currentNode.texture.id !== "inherit" ? currentNode.texture : prevTexture)
+        const isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
 
         this.scene.multMatrix(currentNode.transformation);
         if(currentNode.animation !== null){
@@ -1735,16 +1736,14 @@ export class MySceneGraph {
             // restore scene transformation matrix
             this.scene.popMatrix();
         }
-        let currentAppearence = this.materials[materialID];
 
+        const currentAppearence = this.materials[materialID];
         if (texture.id !== "none")
             currentAppearence.setTexture(this.textures[texture.id]);
         else
             currentAppearence.setTexture(null);
-
         currentAppearence.apply();
-
-        let isHighlighted = (Object.keys(currentNode.highlighted).length > 0)
+        
         if(isHighlighted){
             const hasTexture = (texture.id !== "none");
             if (hasTexture) {
@@ -1755,8 +1754,8 @@ export class MySceneGraph {
                 ambientColor : this.materials[materialID].ambient,
                 diffuseColor : this.materials[materialID].diffuse,
                 specularColor : this.materials[materialID].specular,
-                scaleFactor : currentNode.highlighted.scale,
-                colorFactors : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
+                shaderScaleFactor : currentNode.highlighted.scale,
+                highlightColor : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
             });
             this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
         }
