@@ -39,6 +39,13 @@ export class MyInterface extends CGFinterface {
         this.activeKeys={};
     }
 
+    initInterface(){
+        this.initCameras();
+        this.initLights();
+        this.initShaders();
+        this.initAnimations();
+    }
+
     initCameras(){
         this.cameras = this.gui.addFolder('Cameras');
         this.cameras.add(this.scene, 'currentViewID', this.scene.viewIDs).name('Views').onChange(
@@ -74,9 +81,14 @@ export class MyInterface extends CGFinterface {
     }
 
     initShaders(){
-        this.shaderSelect = this.gui.addFolder('Shaders');
-        this.shaderToggle = this.shaderSelect.add(this.scene.shadersController, 'shadersActive').name("Toggle Shader");
-        this.shaderPause = this.shaderSelect.add(this.scene.shadersController, 'freezeShader').name("Freeze Shader");
+        this.shaderFolder = this.gui.addFolder('Shaders');
+        this.shaderToggle = this.shaderFolder.add(this.scene.shadersController, 'shadersActive').name("Toggle Shader");
+        this.shaderFreeze = this.shaderFolder.add(this.scene.shadersController, 'freezeShader').name("Freeze Shader");
+    }
+
+    initAnimations(){
+        this.animationFolder = this.gui.addFolder('Animations');
+        this.animationFreeze = this.animationFolder.add(this.scene.animationsController, 'freezeAnimations').name("Freeze Animations");
     }
 
     processKeyDown(event) {

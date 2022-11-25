@@ -81,6 +81,8 @@ export class MySceneGraph {
         this.scene.interface.initCameras();
         this.scene.interface.initLights();
         this.scene.interface.initShaders();
+        this.scene.interface.initAnimations();
+        // this.scene.interface.initInterface();
     }
 
     /**
@@ -1746,6 +1748,7 @@ export class MySceneGraph {
         const isHighlighted = (Object.keys(currentNode.highlighted).length > 0) && this.scene.shadersController.shadersActive;
 
         this.scene.multMatrix(currentNode.transformation);
+        
         if(currentNode.animation !== null){
             if(this.animations[currentNode.animation].apply() !== 0){
                 this.onXMLMinorError("Error animating component with id " + currentNode.id);

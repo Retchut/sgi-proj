@@ -109,6 +109,10 @@ export class XMLscene extends CGFscene {
         });
     }
 
+    initAnimations(){
+        this.animationsController = { freezeAnimations : false };
+    }
+
     setDefaultAppearance() {
         this.setAmbient(0.2, 0.4, 0.8, 1.0);
         this.setDiffuse(0.2, 0.4, 0.8, 1.0);
@@ -127,6 +131,7 @@ export class XMLscene extends CGFscene {
 
         this.initLights();
         this.initShaders();
+        this.initAnimations();
 
         this.initXMLCameras();
 
@@ -144,7 +149,7 @@ export class XMLscene extends CGFscene {
             if(this.runTime == null) 
                 elapsedTime = 0;
             else 
-                elapsedTime = currTime - this.runTime;
+                elapsedTime = (this.animationsController.freezeAnimations) ? 0 : (currTime - this.runTime);
 
             this.runTime = currTime;
 
