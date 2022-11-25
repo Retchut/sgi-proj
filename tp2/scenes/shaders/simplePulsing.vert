@@ -14,8 +14,7 @@ uniform float shaderTimeFactor;
 
 void main() {
     float absTimeFactor = abs(sin(shaderTimeFactor));
-    vec3 offset = aVertexNormal * shaderScaleFactor * absTimeFactor;
-    // vec3 offset = vec3(0,0,0);
+    vec3 offset = aVertexNormal * (shaderScaleFactor - 1.0) * absTimeFactor;
 	
 	vTextureCoord = aTextureCoord;
 

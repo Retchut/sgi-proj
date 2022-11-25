@@ -1743,7 +1743,8 @@ export class MySceneGraph {
         else
             currentAppearence.setTexture(null);
         currentAppearence.apply();
-        
+
+        // apply shader before drawing primitives        
         if(isHighlighted){
             const hasTexture = (texture.id !== "none");
             if (hasTexture) {
@@ -1767,6 +1768,7 @@ export class MySceneGraph {
             this.primitives[currentNode.children.primitiveRefs[i]].display();
         }
 
+        // reset to default scene shader
         if(isHighlighted)
 		    this.scene.setActiveShader(this.scene.defaultShader);
     }
