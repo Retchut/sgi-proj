@@ -100,7 +100,7 @@ export class XMLscene extends CGFscene {
         ];
         this.selectedShader = 0;
         // dat.gui does not let us work with primitive values, so we have to wrap the boolean inside an object
-        this.shadersController = { shadersActive : true, shadersPaused : false };
+        this.shadersController = { shadersActive : true, freezeShader : false };
         this.shaders[this.selectedShader].setUniformsValues({
             shaderTimeFactor : 0,
             shaderScaleFactor : this.graph.shaderScale,
@@ -151,7 +151,7 @@ export class XMLscene extends CGFscene {
             for (const anim in this.graph.animations)
                 this.graph.animations[anim].update(elapsedTime / 1000);
 
-            if(this.shadersController.shadersActive && !this.shadersController.shadersPaused)
+            if(this.shadersController.shadersActive && !this.shadersController.freezeShader)
                 this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTime / 1000 % 100 });
         }
     }

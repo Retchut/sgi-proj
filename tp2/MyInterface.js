@@ -76,7 +76,7 @@ export class MyInterface extends CGFinterface {
     initShaders(){
         this.shaderSelect = this.gui.addFolder('Shaders');
         this.shaderToggle = this.shaderSelect.add(this.scene.shadersController, 'shadersActive').name("Toggle Shader");
-        this.shaderPause = this.shaderSelect.add(this.scene.shadersController, 'shadersPaused').name("Pause Shader").onChange(() => console.log("pausing"));
+        this.shaderPause = this.shaderSelect.add(this.scene.shadersController, 'freezeShader').name("Freeze Shader");
     }
 
     processKeyDown(event) {
