@@ -31,7 +31,9 @@
 - The most difficult thing to implement for us was the shaders. Besides that, we ran into some difficulties when it came to synchronizing events in our application: synchronizing the fragment color changes in the fragment shader with the geometry changes in the vertex shader.
 - Scene
   - The demonstration scene consists of some planets from an alternative universe with different laws of physics. A sun and a planet with some child objects were also added. some objects on the scene have animations and a shader applied to them.
-  - [General View of the Scene]()
+  - [View of the Scene](tp2/scenes/screenshot1.png)
+  - [View of the Scene](tp2/scenes/screenshot2.png)
+  - [View of the Scene](tp2/scenes/screenshot3.png)
   - [Scene XML](scenes/demo.xml)
 
 ----
