@@ -117,6 +117,9 @@ export class MyKeyframeAnimation extends MyAnimation {
      */
     apply() {
         if(!this.active){
+            let nullMatrix = mat4.create();
+            mat4.multiplyScalar(nullMatrix, 0);
+            this.scene.multMatrix(nullMatrix);
             return 0;
         }
 
