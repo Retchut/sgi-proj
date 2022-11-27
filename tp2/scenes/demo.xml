@@ -278,7 +278,7 @@
 
     <animations>
         <keyframeanim id="cometAnim">
-            <keyframe instant="0">
+            <keyframe instant="3">
                 <translation x="0" y="0" z="0" />
                 <rotation axis="z" angle="0" />
                 <rotation axis="y" angle="0" />
@@ -416,6 +416,7 @@
                 <!-- <componentref id="barrelHighlighted" /> -->
                 <!-- <primitiveref id="basicNurbsRectangle" /> -->
                 <componentref id="comet" />
+                <componentref id="tent" />
             </children>
         </component>
         <component id="planetRing">
@@ -504,6 +505,19 @@
                 <componentref id="blueTree6" />
                 <componentref id="blueTree7" />
                 <componentref id="blueTree8" />
+            </children>
+        </component>
+        <component id="tent">
+            <transformation>
+                <translate x="5" y="0" z="2" />
+                <scale x="0.2" y="0.2" z="0.2" />
+            </transformation>
+            <materials>
+                <material id="planetBlueMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <primitiveref id="basicNurbsTent" />
             </children>
         </component>
         <component id="poleTop">
