@@ -1,12 +1,12 @@
-import { CGFappearance, CGFcamera, CGFcameraOrtho, CGFtexture, CGFXMLreader } from '../lib/CGF.js';
-import { MyRectangle } from './MyRectangle.js';
-import { MyTriangle } from './MyTriangle.js';
-import { MyCylinder } from './MyCylinder.js';
-import { MySphere } from './MySphere.js';
-import { MyTorus } from './MyTorus.js';
-import { MyPatch } from './MyPatch.js';
-import { MyKeyframeAnimation } from './MyKeyframeAnimation.js';
-import { MyKeyframe } from './MyKeyframe.js';
+import { CGFappearance, CGFcamera, CGFcameraOrtho, CGFtexture, CGFXMLreader } from '../../lib/CGF.js';
+import { MyRectangle } from '../Primitives/MyRectangle.js';
+import { MyTriangle } from '../Primitives/MyTriangle.js';
+import { MyCylinder } from '../Primitives/MyCylinder.js';
+import { MySphere } from '../Primitives/MySphere.js';
+import { MyTorus } from '../Primitives/MyTorus.js';
+import { MyPatch } from '../Primitives/MyPatch.js';
+import { MyKeyframeAnimation } from '../Animation/MyKeyframeAnimation.js';
+import { MyKeyframe } from '../Animation/MyKeyframe.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -56,7 +56,7 @@ export class MySceneGraph {
          * After the file is read, the reader calls onXMLReady on this object.
          * If any error occurs, the reader calls onXMLError on this object, with an error message
          */
-        this.reader.open('scenes/' + filename, this);
+        this.reader.open('./scenes/' + filename, this);
     }
 
     /*

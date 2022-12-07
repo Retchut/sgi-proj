@@ -1,7 +1,7 @@
 import { CGFapplication } from '../lib/CGF.js';
-import { XMLscene } from './XMLscene.js';
-import { MyInterface } from './MyInterface.js';
-import { MySceneGraph } from './MySceneGraph.js';
+import { XMLscene } from './Scene/XMLscene.js';
+import { MyInterface } from './Scene/MyInterface.js';
+import { MySceneGraph } from './Scene/MySceneGraph.js';
 
 function getUrlVars() {
     var vars = {};

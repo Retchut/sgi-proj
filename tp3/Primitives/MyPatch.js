@@ -1,4 +1,4 @@
-import { CGFobject, CGFnurbsObject, CGFnurbsSurface } from '../lib/CGF.js';
+import { CGFobject, CGFnurbsObject, CGFnurbsSurface } from '../../lib/CGF.js';
 
 /*
     superfícies; a classe deve considerar a possibilidade de as curvas poderem ser de grau 1, 2 ou 3 em qualquer das direções “U” e “V”. Adicionalmente, é definido o número de subdivisões/vértices ao longo da superfície em ambas direções (“partsU” / “partsV”)

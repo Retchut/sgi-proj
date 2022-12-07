@@ -1,0 +1,161 @@
+<sxs>
+    <scene root="spaceRoot" axis_length="5" />
+
+    <views default="defaultCamera">
+        <perspective id="defaultCamera" near="0.1" far="500" angle="45">
+            <from x="20" y="15" z="20" />
+            <to x="0" y="0" z="0" />
+        </perspective>
+    </views>
+
+    <ambient>
+        <ambient r="0.2" g="0.2" b="0.2" a="1.0" />
+        <background r="0.0" g="0.0" b="0.0" a="1.0" />
+    </ambient>
+
+    <lights>
+        <omni id="lightFront" enabled="1">
+            <location x="0" y="6" z="0" w="1.0" />
+            <ambient r="0" g="0" b="0" a="1.0" />
+            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
+            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
+        </omni>
+    </lights>
+
+    <textures>
+        <texture id="cubemapFront" file="scenes/images/cubemap/front.png" />
+        <texture id="cubemapBack" file="scenes/images/cubemap/back.png" />
+        <texture id="cubemapRight" file="scenes/images/cubemap/right.png" />
+        <texture id="cubemapLeft" file="scenes/images/cubemap/left.png" />
+        <texture id="cubemapTop" file="scenes/images/cubemap/top.png" />
+        <texture id="cubemapBottom" file="scenes/images/cubemap/bottom.png" />
+    </textures>
+
+    <materials>
+        <material id="cubemapMaterial" shininess="1">
+            <emission r="1.0" g="1.0" b="1.0" a="1.0" />
+            <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
+            <specular r="0.0" g="0.0" b="0.0" a="1.0" />
+        </material>
+    </materials>
+
+    <transformations>
+    </transformations>
+
+    <primitives>
+        <primitive id="cubemapSide">
+            <rectangle x1="-0.5" y1="-0.5" x2="0.5" y2="0.5" />
+        </primitive>
+    </primitives>
+
+    <animations>
+    </animations>
+
+    <components>
+        <component id="spaceRoot">
+            <transformation></transformation>
+            <materials>
+                <material id="cubemapMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="cubemap" />
+            </children>
+        </component>
+        <component id="cubemap">
+            <transformation>
+                <scale x="50" y="50" z="50" />
+            </transformation>
+            <materials>
+                <material id="cubemapMaterial" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="cubemapFront" />
+                <componentref id="cubemapBack" />
+                <componentref id="cubemapRight" />
+                <componentref id="cubemapLeft" />
+                <componentref id="cubemapTop" />
+                <componentref id="cubemapBottom" />
+            </children>
+        </component>
+        <component id="cubemapFront">
+            <transformation>
+                <translate x="0" y="0" z="-0.5" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="cubemapFront" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="cubemapSide" />
+            </children>
+        </component>
+        <component id="cubemapBack">
+            <transformation>
+                <translate x="0" y="0" z="0.5" />
+                <rotate axis="y" angle="180" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="cubemapBack" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="cubemapSide" />
+            </children>
+        </component>
+        <component id="cubemapRight">
+            <transformation>
+                <translate x="0.5" y="0" z="0" />
+                <rotate axis="y" angle="-90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="cubemapRight" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="cubemapSide" />
+            </children>
+        </component>
+        <component id="cubemapLeft">
+            <transformation>
+                <translate x="-0.5" y="0" z="0" />
+                <rotate axis="y" angle="90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="cubemapLeft" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="cubemapSide" />
+            </children>
+        </component>
+        <component id="cubemapTop">
+            <transformation>
+                <translate x="0" y="0.5" z="0" />
+                <rotate axis="x" angle="90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="cubemapTop" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="cubemapSide" />
+            </children>
+        </component>
+        <component id="cubemapBottom">
+            <transformation>
+                <translate x="0" y="-0.5" z="0" />
+                <rotate axis="x" angle="-90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="cubemapBottom" length_s="1" length_t="1" />
+            <children>
+                <primitiveref id="cubemapSide" />
+            </children>
+        </component>
+    </components>
+</sxs>
