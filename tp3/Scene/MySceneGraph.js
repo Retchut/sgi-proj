@@ -1232,27 +1232,11 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
-                // x2
-                var param = 'x2';
-                var x2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(x2 != null && !isNaN(x2))) {
-                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
-                    continue;
-                }
-                
-                // y2
-                var param = 'y2';
-                var y2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(y2 != null && !isNaN(y2))) {
-                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
-                    continue;
-                }
-                
-                // z2
-                var param = 'z2';
-                var z2 = this.reader.getFloat(grandChildren[0], param);
-                if (!(z2 != null && !isNaN(z2))) {
+
+                // size
+                var param = 'size';
+                var size = this.reader.getFloat(grandChildren[0], param);
+                if (!(size != null && !isNaN(size))) {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
@@ -1306,17 +1290,11 @@ export class MySceneGraph {
                 }
 
                 const p1 = vec3.fromValues(x1, y1, z1);
-                const p2 = vec3.fromValues(x2, y2, z2);
                 const cA = vec3.fromValues(rA, gA, bA);
                 const cB = vec3.fromValues(rB, gB, bB);
 
-                console.log(p1)
-                console.log(p2)
-                console.log(cA)
-                console.log(cB)
 
-
-                var board = new MyBoard(this.scene, p1, p2, cA, cB);
+                var board = new MyBoard(this.scene, p1, size, cA, cB);
                 this.primitives[primitiveId] = board;
             }
             else {
@@ -1930,6 +1908,8 @@ export class MySceneGraph {
         this.scene.pushMatrix();
 
         this.drawComponent(this.components[this.idRoot], null);
+
+        
 
         // restore the last preserved scene matrix
         this.scene.popMatrix();

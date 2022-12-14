@@ -55,8 +55,8 @@
         </primitive>
         <primitive id="board">
             <board
-                x1="-0.5" y1="-0.5" z1="0.0"
-                x2="0.5" y2="0.5" z2="0.0"
+                x1="0" y1="0" z1="0.0"
+                size="1"
                 rA="0" gA="0" bA="0"
                 rB="1" gB="1" bB="1" />
             </primitive>
