@@ -32,7 +32,13 @@
     </textures>
 
     <materials>
-        <material id="cubemapMaterial" shininess="1">
+        <material id="placeholderMat" shininess="1">
+            <emission r="0.5" g="0.5" b="0.5" a="1.0" />
+            <ambient r="0.5" g="0.5" b="0.5" a="1.0" />
+            <diffuse r="0.5" g="0.5" b="0.5" a="1.0" />
+            <specular r="0.5" g="0.5" b="0.5" a="1.0" />
+        </material>
+        <material id="cubemapMat" shininess="1">
             <emission r="1.0" g="1.0" b="1.0" a="1.0" />
             <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
             <diffuse r="0.6" g="0.0" b="0.0" a="1.0" />
@@ -47,28 +53,51 @@
         <primitive id="cubemapSide">
             <rectangle x1="-0.5" y1="-0.5" x2="0.5" y2="0.5" />
         </primitive>
+        <primitive id="board">
+            <board
+                x1="-0.5" y1="-0.5" z1="0.0"
+                x2="0.5" y2="0.5" z2="0.0"
+                rA="0" gA="0" bA="0"
+                rB="1" gB="1" bB="1" />
+            </primitive>
     </primitives>
 
     <animations>
     </animations>
 
     <components>
+        <!-- Root -->
         <component id="spaceRoot">
             <transformation></transformation>
             <materials>
-                <material id="cubemapMaterial" />
+                <material id="cubemapMat" />
             </materials>
             <texture id="none" />
             <children>
                 <componentref id="cubemap" />
+                <componentref id="boardComp" />
             </children>
         </component>
+        <!-- Root End -->
+        <!-- Board Start -->
+        <component id="boardComp">
+            <transformation></transformation>
+            <materials>
+                <material id="placeholderMat" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <primitiveref id="board" />
+            </children>
+        </component>
+        <!-- Board End -->
+        <!-- Cubemap -->
         <component id="cubemap">
             <transformation>
                 <scale x="50" y="50" z="50" />
             </transformation>
             <materials>
-                <material id="cubemapMaterial" />
+                <material id="cubemapMat" />
             </materials>
             <texture id="none" />
             <children>
@@ -157,5 +186,6 @@
                 <primitiveref id="cubemapSide" />
             </children>
         </component>
+        <!-- Cubemap End -->
     </components>
 </sxs>

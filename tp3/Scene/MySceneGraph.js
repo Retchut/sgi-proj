@@ -7,6 +7,7 @@ import { MyTorus } from '../Primitives/MyTorus.js';
 import { MyPatch } from '../Primitives/MyPatch.js';
 import { MyKeyframeAnimation } from '../Animation/MyKeyframeAnimation.js';
 import { MyKeyframe } from '../Animation/MyKeyframe.js';
+import { MyBoard } from '../Board/MyBoard.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -824,13 +825,14 @@ export class MySceneGraph {
             }
 
             grandChildren = children[i].children;
-
+            
             // Validate the primitive type
             if (grandChildren.length != 1 ||
                 (grandChildren[0].nodeName != 'rectangle' && grandChildren[0].nodeName != 'triangle' &&
                     grandChildren[0].nodeName != 'cylinder' && grandChildren[0].nodeName != 'sphere' &&
-                    grandChildren[0].nodeName != 'torus' && grandChildren[0].nodeName != 'patch')) {
-                return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere, torus or patch)"
+                    grandChildren[0].nodeName != 'torus' && grandChildren[0].nodeName != 'patch'
+                    && grandChildren[0].nodeName != 'board')) {
+                return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere, torus, patch or board.)"
             }
 
             // Specifications for the current primitive.
@@ -1204,6 +1206,118 @@ export class MySceneGraph {
                     controlPointsGrouped.push(controlPoints.splice(0, degree_v + 1));
                 var patch = new MyPatch(this.scene, primitiveId, degree_u, degree_v, parts_u, parts_v, controlPointsGrouped);
                 this.primitives[primitiveId] = patch;
+            }
+            else if (primitiveType == 'board') {
+                // position1 = [0, 0, 0], position2 = [1, 1, 1], colorA = [0, 0, 0], colorB = [1, 1, 1]
+                // x1
+                var param = 'x1';
+                var x1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(x1 != null && !isNaN(x1))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                // y1
+                var param = 'y1';
+                var y1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(y1 != null && !isNaN(y1))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // z1
+                var param = 'z1';
+                var z1 = this.reader.getFloat(grandChildren[0], param);
+                if (!(z1 != null && !isNaN(z1))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // x2
+                var param = 'x2';
+                var x2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(x2 != null && !isNaN(x2))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // y2
+                var param = 'y2';
+                var y2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(y2 != null && !isNaN(y2))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // z2
+                var param = 'z2';
+                var z2 = this.reader.getFloat(grandChildren[0], param);
+                if (!(z2 != null && !isNaN(z2))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // rA
+                var param = 'rA';
+                var rA = this.reader.getFloat(grandChildren[0], param);
+                if (!(rA != null && !isNaN(rA))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // gA
+                var param = 'gA';
+                var gA = this.reader.getFloat(grandChildren[0], param);
+                if (!(gA != null && !isNaN(gA))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // bA
+                var param = 'bA';
+                var bA = this.reader.getFloat(grandChildren[0], param);
+                if (!(bA != null && !isNaN(bA))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // rB
+                var param = 'rB';
+                var rB = this.reader.getFloat(grandChildren[0], param);
+                if (!(rB != null && !isNaN(rB))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // gB
+                var param = 'gB';
+                var gB = this.reader.getFloat(grandChildren[0], param);
+                if (!(gB != null && !isNaN(gB))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+                
+                // bB
+                var param = 'bB';
+                var bB = this.reader.getFloat(grandChildren[0], param);
+                if (!(rB != null && !isNaN(bB))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                const p1 = vec3.fromValues(x1, y1, z1);
+                const p2 = vec3.fromValues(x2, y2, z2);
+                const cA = vec3.fromValues(rA, gA, bA);
+                const cB = vec3.fromValues(rB, gB, bB);
+
+                console.log(p1)
+                console.log(p2)
+                console.log(cA)
+                console.log(cB)
+
+
+                var board = new MyBoard(this.scene, p1, p2, cA, cB);
+                this.primitives[primitiveId] = board;
             }
             else {
                 console.warn("To do: Parse other primitives.");
