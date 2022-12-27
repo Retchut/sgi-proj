@@ -23,7 +23,6 @@ export class MyBoard extends CGFobject {
         let bottomLeft = getSquareCorner([position[0], position[2]], size);
         const rowNum = 8;
         const colNum = 8;
-        size = 1;
         const increment = size / rowNum;
 
         for (let row = 0; row < rowNum; row++) {
