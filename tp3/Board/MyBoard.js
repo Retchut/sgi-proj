@@ -20,7 +20,7 @@ export class MyBoard extends CGFobject {
         this.appearanceB = new CGFappearance(this.scene);
         this.appearanceA.setAmbient(...colorB);
 
-        let bottomLeft = getSquareCorner(position, size);
+        let bottomLeft = getSquareCorner([position[0], position[2]], size);
         const rowNum = 8;
         const colNum = 8;
         size = 1;
@@ -31,10 +31,10 @@ export class MyBoard extends CGFobject {
             const rowBase = row * increment;
             const rowHeight = (row + 1) * increment;
             for (let col = 0; col < colNum; col++) {
-                const y1 = rowBase;
-                const y2 = rowHeight;
-                const x1 = col * increment;
-                const x2 = (col + 1) * increment;
+                const y1 = bottomLeft[1] + rowBase;
+                const y2 = bottomLeft[1] + rowHeight;
+                const x1 = bottomLeft[0] + (col * increment);
+                const x2 = bottomLeft[0] + ((col + 1) * increment);
                 const id = "board-" + row + "-" + col;
                 rowList.push(new MyTile(this.scene, id, x1, x2, y1, y2));
             }
