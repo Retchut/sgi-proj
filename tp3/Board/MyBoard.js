@@ -1,5 +1,5 @@
 import { CGFappearance, CGFobject } from '../../lib/CGF.js';
-import { getSquareCorners } from './BoardUtils.js';
+import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
 
 
@@ -19,12 +19,24 @@ export class MyBoard extends CGFobject {
         this.appearanceA.setAmbient(...colorA);
         this.appearanceB = new CGFappearance(this.scene);
         this.appearanceA.setAmbient(...colorB);
-        const [bottomLeft, bottomRight] = getSquareCorners(position, size);
-        console.log(bottomLeft, bottomRight);
-        for (let row = 0; row < 8; row++) {
+
+        let bottomLeft = getSquareCorner(position, size);
+        const rowNum = 8;
+        const colNum = 8;
+        size = 1;
+        const increment = size / rowNum;
+
+        for (let row = 0; row < rowNum; row++) {
             let rowList = [];
-            for (let col = 0; col < 8; col++) {
-                rowList.push(new MyTile(this.scene, [bottomLeft[0] + col * size / 8, bottomLeft[1] + row * size / 8], size / 8));
+            const rowBase = row * increment;
+            const rowHeight = (row + 1) * increment;
+            for (let col = 0; col < colNum; col++) {
+                const y1 = rowBase;
+                const y2 = rowHeight;
+                const x1 = col * increment;
+                const x2 = (col + 1) * increment;
+                const id = "board-" + row + "-" + col;
+                rowList.push(new MyTile(this.scene, id, x1, x2, y1, y2));
             }
             this.tiles.push(rowList);
         }

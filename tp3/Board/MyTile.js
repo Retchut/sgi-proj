@@ -3,12 +3,11 @@ import { MyRectangle } from "../Primitives/MyRectangle.js";
 import { getSquareCorners } from './BoardUtils.js'
 
 export class MyTile extends CGFobject {
-    constructor(scene, position, size) {
+    constructor(scene, id, x1, x2, y1, y2) {
         super(scene);
-        console.log("Position: ", position);
-        console.log("Size: ", size);
-        let corners = getSquareCorners(position, size);
-        this.tile = new MyRectangle(this.scene, corners[0], corners[1]);
+        this.tile = new MyRectangle(this.scene, id, x1, x2, y1, y2);
+        // let [bottomLeft, topRight] = getSquareCorners(position, size);
+        // this.tile = new MyRectangle(this.scene, corners[0], corners[1]);
     }
 
     /**
