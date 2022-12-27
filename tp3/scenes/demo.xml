@@ -81,7 +81,9 @@
         <!-- Root End -->
         <!-- Board Start -->
         <component id="boardComp">
-            <transformation></transformation>
+            <transformation>
+                <rotate axis="x" angle="-90" />
+            </transformation>
             <materials>
                 <material id="placeholderMat" />
             </materials>
