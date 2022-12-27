@@ -25,6 +25,7 @@ export class MyBoard extends CGFobject {
         const colNum = 8;
         const increment = size / rowNum;
 
+        var tileID = 1;
         for (let row = 0; row < rowNum; row++) {
             let rowList = [];
             const rowBase = row * increment;
@@ -34,8 +35,8 @@ export class MyBoard extends CGFobject {
                 const y2 = bottomLeft[1] + rowHeight;
                 const x1 = bottomLeft[0] + (col * increment);
                 const x2 = bottomLeft[0] + ((col + 1) * increment);
-                const id = "board-" + row + "-" + col;
-                rowList.push(new MyTile(this.scene, id, x1, x2, y1, y2));
+                rowList.push(new MyTile(this.scene, tileID, x1, x2, y1, y2));
+                tileID++;
             }
             this.tiles.push(rowList);
         }

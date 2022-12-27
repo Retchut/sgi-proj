@@ -38,6 +38,9 @@ export class XMLscene extends CGFscene {
 
         this.axis = new CGFaxis(this);
         this.setUpdatePeriod(100);
+
+        // enable picking
+        this.setPickEnabled(true);
     }
 
     /**
@@ -113,6 +116,24 @@ export class XMLscene extends CGFscene {
         this.animationsController = { freezeAnimations : false };
     }
 
+	logPicking()
+	{
+		if (this.pickMode == false) {
+			// results can only be retrieved when picking mode is false
+			if (this.pickResults != null && this.pickResults.length > 0) {
+				for (var i=0; i< this.pickResults.length; i++) {
+					var obj = this.pickResults[i][0];
+					if (obj)
+					{
+						var customId = this.pickResults[i][1];				
+						console.log("Picked object: " + obj + ", with pick id " + customId);
+					}
+				}
+				this.pickResults.splice(0,this.pickResults.length);
+			}		
+		}
+	}
+
     setDefaultAppearance() {
         this.setAmbient(0.2, 0.4, 0.8, 1.0);
         this.setDiffuse(0.2, 0.4, 0.8, 1.0);
@@ -166,6 +187,8 @@ export class XMLscene extends CGFscene {
      */
     display() {
         // ---- BEGIN Background, camera and axis setup
+		this.logPicking();
+		this.clearPickRegistration();
 
         // Clear image and depth buffer everytime we update the scene
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
