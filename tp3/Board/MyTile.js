@@ -10,7 +10,7 @@ export class MyTile extends CGFobject {
         const tileLen = x2-x1;
 
         // initialize this tile's piece's values
-        this.piece = new MyPiece(this.scene, tileLen);
+        this.piece = null;
         this.pieceTransformation = mat4.create();
         // positioning of this piece
         mat4.translate(this.pieceTransformation, this.pieceTransformation, [x1 + tileLen/2,y1 + tileLen/2,0]);
@@ -24,12 +24,15 @@ export class MyTile extends CGFobject {
     */
     display() {
         this.scene.registerForPick(this.tileID, this);
-        
+
         this.tile.display();
 
-        this.scene.pushMatrix();
-        this.scene.multMatrix(this.pieceTransformation);
-        this.piece.display();
-        this.scene.popMatrix();
+        // display piece if this tile currently contains one
+        if(this.piece !== null){
+            this.scene.pushMatrix();
+            this.scene.multMatrix(this.pieceTransformation);
+            this.piece.display();
+            this.scene.popMatrix();
+        }
     }
 }
