@@ -17,6 +17,7 @@ export class MyBoard extends CGFobject {
         super(scene);
         this.tiles = [];
 
+        // generate appearances for both player's tiles
         let vecA = vec3.fromValues(...colorA);
         let vecAmbientA = vec3.create(), vecDiffuseA = vec3.create(), vecSpecularA = vec3.create();
         vec3.scale(vecAmbientA, vecA, 1);
@@ -37,36 +38,38 @@ export class MyBoard extends CGFobject {
         vec3.scale(vecSpecularB, vecB, 0.3);
         vec3.add(vecSpecularB, vecSpecularB, vec3.fromValues(0.3, 0.3, 0.3));
         this.appearanceB = new CGFappearance(this.scene);
-        console.log(vecAmbientB)
         this.appearanceB.setAmbient(1, 1, 1, 1);
         this.appearanceB.setDiffuse(...vecDiffuseB, 1);
         this.appearanceB.setSpecular(...vecSpecularB, 1);
 
+        // initialize board tiles, starting at its lower left corner
+        // tiles will have id (1 to boardDimensions*boardDimensions)
         this.size = size;
         let bottomLeft = getSquareCorner([position[0], position[2]], size);
-        this.rowNum = 8;
-        this.colNum = 8;
-        this.increment = size / this.rowNum;
+        this.boardDimensions = 8;
+        this.tileLen = size / this.boardDimensions;
 
         var tileID = 1;
-        for (let row = 0; row < this.rowNum; row++) {
+        for (let row = 0; row < this.boardDimensions; row++) {
             let rowList = [];
-            const rowBase = row * this.increment;
-            const rowHeight = (row + 1) * this.increment;
-            for (let col = 0; col < this.colNum; col++) {
+            // base and height of this row
+            const rowBase = row * this.tileLen;
+            const rowHeight = (row + 1) * this.tileLen;
+
+            for (let col = 0; col < this.boardDimensions; col++) {
+                // calculate position of the tile
                 const y1 = bottomLeft[1] + rowBase;
                 const y2 = bottomLeft[1] + rowHeight;
-                const x1 = bottomLeft[0] + (col * this.increment);
-                const x2 = bottomLeft[0] + ((col + 1) * this.increment);
+                const x1 = bottomLeft[0] + (col * this.tileLen);
+                const x2 = bottomLeft[0] + ((col + 1) * this.tileLen);
+                
+                // push the new tile to the row's list
                 rowList.push(new MyTile(this.scene, tileID, x1, x2, y1, y2));
                 tileID++;
             }
+
             this.tiles.push(rowList);
         }
-
-        this.piece = new MyPiece(this.scene);
-        this.pieceTransformation = mat4.create();
-        mat4.scale(this.pieceTransformation, this.pieceTransformation, [this.increment * 0.9, this.increment * 0.9, this.increment * 0.9])
     }
 
     /**
@@ -83,18 +86,8 @@ export class MyBoard extends CGFobject {
                 if ((row + col) % 2 == 0) {
 
                 }
-
-                let translateMatrix = mat4.create();
-                const baseline = -this.increment * (this.rowNum / 2) + this.increment / 2;
-                mat4.translate(translateMatrix, translateMatrix, [baseline + (col * this.increment), baseline + (row * this.increment), 0])
-                this.scene.pushMatrix();
-                this.scene.multMatrix(translateMatrix);
-                this.scene.multMatrix(this.pieceTransformation);
-                this.piece.display();
-                this.scene.popMatrix();
             }
         }
-
     }
 
     /**

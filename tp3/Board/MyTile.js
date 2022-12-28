@@ -1,4 +1,5 @@
 import { CGFobject } from "../../lib/CGF.js";
+import { MyPiece } from "./MyPiece.js";
 import { MyRectangle } from "../Primitives/MyRectangle.js";
 
 export class MyTile extends CGFobject {
@@ -6,6 +7,15 @@ export class MyTile extends CGFobject {
         super(scene);
         this.tileID = id;
         this.tile = new MyRectangle(this.scene, id, x1, x2, y1, y2);
+        const tileLen = x2-x1;
+
+        // initialize this tile's piece's values
+        this.piece = new MyPiece(this.scene, tileLen);
+        this.pieceTransformation = mat4.create();
+        // positioning of this piece
+        mat4.translate(this.pieceTransformation, this.pieceTransformation, [x1 + tileLen/2,y1 + tileLen/2,0]);
+        // scale of this scale
+        mat4.scale(this.pieceTransformation, this.pieceTransformation, [tileLen * 0.9, tileLen * 0.9, tileLen * 0.9])
     }
     
     /**
@@ -14,6 +24,12 @@ export class MyTile extends CGFobject {
     */
     display() {
         this.scene.registerForPick(this.tileID, this);
+        
         this.tile.display();
+
+        this.scene.pushMatrix();
+        this.scene.multMatrix(this.pieceTransformation);
+        this.piece.display();
+        this.scene.popMatrix();
     }
 }

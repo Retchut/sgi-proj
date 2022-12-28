@@ -3,7 +3,7 @@ import { MyCylinder } from "../Primitives/MyCylinder.js";
 import { MyTorus } from "../Primitives/MyTorus.js";
 
 export class MyPiece extends CGFobject {
-    constructor(scene, id) {
+    constructor(scene, tileLen) {
         super(scene);
         this.side = new MyCylinder(this.scene, 0, 0.5, 0.5, 0.2, 50, 1);
         this.base = new MyCylinder(this.scene, 0, 0.5, 0, 0, 50, 2);
@@ -18,6 +18,10 @@ export class MyPiece extends CGFobject {
         mat4.translate(this.ringTransformation, this.ringTransformation, [0, 0, 0.2]);
         this.innerRingTransformation = mat4.create();
         mat4.scale(this.innerRingTransformation, this.innerRingTransformation, [1, 1, 0.2]);
+
+        // todo: integrate this into the piece itself
+        // this.scaleTransf = mat4.create();
+        // mat4.scale(this.scaleTransf, this.scaleTransf, [this.tileLen * 0.9, this.tileLen * 0.9, this.tileLen * 0.9])
     }
 
     /**
