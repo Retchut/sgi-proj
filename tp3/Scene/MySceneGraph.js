@@ -8,6 +8,7 @@ import { MyPatch } from '../Primitives/MyPatch.js';
 import { MyKeyframeAnimation } from '../Animation/MyKeyframeAnimation.js';
 import { MyKeyframe } from '../Animation/MyKeyframe.js';
 import { MyBoard } from '../Board/MyBoard.js';
+import { GameManager } from '../Game/GameManager.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -40,6 +41,7 @@ export class MySceneGraph {
         this.nodes = [];
 
         this.idRoot = null;                    // The id of the root element.
+        this.idBoard = null;
 
         this.axisCoords = [];
         this.axisCoords['x'] = [1, 0, 0];
@@ -76,6 +78,8 @@ export class MySceneGraph {
         }
 
         this.loadedOk = true;
+
+        this.gameManager = new GameManager(this.scene, this.primitives[this.idBoard]);
 
         // As the graph loaded ok, signal the scene so that any additional initialization depending on the graph can take place
         this.scene.onGraphLoaded();
@@ -1295,6 +1299,7 @@ export class MySceneGraph {
 
 
                 var board = new MyBoard(this.scene, p1, size, cA, cB);
+                this.idBoard = primitiveId;
                 this.primitives[primitiveId] = board;
             }
             else {

@@ -73,6 +73,38 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method getTiles
+     * @returns the board's tiles bidimensional array
+     */
+    getTiles(){
+        return this.tiles;
+    }
+
+    /**
+     * @method getBoardDimensions
+     * @returns the board's dimensions
+     */
+    getBoardDimensions(){
+        return this.boardDimensions;
+    }
+
+    /**
+     * @method getAppearance1
+     * @returns the board's appearance for player 1
+     */
+    getAppearanceA(){
+        return this.appearanceA;
+    }
+
+    /**
+     * @method getAppearance2
+     * @returns the board's appearance for player 2
+     */
+    getAppearanceB(){
+        return this.appearanceB;
+    }
+
+    /**
      * @method display
      * Displays the object by calling each of its primitives' display function
      */

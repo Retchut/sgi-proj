@@ -1,5 +1,4 @@
 import { CGFobject } from "../../lib/CGF.js";
-import { MyPiece } from "./MyPiece.js";
 import { MyRectangle } from "../Primitives/MyRectangle.js";
 
 export class MyTile extends CGFobject {
@@ -16,6 +15,22 @@ export class MyTile extends CGFobject {
         mat4.translate(this.pieceTransformation, this.pieceTransformation, [x1 + tileLen/2,y1 + tileLen/2,0]);
         // scale of this scale
         mat4.scale(this.pieceTransformation, this.pieceTransformation, [tileLen * 0.9, tileLen * 0.9, tileLen * 0.9])
+    }
+
+    /**
+     * @method getID 
+     * @returns this tile's ID
+     */
+    getID(){
+        return this.tileID;
+    }
+
+    /**
+     * Sets this tile's piece
+     * @param {MyPiece} piece piece to be assigned to this tile
+     */
+    setPiece(piece){
+        this.piece = piece;
     }
     
     /**
