@@ -1,9 +1,19 @@
-import { CGFobject } from "../../lib/CGF.js";
+import { CGFappearance, CGFobject } from "../../lib/CGF.js";
 import { MyCylinder } from "../Primitives/MyCylinder.js";
 import { MyTorus } from "../Primitives/MyTorus.js";
 
+/**
+ * MyPiece class, holds a game piece's data and logic.
+ */
 export class MyPiece extends CGFobject {
-    constructor(scene, player, appearance, tileLen) {
+    /**
+     * @constructor
+     * @param {MyScene} scene   the application's scene
+     * @param {Number} tileLen  length of the tile this piece is contained in
+     * @param {Number} player   player who owns the piece - 0/1
+     * @param {CGFappearance} appearance the material for this piece
+     */
+    constructor(scene, tileLen, player, appearance) {
         super(scene);
 
         this.player = player;
