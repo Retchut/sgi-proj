@@ -1,5 +1,6 @@
 import { CGFscene, CGFshader } from '../../lib/CGF.js';
 import { CGFaxis,CGFcamera } from '../../lib/CGF.js';
+import { GameManager } from '../Game/GameManager.js';
 
 
 var DEGREE_TO_RAD = Math.PI / 180;
@@ -116,8 +117,12 @@ export class XMLscene extends CGFscene {
         this.animationsController = { freezeAnimations : false };
     }
 
-	logPicking()
-	{
+    initGameManager(board){
+        this.gameManager = new GameManager(this, board);
+        this.gameManager.initGame();
+    }
+
+	logPicking(){
 		if (this.pickMode == false) {
 			// results can only be retrieved when picking mode is false
 			if (this.pickResults != null && this.pickResults.length > 0) {
@@ -125,7 +130,7 @@ export class XMLscene extends CGFscene {
 					var obj = this.pickResults[i][0];
 					if (obj)
 					{
-						var customId = this.pickResults[i][1];				
+						var customId = this.pickResults[i][1];
 						console.log("Picked object: " + obj + ", with pick id " + customId);
 					}
 				}
