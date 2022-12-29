@@ -26,6 +26,14 @@ export class MyTile extends CGFobject {
     }
 
     /**
+     * @method getPiece 
+     * @returns this tile's piece
+     */
+    getPiece(){
+        return this.piece;
+    }
+
+    /**
      * Sets this tile's piece
      * @param {MyPiece} piece piece to be assigned to this tile
      */
