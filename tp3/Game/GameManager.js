@@ -1,3 +1,4 @@
+import { MyScene } from "../Scene/XMLscene.js";
 import { MyBoard } from "../Board/MyBoard.js";
 import { MyPiece } from "../Board/MyPiece.js";
 import { MyTile } from "../Board/MyTile.js";
