@@ -80,7 +80,7 @@ export class GameManager {
                 return;
             }
             tileObj.toggleHighlightPiece();
-            this.move(tileID);
+            this.move(tileObj);
             this.selectedTileID = 0; // reset selected tile
             this.turnPlayer = (this.turnPlayer + 1) % 2; // change turn player
         }
@@ -123,18 +123,13 @@ export class GameManager {
         return possibleMoves;
     }
 
-    move(tileID){
+    move(newTile){
         // tile IDs are between [1, boardDimensions^2], array indices are between [0, boardDimensions - 1]
         const oldComparisonID = this.selectedTileID - 1;
-        const newComparisonID = tileID - 1;
         const oldTileRow = Math.floor(oldComparisonID / this.boardDimensions);
         const oldTileCol = oldComparisonID % this.boardDimensions;
-        const newTileRow = Math.floor(newComparisonID / this.boardDimensions);
-        const newTileCol = newComparisonID % this.boardDimensions;
-        const tiles = this.board.getTiles();
         
-        const oldTile = tiles[oldTileRow][oldTileCol];
-        const newTile = tiles[newTileRow][newTileCol];
+        const oldTile = this.board.getTiles()[oldTileRow][oldTileCol];
         const piece = oldTile.getPiece();
 
         oldTile.setPiece(null);
