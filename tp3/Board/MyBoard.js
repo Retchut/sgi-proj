@@ -7,7 +7,7 @@ import { MyTile } from './MyTile.js';
 export class MyBoard extends CGFobject {
     /**
      * @constructor
-     * @param {XMLscene} scene - Reference to MyScene object
+     * @param {XMLscene} scene - The application's scene
      * @param {vec3} position1 - Position of the bottom left corner of the board
      * @param {vec3} position2 - Position of the top right corner of the board
      * @param {vec3} colorA    - Color of player0's material
