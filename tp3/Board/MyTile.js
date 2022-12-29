@@ -32,6 +32,14 @@ export class MyTile extends CGFobject {
     setPiece(piece){
         this.piece = piece;
     }
+
+    /**
+     * Highlights the piece in this tile
+     */
+    highlightPiece(){
+        // TODO: highlight the piece in this tile
+        console.error("TODO: IMPLEMENT HIGHLIGHTING PIECE FUNCTION")
+    }
     
     /**
     * @method display
