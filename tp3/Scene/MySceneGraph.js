@@ -80,6 +80,7 @@ export class MySceneGraph {
         this.loadedOk = true;
 
         this.gameManager = new GameManager(this.scene, this.primitives[this.idBoard]);
+        this.gameManager.initGame();
 
         // As the graph loaded ok, signal the scene so that any additional initialization depending on the graph can take place
         this.scene.onGraphLoaded();
