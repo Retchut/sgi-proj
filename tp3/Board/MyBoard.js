@@ -7,11 +7,11 @@ import { MyTile } from './MyTile.js';
 export class MyBoard extends CGFobject {
     /**
      * @constructor
-     * @param {XMLscene} scene     - Reference to MyScene object
-     * @param {*} position1 - Position of the bottom left corner of the board
-     * @param {*} position2 - Position of the top right corner of the board
-     * @param {*} colorA    - Color of player1's material
-     * @param {*} colorB    - Color of player2's material
+     * @param {XMLscene} scene - Reference to MyScene object
+     * @param {vec3} position1 - Position of the bottom left corner of the board
+     * @param {vec3} position2 - Position of the top right corner of the board
+     * @param {vec3} colorA    - Color of player1's material
+     * @param {vec3} colorB    - Color of player2's material
      */
     constructor(scene, position = [0, 0, 0], size = 5, colorA = [1, 1, 1], colorB = [0, 0, 0]) {
         super(scene);
@@ -107,6 +107,11 @@ export class MyBoard extends CGFobject {
         return this.appearanceB;
     }
 
+    /**
+     * @method getTileAt
+     * @param tileID - id of the tile
+     * @returns the MyTile object at tileID on the board
+     */
     getTileAt(tileID){
         // tile IDs are between [1, boardDimensions^2], array indices are between [0, boardDimensions - 1]
         const index = tileID - 1;
