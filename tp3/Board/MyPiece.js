@@ -1,4 +1,5 @@
 import { CGFappearance, CGFobject } from "../../lib/CGF.js";
+import { XMLscene } from "../Scene/XMLscene.js";
 import { MyCylinder } from "../Primitives/MyCylinder.js";
 import { MyTorus } from "../Primitives/MyTorus.js";
 
@@ -8,7 +9,7 @@ import { MyTorus } from "../Primitives/MyTorus.js";
 export class MyPiece extends CGFobject {
     /**
      * @constructor
-     * @param {MyScene} scene   the application's scene
+     * @param {XMLscene} scene   the application's scene
      * @param {Number} tileLen  length of the tile this piece is contained in
      * @param {Number} player   player who owns the piece - 0/1
      * @param {CGFappearance} appearance the material for this piece

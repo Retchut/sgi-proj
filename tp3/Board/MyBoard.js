@@ -1,4 +1,5 @@
 import { CGFappearance, CGFobject } from '../../lib/CGF.js';
+import { XMLscene } from '../Scene/XMLscene.js';
 import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
 
@@ -6,7 +7,7 @@ import { MyTile } from './MyTile.js';
 export class MyBoard extends CGFobject {
     /**
      * @constructor
-     * @param {*} scene     - Reference to MyScene object
+     * @param {XMLscene} scene     - Reference to MyScene object
      * @param {*} position1 - Position of the bottom left corner of the board
      * @param {*} position2 - Position of the top right corner of the board
      * @param {*} colorA    - Color of player1's material
