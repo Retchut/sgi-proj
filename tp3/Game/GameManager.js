@@ -9,8 +9,8 @@ import { MyTile } from "../Board/MyTile.js";
 export class GameManager {
     /**
      * @constructor
-     * @param {MyScene} scene
-     * @param {MyBoard} board
+     * @param {MyScene} scene   the application's scene
+     * @param {MyBoard} board   the board the game is played in
      */
     constructor(scene, board){
         this.scene = scene;
