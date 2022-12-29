@@ -48,11 +48,7 @@ export class GameManager {
     }
 
     handlePick(tileID){
-        const comparisonID = tileID - 1; // id are between [1, boardDimensions^2], indices are between [0, boardDimensions - 1]
-        const tileRow = Math.floor(comparisonID / this.boardDimensions);
-        const tileCol = comparisonID % this.boardDimensions;
-
-        const tileObj = this.board.getTiles()[tileRow][tileCol];
+        const tileObj = this.board.getTileAt(tileID);
 
         // tile not yet selected (tile ids are in range [1, boardDimensions^2])
         if(this.selectedTileID === 0){
@@ -87,7 +83,6 @@ export class GameManager {
     }
 
     getValidMoves(tileID){
-        // TODO: invert operation if player == 1
         console.warn("TODO: avoid moving to tiles with pieces");
         console.warn("TODO: allow moving over pieces (and make it the only option)");
 
@@ -111,12 +106,7 @@ export class GameManager {
     }
 
     move(newTile){
-        // tile IDs are between [1, boardDimensions^2], array indices are between [0, boardDimensions - 1]
-        const oldComparisonID = this.selectedTileID - 1;
-        const oldTileRow = Math.floor(oldComparisonID / this.boardDimensions);
-        const oldTileCol = oldComparisonID % this.boardDimensions;
-        
-        const oldTile = this.board.getTiles()[oldTileRow][oldTileCol];
+        const oldTile = this.board.getTileAt(this.selectedTileID);
         const piece = oldTile.getPiece();
 
         oldTile.setPiece(null);

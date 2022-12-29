@@ -106,6 +106,16 @@ export class MyBoard extends CGFobject {
         return this.appearanceB;
     }
 
+    getTileAt(tileID){
+        console.log(tileID);
+        // tile IDs are between [1, boardDimensions^2], array indices are between [0, boardDimensions - 1]
+        const index = tileID - 1;
+        const tileRow = Math.floor(index / this.boardDimensions);
+        const tileCol = index % this.boardDimensions;
+        console.log(tileRow, tileCol);
+        return this.tiles[tileRow][tileCol];
+    }
+
     /**
      * @method display
      * Displays the object by calling each of its primitives' display function
