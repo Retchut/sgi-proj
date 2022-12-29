@@ -119,6 +119,7 @@ export class XMLscene extends CGFscene {
 
     initGameManager(board){
         this.gameManager = new GameManager(this, board);
+        this.gameManager.initGame();
     }
 
 	logPicking(){

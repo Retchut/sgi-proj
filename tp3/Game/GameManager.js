@@ -4,9 +4,7 @@ export class GameManager {
     constructor(scene, board){
         this.scene = scene;
         this.board = board;
-        this.boardDimensions = this.board.getBoardDimensions()
-        
-        this.initGame();
+        this.boardDimensions = this.board.getBoardDimensions();
     }
 
     initGame(){
