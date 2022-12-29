@@ -1,7 +1,18 @@
 import { CGFobject } from "../../lib/CGF.js";
+import { XMLscene } from "../Scene/XMLscene.js";
 import { MyRectangle } from "../Primitives/MyRectangle.js";
+import { MyPiece } from "./MyPiece.js";
 
 export class MyTile extends CGFobject {
+    /**
+     * @constructor
+     * @param {XMLscene} scene  - The application's scene
+     * @param {id} id           - This tile's ID
+     * @param {Number} x1       - x1 position for this tile's rectangle
+     * @param {Number} x2       - x2 position for this tile's rectangle
+     * @param {Number} y1       - y1 position for this tile's rectangle
+     * @param {Number} y2       - y2 position for this tile's rectangle
+     */
     constructor(scene, id, x1, x2, y1, y2) {
         super(scene);
         this.tileID = id;
