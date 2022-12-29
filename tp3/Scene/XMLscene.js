@@ -119,7 +119,6 @@ export class XMLscene extends CGFscene {
 
     initGameManager(board){
         this.gameManager = new GameManager(this, board);
-        this.gameManager.initGame();
     }
 
 	logPicking(){
@@ -215,7 +214,6 @@ export class XMLscene extends CGFscene {
         }
 
         if (this.sceneInited) {
-            console.log(this.gameManager.turnPlayer);
             // Draw axis
             this.setDefaultAppearance();
 
