@@ -1,4 +1,4 @@
-import { MyScene } from "../Scene/XMLscene.js";
+import { XMLscene } from "../Scene/XMLscene.js";
 import { MyBoard } from "../Board/MyBoard.js";
 import { MyPiece } from "../Board/MyPiece.js";
 import { MyTile } from "../Board/MyTile.js";
@@ -9,7 +9,7 @@ import { MyTile } from "../Board/MyTile.js";
 export class GameManager {
     /**
      * @constructor
-     * @param {MyScene} scene - The application's scene
+     * @param {XMLscene} scene - The application's scene
      * @param {MyBoard} board - The board the game is played in
      */
     constructor(scene, board){
@@ -41,7 +41,7 @@ export class GameManager {
             // player 0
             for(const tile of tiles[row]){
                 if((tile.getID() + row % 2) % 2 == 1){
-                    var newPiece = new MyPiece(this.scene, 0, p0Appearance, this.boardDimensions);
+                    var newPiece = new MyPiece(this.scene, this.boardDimensions, 0, p0Appearance);
                     this.piecesInPlay.push(newPiece);
                     tile.setPiece(newPiece);
                 }
@@ -50,7 +50,7 @@ export class GameManager {
             // player 1
             for(const tile of tiles[tiles.length - row - 1]){
                 if((tile.getID() - 1 + row % 2) % 2 == 1){
-                    var newPiece = new MyPiece(this.scene, 1, p1Appearance, this.boardDimensions);
+                    var newPiece = new MyPiece(this.scene, this.boardDimensions, 1, p1Appearance);
                     this.piecesInPlay.push(newPiece);
                     tile.setPiece(newPiece);
                 }

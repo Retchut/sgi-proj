@@ -52,6 +52,7 @@ export class MyPiece extends CGFobject {
     * Displays the piece
     */
     display() {
+        // this.appearance.apply();
         this.appearance.apply();
         
         this.side.display();
