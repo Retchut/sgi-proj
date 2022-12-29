@@ -95,8 +95,6 @@ export class MyBoard extends CGFobject {
      * @returns the board's appearance for player 0
      */
     getAppearanceW(){
-        console.log("APPW:");
-        console.log(this.appearanceW);
         return this.appearanceW;
     }
 
@@ -105,8 +103,6 @@ export class MyBoard extends CGFobject {
      * @returns the board's appearance for player 1
      */
     getAppearanceB(){
-        console.log("APPB:");
-        console.log(this.appearanceB);
         return this.appearanceB;
     }
 
