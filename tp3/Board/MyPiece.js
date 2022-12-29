@@ -5,6 +5,7 @@ import { MyTorus } from "../Primitives/MyTorus.js";
 export class MyPiece extends CGFobject {
     constructor(scene, player, appearance, tileLen) {
         super(scene);
+        console.log("HI")
 
         this.player = player;
         this.appearance = appearance;

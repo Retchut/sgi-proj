@@ -58,8 +58,8 @@
             <board
                 x1="0" y1="0" z1="0.0"
                 size="5"
-                rA="0" gA="0" bA="0"
-                rB="1" gB="1" bB="1" />
+                rA="1" gA="1" bA="1"
+                rB="0" gB="0" bB="0" />
             </primitive>
     </primitives>
 

@@ -1,7 +1,6 @@
 import { CGFappearance, CGFobject } from '../../lib/CGF.js';
 import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
-import { MyPiece } from './MyPiece.js';
 
 
 export class MyBoard extends CGFobject {
@@ -13,22 +12,25 @@ export class MyBoard extends CGFobject {
      * @param {*} colorA    - Color of player1's material
      * @param {*} colorB    - Color of player2's material
      */
-    constructor(scene, position = [0, 0, 0], size = 5, colorA = [0, 0, 0], colorB = [1, 1, 1]) {
+    constructor(scene, position = [0, 0, 0], size = 5, colorA = [1, 1, 1], colorB = [0, 0, 0]) {
         super(scene);
         this.tiles = [];
 
         // generate appearances for both player's tiles
-        let vecA = vec3.fromValues(...colorA);
-        let vecAmbientA = vec3.create(), vecDiffuseA = vec3.create(), vecSpecularA = vec3.create();
-        vec3.scale(vecAmbientA, vecA, 1);
-        vec3.scale(vecDiffuseA, vecA, 0.6);
-        vec3.add(vecDiffuseA, vecDiffuseA, vec3.fromValues(0.3, 0.3, 0.3));
-        vec3.scale(vecSpecularA, vecA, 0.3);
-        vec3.add(vecSpecularA, vecSpecularA, vec3.fromValues(0.3, 0.3, 0.3));
-        this.appearanceA = new CGFappearance(this.scene);
-        this.appearanceA.setAmbient(...vecAmbientA, 1);
-        this.appearanceA.setDiffuse(...vecDiffuseA, 1);
-        this.appearanceA.setSpecular(...vecSpecularA, 1);
+        console.warn("TODO: rename colorA in xml and scene to colorW, to make it consistent with the remainder of the code -- IF THE SPECIFICATION ALLOWS")
+        console.warn("TODO: test if board appearances derived from colorA and colorB")
+        let vecW = vec3.fromValues(...colorA);
+        let vecAmbientW = vec3.create(), vecDiffuseW = vec3.create(), vecSpecularW = vec3.create();
+        vec3.scale(vecAmbientW, vecW, 1);
+        vec3.scale(vecDiffuseW, vecW, 0.6);
+        vec3.add(vecDiffuseW, vecDiffuseW, vec3.fromValues(0.3, 0.3, 0.3));
+        vec3.scale(vecSpecularW, vecW, 0.3);
+        vec3.add(vecSpecularW, vecSpecularW, vec3.fromValues(0.3, 0.3, 0.3));
+        this.appearanceW = new CGFappearance(this.scene);
+        console.warn("TODO : why is the ambient property not being derived from colorA?")
+        this.appearanceW.setAmbient(1, 1, 1, 1);
+        this.appearanceW.setDiffuse(...vecDiffuseW, 1);
+        this.appearanceW.setSpecular(...vecSpecularW, 1);
 
         let vecB = vec3.fromValues(...colorB);
         let vecAmbientB = vec3.create(), vecDiffuseB = vec3.create(), vecSpecularB = vec3.create();
@@ -38,7 +40,7 @@ export class MyBoard extends CGFobject {
         vec3.scale(vecSpecularB, vecB, 0.3);
         vec3.add(vecSpecularB, vecSpecularB, vec3.fromValues(0.3, 0.3, 0.3));
         this.appearanceB = new CGFappearance(this.scene);
-        this.appearanceB.setAmbient(1, 1, 1, 1);
+        this.appearanceB.setAmbient(...vecAmbientB, 1);
         this.appearanceB.setDiffuse(...vecDiffuseB, 1);
         this.appearanceB.setSpecular(...vecSpecularB, 1);
 
@@ -89,18 +91,22 @@ export class MyBoard extends CGFobject {
     }
 
     /**
-     * @method getAppearance1
-     * @returns the board's appearance for player 1
+     * @method getappearanceW
+     * @returns the board's appearance for player 0
      */
-    getAppearanceA(){
-        return this.appearanceA;
+    getAppearanceW(){
+        console.log("APPW:");
+        console.log(this.appearanceW);
+        return this.appearanceW;
     }
 
     /**
-     * @method getAppearance2
-     * @returns the board's appearance for player 2
+     * @method getAppearanceB
+     * @returns the board's appearance for player 1
      */
     getAppearanceB(){
+        console.log("APPB:");
+        console.log(this.appearanceB);
         return this.appearanceB;
     }
 
@@ -111,8 +117,9 @@ export class MyBoard extends CGFobject {
     display() {
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
-                if ((row + col) % 2 == 0) this.appearanceA.apply();
-                else this.appearanceB.apply();
+                // bottom right corner for both players must be white or the otherwise provided colorA
+                if ((row + col) % 2 == 0) this.appearanceB.apply();
+                else this.appearanceW.apply();
                 this.tiles[row][col].display();
 
                 if ((row + col) % 2 == 0) {

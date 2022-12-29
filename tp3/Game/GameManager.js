@@ -5,7 +5,6 @@ export class GameManager {
         this.scene = scene;
         this.board = board;
         this.boardDimensions = this.board.getBoardDimensions()
-        // this.board = new MyBoard()
         
         this.initGame();
     }
@@ -20,8 +19,8 @@ export class GameManager {
         this.piecesInPlay = [];
         this.availableMoves = [];
 
-        const p0Appearance = this.board.getAppearanceB();
-        const p1Appearance = this.board.getAppearanceA();
+        const p0Appearance = this.board.getAppearanceW();
+        const p1Appearance = this.board.getAppearanceB();
         const tiles = this.board.getTiles();
         const rowsToSpawn = 3;
         
