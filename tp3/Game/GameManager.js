@@ -65,15 +65,22 @@ export class GameManager {
             this.availableMoves = this.getValidMoves(tileID);
             tileObj.toggleHighlightPiece();
         }
-        // tile selected
+        // initial tile selected
         else{
             // check if the tile selected corresponds to one of the possible moves
-            console.warn("TODO: implement canceling tile selection by clicking on the selected tile again")
             if(!this.availableMoves.includes(tileID)){
                 console.log("that's not one of the available moves");
                 return;
             }
+
             tileObj.toggleHighlightPiece();
+
+            if(tileID === this.selectedTileID){
+                console.log("desselecting selected tile");
+                this.selectedTileID = 0;
+                return;
+            }
+
             this.move(tileObj);
             this.selectedTileID = 0; // reset selected tile
             this.turnPlayer = (this.turnPlayer + 1) % 2; // change turn player
@@ -81,10 +88,11 @@ export class GameManager {
     }
 
     getValidMoves(tileID){
-        console.warn("TODO: avoid moving to tiles with pieces");
         console.warn("TODO: allow moving over pieces (and make it the only option)");
 
-        let possibleMoves = [];
+        // initialize the array with the tileID to allow for desselecting this tile later
+        let possibleMoves = [tileID];
+
         // player 1 moves to a lower row, player 0 to an upper row
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
         if(tileID % this.boardDimensions !== 0){
