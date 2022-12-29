@@ -132,7 +132,7 @@ export class XMLscene extends CGFscene {
 					{
 						var customId = this.pickResults[i][1];
 						// console.log("Picked object: " + obj + ", with pick id " + customId);
-                        console.log(this.gameManager.getValidMoves(customId));
+                        this.gameManager.handlePick(customId);
 					}
 				}
 				this.pickResults.splice(0,this.pickResults.length);
@@ -215,6 +215,7 @@ export class XMLscene extends CGFscene {
         }
 
         if (this.sceneInited) {
+            console.log(this.gameManager.turnPlayer);
             // Draw axis
             this.setDefaultAppearance();
 

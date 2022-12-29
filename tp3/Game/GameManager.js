@@ -14,9 +14,11 @@ export class GameManager {
         // TODO: implement this later if necessary (resets board state to its defaults - requires changing the constructor)
         // this.board.clear()
         this.turnPlayer = 0; // 0 - white, 1 - black
+        this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
         this.player1Pit = [];
         this.player2Pit = [];
         this.piecesInPlay = [];
+        this.availableMoves = [];
 
         const p1Appearance = this.board.getAppearanceB();
         const p2Appearance = this.board.getAppearanceA();
@@ -43,6 +45,45 @@ export class GameManager {
             }
         }
             // impar, row 0,1,2; 5,6,7
+    }
+
+    getAvailableMoves(){
+        return this.availableMoves;
+    }
+
+    handlePick(tileID){
+        const comparisonID = tileID - 1; // id are between [1, boardDimensions^2], indices are between [0, boardDimensions - 1]
+        const tileRow = Math.floor(comparisonID / this.boardDimensions);
+        const tileCol = comparisonID % this.boardDimensions;
+
+        const tileObj = this.board.getTiles()[tileRow][tileCol];
+
+        // tile not yet selected (tile ids are in range [1, boardDimensions^2])
+        if(this.selectedTileID === 0){
+            // check for a piece on the selected tile
+            if(tileObj.getPiece() === null){
+                console.log("no piece on this tile");
+                return;
+            }
+            console.warn("TODO: only allow selecting tiles with pieces belonging to the current player")
+
+            this.selectedTileID = tileID;
+            this.availableMoves = this.getValidMoves(tileID);
+            tileObj.toggleHighlightPiece();
+        }
+        // tile selected
+        else{
+            // check if the tile selected corresponds to one of the possible moves
+            console.warn("TODO: implement canceling tile selection by clicking on the selected tile again")
+            if(!this.availableMoves.includes(tileID)){
+                console.warn("didn't select one of the available moves --- skipping   TODO: remove this warning later");
+                return;
+            }
+            tileObj.toggleHighlightPiece();
+            this.move(tileID);
+            this.selectedTileID = 0; // reset selected tile
+            this.turnPlayer = (this.turnPlayer + 1) % 2; // change turn player
+        }
     }
 
     getValidMoves(tileID){
@@ -80,7 +121,7 @@ export class GameManager {
         return possibleMoves;
     }
 
-    move(){
-
+    move(tileID){
+        console.warn("TODO: implement GameManager.move() -- moving tile with id this.selectedTile to the tile with tileID id");
     }
 }
