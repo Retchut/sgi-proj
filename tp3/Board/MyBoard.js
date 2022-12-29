@@ -111,8 +111,8 @@ export class MyBoard extends CGFobject {
      * Displays the object by calling each of its primitives' display function
      */
     display() {
-        for (let row = 0; row < 8; row++) {
-            for (let col = 0; col < 8; col++) {
+        for (let row = 0; row < this.boardDimensions; row++) {
+            for (let col = 0; col < this.boardDimensions; col++) {
                 // bottom right corner for both players must be white or the otherwise provided colorA
                 if ((row + col) % 2 == 0) this.appearanceB.apply();
                 else this.appearanceW.apply();
