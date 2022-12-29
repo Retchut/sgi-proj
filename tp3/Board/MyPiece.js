@@ -9,10 +9,10 @@ import { MyTorus } from "../Primitives/MyTorus.js";
 export class MyPiece extends CGFobject {
     /**
      * @constructor
-     * @param {XMLscene} scene   the application's scene
-     * @param {Number} tileLen  length of the tile this piece is contained in
-     * @param {Number} player   player who owns the piece - 0/1
-     * @param {CGFappearance} appearance the material for this piece
+     * @param {XMLscene} scene           - the application's scene
+     * @param {Number} tileLen           - length of the tile this piece is contained in
+     * @param {Number} player            - player who owns the piece - 0/1
+     * @param {CGFappearance} appearance - the material for this piece
      */
     constructor(scene, tileLen, player, appearance) {
         super(scene);
