@@ -34,11 +34,11 @@ export class MyTile extends CGFobject {
     }
 
     /**
-     * Highlights the piece in this tile
+     * Toggles the highlighting on the piece in this tile
      */
-    highlightPiece(){
+    toggleHighlightPiece(){
         // TODO: highlight the piece in this tile
-        console.warn("TODO: IMPLEMENT HIGHLIGHTING PIECE FUNCTION")
+        console.warn("TODO: IMPLEMENT TOGGLING THE HIGHLIGHTING ON THIS TILE'S PIECE FUNCTION")
     }
     
     /**
