@@ -47,10 +47,6 @@ export class GameManager {
         }
     }
 
-    getAvailableMoves(){
-        return this.availableMoves;
-    }
-
     handlePick(tileID){
         const comparisonID = tileID - 1; // id are between [1, boardDimensions^2], indices are between [0, boardDimensions - 1]
         const tileRow = Math.floor(comparisonID / this.boardDimensions);
@@ -80,7 +76,7 @@ export class GameManager {
             // check if the tile selected corresponds to one of the possible moves
             console.warn("TODO: implement canceling tile selection by clicking on the selected tile again")
             if(!this.availableMoves.includes(tileID)){
-                console.warn("didn't select one of the available moves --- skipping   TODO: remove this warning later");
+                console.log("that's not one of the available moves");
                 return;
             }
             tileObj.toggleHighlightPiece();
@@ -92,36 +88,23 @@ export class GameManager {
 
     getValidMoves(tileID){
         // TODO: invert operation if player == 1
-        console.warn("TODO: avoid moving to tiles with pieces")
-        console.warn("TODO: allow moving over pieces (and make it the only option)")
+        console.warn("TODO: avoid moving to tiles with pieces");
+        console.warn("TODO: allow moving over pieces (and make it the only option)");
+
         let possibleMoves = [];
-        if(this.turnPlayer === 0){
-            if(tileID % this.boardDimensions !== 0){
-                // can move right
-                const move = tileID + this.boardDimensions + 1;
-                if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
-                    possibleMoves.push(move);
-            }
-            if(tileID % this.boardDimensions !== 1){
-                // can move left
-                const move = tileID + this.boardDimensions - 1;
-                if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
-                    possibleMoves.push(move);
-            }
+        // player 1 moves to a lower row, player 0 to an upper row
+        const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+        if(tileID % this.boardDimensions !== 0){
+            // can move right
+            const move = tileID + rowOffset + 1;
+            if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
+                possibleMoves.push(move);
         }
-        else{
-            if(tileID % this.boardDimensions !== 0){
-                // can move right
-                const move = tileID - (this.boardDimensions - 1);
-                if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
-                    possibleMoves.push(move);
-            }
-            if(tileID % this.boardDimensions !== 1){
-                // can move left
-                const move = tileID - (this.boardDimensions + 1);
-                if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
-                    possibleMoves.push(move);
-            }
+        if(tileID % this.boardDimensions !== 1){
+            // can move left
+            const move = tileID + rowOffset - 1;
+            if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
+                possibleMoves.push(move);
         }
 
         return possibleMoves;
