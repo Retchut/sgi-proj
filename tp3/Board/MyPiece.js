@@ -3,9 +3,10 @@ import { MyCylinder } from "../Primitives/MyCylinder.js";
 import { MyTorus } from "../Primitives/MyTorus.js";
 
 export class MyPiece extends CGFobject {
-    constructor(scene, appearance, tileLen) {
+    constructor(scene, player, appearance, tileLen) {
         super(scene);
 
+        this.player = player;
         this.appearance = appearance;
 
         this.side = new MyCylinder(this.scene, 0, 0.5, 0.5, 0.2, 50, 1);
@@ -25,6 +26,14 @@ export class MyPiece extends CGFobject {
         // Todo: integrate this into the piece itself
         // this.scaleTransf = mat4.create();
         // mat4.scale(this.scaleTransf, this.scaleTransf, [this.tileLen * 0.9, this.tileLen * 0.9, this.tileLen * 0.9])
+    }
+
+    /**
+     * @method getPlayer
+     * @returns this piece's player
+     */
+    getPlayer(){
+        return this.player;
     }
 
     /**

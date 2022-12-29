@@ -15,30 +15,32 @@ export class GameManager {
         // this.board.clear()
         this.turnPlayer = 0; // 0 - white, 1 - black
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
+        this.player0Pit = [];
         this.player1Pit = [];
-        this.player2Pit = [];
         this.piecesInPlay = [];
         this.availableMoves = [];
 
-        const p1Appearance = this.board.getAppearanceB();
-        const p2Appearance = this.board.getAppearanceA();
+        const p0Appearance = this.board.getAppearanceB();
+        const p1Appearance = this.board.getAppearanceA();
         const tiles = this.board.getTiles();
         const rowsToSpawn = 3;
         
         for(let row = 0; row < rowsToSpawn; row++){
 
             // TODO: clean this up
+            // player 0
             for(const tile of tiles[row]){
                 if((tile.getID() + row % 2) % 2 == 1){
-                    var newPiece = new MyPiece(this.scene, p1Appearance, this.boardDimensions);
+                    var newPiece = new MyPiece(this.scene, 0, p0Appearance, this.boardDimensions);
                     this.piecesInPlay.push(newPiece);
                     tile.setPiece(newPiece);
                 }
             }
 
+            // player 1
             for(const tile of tiles[tiles.length - row - 1]){
                 if((tile.getID() - 1 + row % 2) % 2 == 1){
-                    var newPiece = new MyPiece(this.scene, p2Appearance, this.boardDimensions);
+                    var newPiece = new MyPiece(this.scene, 1, p1Appearance, this.boardDimensions);
                     this.piecesInPlay.push(newPiece);
                     tile.setPiece(newPiece);
                 }
