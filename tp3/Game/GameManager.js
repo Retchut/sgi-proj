@@ -45,7 +45,6 @@ export class GameManager {
                 }
             }
         }
-            // impar, row 0,1,2; 5,6,7
     }
 
     getAvailableMoves(){
@@ -89,6 +88,8 @@ export class GameManager {
 
     getValidMoves(tileID){
         // TODO: invert operation if player == 1
+        console.warn("TODO: avoid moving to tiles with pieces")
+        console.warn("TODO: allow moving over pieces (and make it the only option)")
         let possibleMoves = [];
         if(this.turnPlayer === 0){
             if(tileID % this.boardDimensions !== 0){
@@ -123,6 +124,20 @@ export class GameManager {
     }
 
     move(tileID){
-        console.warn("TODO: implement GameManager.move() -- moving tile with id this.selectedTile to the tile with tileID id");
+        // tile IDs are between [1, boardDimensions^2], array indices are between [0, boardDimensions - 1]
+        const oldComparisonID = this.selectedTileID - 1;
+        const newComparisonID = tileID - 1;
+        const oldTileRow = Math.floor(oldComparisonID / this.boardDimensions);
+        const oldTileCol = oldComparisonID % this.boardDimensions;
+        const newTileRow = Math.floor(newComparisonID / this.boardDimensions);
+        const newTileCol = newComparisonID % this.boardDimensions;
+        const tiles = this.board.getTiles();
+        
+        const oldTile = tiles[oldTileRow][oldTileCol];
+        const newTile = tiles[newTileRow][newTileCol];
+        const piece = oldTile.getPiece();
+
+        oldTile.setPiece(null);
+        newTile.setPiece(piece);
     }
 }
