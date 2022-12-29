@@ -65,7 +65,11 @@ export class GameManager {
                 console.log("no piece on this tile");
                 return;
             }
-            console.warn("TODO: only allow selecting tiles with pieces belonging to the current player")
+
+            if(tileObj.getPiece().getPlayer() !== this.turnPlayer){
+                console.log("that piece does not belong to the current turn player");
+                return;
+            }
 
             this.selectedTileID = tileID;
             this.availableMoves = this.getValidMoves(tileID);
