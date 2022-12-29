@@ -13,7 +13,7 @@ export class GameManager {
     initGame(){
         // TODO: implement this later if necessary (resets board state to its defaults - requires changing the constructor)
         // this.board.clear()
-        this.turn = 0; // 0 - white, 1 - black
+        this.turnPlayer = 0; // 0 - white, 1 - black
         this.player1Pit = [];
         this.player2Pit = [];
         this.piecesInPlay = [];
@@ -45,10 +45,10 @@ export class GameManager {
             // impar, row 0,1,2; 5,6,7
     }
 
-    getValidMoves(player, tileID){
+    getValidMoves(tileID){
         // TODO: invert operation if player == 1
         let possibleMoves = [];
-        if(player === 0){
+        if(this.turnPlayer === 0){
             if(tileID % this.boardDimensions !== 0){
                 // can move right
                 const move = tileID + this.boardDimensions + 1;
