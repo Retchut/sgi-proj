@@ -10,8 +10,8 @@ export class MyBoard extends CGFobject {
      * @param {XMLscene} scene - Reference to MyScene object
      * @param {vec3} position1 - Position of the bottom left corner of the board
      * @param {vec3} position2 - Position of the top right corner of the board
-     * @param {vec3} colorA    - Color of player1's material
-     * @param {vec3} colorB    - Color of player2's material
+     * @param {vec3} colorA    - Color of player0's material
+     * @param {vec3} colorB    - Color of player1's material
      */
     constructor(scene, position = [0, 0, 0], size = 5, colorA = [1, 1, 1], colorB = [0, 0, 0]) {
         super(scene);
