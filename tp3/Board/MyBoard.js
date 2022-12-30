@@ -121,6 +121,17 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method updateShaders updates the shaders of the board, by updating the timefactor on the tiles to be displayed
+     * @param {Array}  tileIDs        - IDs of the tiles with active shaders
+     * @param {Number} currTimeFactor - new value for the shader's timefactor
+     */
+    updateShaders(tileIDs, currTimeFactor){
+        for(const tileID of tileIDs){
+            this.getTileAt(tileID).updateShader(currTimeFactor);
+        }
+    }
+
+    /**
      * @method display
      * Displays the object by calling each of its primitives' display function
      */

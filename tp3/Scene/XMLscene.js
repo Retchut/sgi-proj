@@ -184,8 +184,11 @@ export class XMLscene extends CGFscene {
             for (const anim in this.graph.animations)
                 this.graph.animations[anim].update(elapsedTime / 1000);
 
+            const currTimeFactor = currTime / 1000 % 100;
             if(this.shadersController.shadersActive && !this.shadersController.freezeShader)
-                this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTime / 1000 % 100 });
+                this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTimeFactor });
+            
+            this.gameManager.updateShaders(currTimeFactor);
         }
     }
 

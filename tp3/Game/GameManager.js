@@ -146,4 +146,13 @@ export class GameManager {
         oldTile.setPiece(null);
         newTile.setPiece(piece);
     }
+
+    /**
+     * @method updateShaders updates the shaders of the board, by passing the new timefactor to be set into the board's method
+     * @param {Number} currTimeFactor - new value for the shader's timefactor
+     */
+    updateShaders(currTimeFactor){
+        const tileIDs = this.availableMoves;
+        this.board.updateShaders(tileIDs, currTimeFactor);
+    }
 }

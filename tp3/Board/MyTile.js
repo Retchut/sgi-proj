@@ -1,4 +1,4 @@
-import { CGFobject } from "../../lib/CGF.js";
+import { CGFobject, CGFshader } from "../../lib/CGF.js";
 import { XMLscene } from "../Scene/XMLscene.js";
 import { MyRectangle } from "../Primitives/MyRectangle.js";
 import { MyPiece } from "./MyPiece.js";
@@ -17,11 +17,20 @@ export class MyTile extends CGFobject {
         super(scene);
         this.tileID = id;
         this.tile = new MyRectangle(this.scene, id, x1, x2, y1, y2);
-        const tileLen = x2-x1;
+
+        this.displayShader = false;
+        this.tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlight.frag');
+        this.tileShader.setUniformsValues({
+            shaderTimeFactor : 0,
+            shaderScaleFactor : 1,
+            factors : vec3.create(),
+            matColor : vec4.create()
+        });
 
         // initialize this tile's piece's values
         this.piece = null;
         this.pieceTransformation = mat4.create();
+        const tileLen = x2-x1;
         // positioning of this piece
         mat4.translate(this.pieceTransformation, this.pieceTransformation, [x1 + tileLen/2,y1 + tileLen/2,0]);
         // scale of this scale
@@ -56,8 +65,16 @@ export class MyTile extends CGFobject {
      * Toggles the highlighting on the piece in this tile
      */
     toggleHighlightPiece(){
-        // TODO: highlight the piece in this tile
+        this.displayShader = !this.displayShader;
         console.warn("TODO: IMPLEMENT TOGGLING THE HIGHLIGHTING ON THIS TILE'S PIECE FUNCTION")
+    }
+
+    /**
+     * @method updateShader updates this tile's highlight shader, by updating its timefactor uniform value
+     * @param {Number} currTimeFactor - new value for the shader's timefactor
+     */
+    updateShader(currTimeFactor){
+        this.tileShader.setUniformsValues({ shaderTimeFactor: currTimeFactor });
     }
     
     /**
@@ -66,6 +83,9 @@ export class MyTile extends CGFobject {
     */
     display() {
         this.scene.registerForPick(this.tileID, this);
+
+        if(this.displayShader)
+            this.scene.setActiveShader(this.tileShader);
 
         this.tile.display();
 
@@ -76,5 +96,8 @@ export class MyTile extends CGFobject {
             this.piece.display();
             this.scene.popMatrix();
         }
+
+        if(this.displayShader)
+            this.scene.setActiveShader(this.scene.defaultShader);
     }
 }
