@@ -58,6 +58,14 @@ export class GameManager {
             }
         }
     }
+    
+    /**
+     * @method getOpponent calculates the next player
+     * @returns the opponent of the current player
+     */
+    getOpponent(){
+        return (this.turnPlayer + 1) % 2;
+    }
 
     /**
      * @method handlePick Method called from the scene when a tile or piece is picked. Depending on the game state, either allows selecting a piece to move, or the movement location
@@ -81,6 +89,7 @@ export class GameManager {
 
             this.selectedTileID = tileID;
             this.availableMoves = this.getValidMoves(tileID);
+            console.log(this.availableMoves);
             this.resetHighlighting();
         }
         // initial tile selected
@@ -102,7 +111,7 @@ export class GameManager {
             this.move(tileObj);
             this.selectedTileID = 0; // reset selected tile
             this.resetHighlighting()
-            this.turnPlayer = (this.turnPlayer + 1) % 2; // change turn player
+            this.turnPlayer = this.getOpponent(); // change turn player
         }
     }
 
@@ -116,23 +125,46 @@ export class GameManager {
 
         // initialize the array with the tileID to allow for desselecting this tile later
         let possibleMoves = [tileID];
+        let captures = [tileID];
 
         // player 1 moves to a lower row, player 0 to an upper row
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
         if(tileID % this.boardDimensions !== 0){
             // can move right
             const move = tileID + rowOffset + 1;
+            const movePiece = this.board.getTileAt(move).getPiece();
             if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
-                if(this.board.getTileAt(move).getPiece() === null)
+                if(movePiece === null)
                     possibleMoves.push(move);
+                else{
+                    // can we capture it?
+                    if(movePiece.getPlayer() === this.getOpponent()){
+                        const captureMove = move + rowOffset + 1;
+                        if(this.board.getTileAt(captureMove))
+                            captures.push(captureMove);
+                    }
+                }
         }
         if(tileID % this.boardDimensions !== 1){
             // can move left
             const move = tileID + rowOffset - 1;
+            const movePiece = this.board.getTileAt(move).getPiece();
             if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
                 if(this.board.getTileAt(move).getPiece() === null)
                     possibleMoves.push(move);
+                else{
+                    if(movePiece.getPlayer() === this.getOpponent()){
+                    // can we capture it?
+                        const captureMove = move + rowOffset - 1;
+                        if(this.board.getTileAt(captureMove))
+                            captures.push(captureMove);
+                    }
+                }
         }
+
+        // if a capture can be made (captures contains more than the original tileID), that's the only possible move the player can make
+        if(captures.length !== 1)
+            possibleMoves = captures;
 
         return possibleMoves;
     }
