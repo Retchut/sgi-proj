@@ -188,7 +188,7 @@ export class XMLscene extends CGFscene {
             if(this.shadersController.shadersActive && !this.shadersController.freezeShader)
                 this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTimeFactor });
             
-            this.gameManager.updateShaders(currTimeFactor);
+            this.gameManager.update(currTime);
         }
     }
 

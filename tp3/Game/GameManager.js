@@ -32,6 +32,10 @@ export class GameManager {
         this.player1Pit = [];
         this.piecesInPlay = [];
         this.availableMoves = [];
+        this.player0LastTime = null;
+        this.player1LastTime = null;
+        this.player0RemainingTime = 300000;
+        this.player1RemainingTime = 300000;
 
         const p0Appearance = this.board.getAppearanceW();
         const p1Appearance = this.board.getAppearanceB();
@@ -193,12 +197,27 @@ export class GameManager {
             this.board.toggleHighlight(tileID);
     }
 
+
+
     /**
      * @method updateShaders updates the shaders of the board, by passing the new timefactor to be set into the board's method
      * @param {Number} currTimeFactor - new value for the shader's timefactor
      */
-    updateShaders(currTimeFactor){
+    update(currTime){
         const tileIDs = this.availableMoves;
-        this.board.updateShaders(tileIDs, currTimeFactor);
+        this.board.updateShaders(tileIDs, currTime / 1000 % 100);
+
+        if (this.turnPlayer == 0) {
+            this.player1LastTime = null;
+            if (this.player0LastTime != null) this.player0RemainingTime -= currTime - this.player0LastTime
+            this.player0LastTime = currTime;
+        }
+        else if (this.turnPlayer == 1) {
+            this.player0LastTime = null;
+            if (this.player1LastTime != null) this.player1RemainingTime -= currTime - this.player1LastTime
+            this.player1LastTime = currTime;
+        }
+
+        this.timer.setTimes(Math.floor(this.player0RemainingTime / 1000), Math.floor(this.player1RemainingTime / 1000));
     }
 }
