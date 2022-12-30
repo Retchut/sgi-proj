@@ -1,10 +1,11 @@
 import { MyPiece } from "../Board/MyPiece.js";
 
 export class GameManager {
-    constructor(scene, board){
+    constructor(scene, board, timer){
         this.scene = scene;
         this.board = board;
-        this.boardDimensions = this.board.getBoardDimensions()
+        this.timer = timer;
+        this.boardDimensions = this.board.getBoardDimensions();
         
         this.initGame();
     }
@@ -45,6 +46,8 @@ export class GameManager {
                 }
             }
         }
+
+        this.timer.setTimes(300, 300);
     }
 
     getAvailableMoves(){
