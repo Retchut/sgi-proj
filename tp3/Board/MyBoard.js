@@ -126,7 +126,7 @@ export class MyBoard extends CGFobject {
      * @returns true if the tile is on the first column of the board, false otherwise
      */
     tileInFirstCol(tileID){
-        return (tileID % this.boardDimensions) !== 1;
+        return (tileID % this.boardDimensions) === 1;
     }
 
     /**
@@ -135,7 +135,7 @@ export class MyBoard extends CGFobject {
      * @returns true if the tile is on the last column of the board, false otherwise
      */
     tileInLastCol(tileID){
-        return (tileID % this.boardDimensions) !== 0;
+        return (tileID % this.boardDimensions) === 0;
     }
 
     /**
