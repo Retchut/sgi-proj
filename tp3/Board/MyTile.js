@@ -64,9 +64,8 @@ export class MyTile extends CGFobject {
     /**
      * Toggles the highlighting on the piece in this tile
      */
-    toggleHighlightPiece(){
+    toggleHighlight(){
         this.displayShader = !this.displayShader;
-        console.warn("TODO: IMPLEMENT TOGGLING THE HIGHLIGHTING ON THIS TILE'S PIECE FUNCTION")
     }
 
     /**

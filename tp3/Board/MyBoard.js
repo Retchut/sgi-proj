@@ -109,7 +109,7 @@ export class MyBoard extends CGFobject {
 
     /**
      * @method getTileAt
-     * @param tileID - id of the tile
+     * @param {Number} tileID - id of the tile
      * @returns the MyTile object at tileID on the board
      */
     getTileAt(tileID){
@@ -118,6 +118,14 @@ export class MyBoard extends CGFobject {
         const tileRow = Math.floor(index / this.boardDimensions);
         const tileCol = index % this.boardDimensions;
         return this.tiles[tileRow][tileCol];
+    }
+
+    /**
+     * @method toggleHighlight Toggles the highlighting on the tile at tile with tileID
+     * @param {Number} - id of the tile
+     */
+    toggleHighlight(tileID){
+        this.getTileAt(tileID).toggleHighlight();
     }
 
     /**

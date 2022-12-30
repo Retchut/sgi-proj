@@ -80,7 +80,7 @@ export class GameManager {
 
             this.selectedTileID = tileID;
             this.availableMoves = this.getValidMoves(tileID);
-            tileObj.toggleHighlightPiece();
+            this.resetHighlighting();
         }
         // initial tile selected
         else{
@@ -90,16 +90,17 @@ export class GameManager {
                 return;
             }
 
-            tileObj.toggleHighlightPiece();
 
             if(tileID === this.selectedTileID){
                 console.log("desselecting selected tile");
                 this.selectedTileID = 0;
+                this.resetHighlighting();
                 return;
             }
 
             this.move(tileObj);
             this.selectedTileID = 0; // reset selected tile
+            this.resetHighlighting()
             this.turnPlayer = (this.turnPlayer + 1) % 2; // change turn player
         }
     }
@@ -145,6 +146,14 @@ export class GameManager {
 
         oldTile.setPiece(null);
         newTile.setPiece(piece);
+    }
+
+    /**
+     * @method resetHighlighting resets the highlighting applied to tiles the player may interact with
+     */
+    resetHighlighting(){
+        for(const tileID of this.availableMoves)
+            this.board.toggleHighlight(tileID);
     }
 
     /**
