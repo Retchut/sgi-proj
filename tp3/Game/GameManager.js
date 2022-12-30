@@ -129,7 +129,7 @@ export class GameManager {
 
         // player 1 moves to a lower row, player 0 to an upper row
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
-        if(tileID % this.boardDimensions !== 0){
+        if(this.board.tileInLastCol(tileID)){
             // can move right
             const move = tileID + rowOffset + 1;
             const movePiece = this.board.getTileAt(move).getPiece();
@@ -145,7 +145,7 @@ export class GameManager {
                     }
                 }
         }
-        if(tileID % this.boardDimensions !== 1){
+        if(this.board.tileInFirstCol(tileID)){
             // can move left
             const move = tileID + rowOffset - 1;
             const movePiece = this.board.getTileAt(move).getPiece();
