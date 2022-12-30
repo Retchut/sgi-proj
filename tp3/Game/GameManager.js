@@ -12,9 +12,10 @@ export class GameManager {
      * @param {XMLscene} scene - The application's scene
      * @param {MyBoard} board - The board the game is played in
      */
-    constructor(scene, board){
+    constructor(scene, board, timer){
         this.scene = scene;
         this.board = board;
+        this.timer = timer;
         this.boardDimensions = this.board.getBoardDimensions();
     }
 
@@ -57,6 +58,8 @@ export class GameManager {
                 }
             }
         }
+
+        this.timer.setTimes(300, 300);
     }
 
     /**

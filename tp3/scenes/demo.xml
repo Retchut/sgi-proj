@@ -59,8 +59,16 @@
                 x1="0" y1="0" z1="0.0"
                 size="5"
                 rA="1" gA="1" bA="1"
-                rB="0" gB="0" bB="0" />
-            </primitive>
+                rB="0" gB="0" bB="0"
+            />
+        </primitive>
+        <primitive id="timer">
+            <timer
+                x="-3" y="0" z="1.25"
+                size="2.5"
+                angle="90"
+            />
+        </primitive>
     </primitives>
 
     <animations>
@@ -83,7 +91,6 @@
         <!-- Board Start -->
         <component id="boardComp">
             <transformation>
-                <rotate axis="x" angle="-90" />
             </transformation>
             <materials>
                 <material id="placeholderMat" />
@@ -91,6 +98,7 @@
             <texture id="none" />
             <children>
                 <primitiveref id="board" />
+                <primitiveref id="timer" />
             </children>
         </component>
         <!-- Board End -->
