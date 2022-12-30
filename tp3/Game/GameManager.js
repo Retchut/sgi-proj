@@ -139,7 +139,8 @@ export class GameManager {
                     // can we capture it?
                     if(!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
                         const captureMove = move + rowOffset + 1;
-                        if(this.board.getTileAt(captureMove).getPiece() === null)
+
+                        if(this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null)
                             captures.push(captureMove);
                     }
                 }
@@ -156,7 +157,7 @@ export class GameManager {
                     if(!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
                     // can we capture it?
                         const captureMove = move + rowOffset - 1;
-                        if(this.board.getTileAt(captureMove).getPiece() === null)
+                        if(this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null)
                             captures.push(captureMove);
                     }
                 }
