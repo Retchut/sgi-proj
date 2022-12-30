@@ -16,6 +16,9 @@ export class MyBoard extends CGFobject {
         super(scene);
         this.tiles = [];
 
+        this.boardTransformation = mat4.create();
+        mat4.rotate(this.boardTransformation, this.boardTransformation, -Math.PI / 2, [1, 0, 0]);
+
         // generate appearances for both player's tiles
         console.warn("TODO: rename colorA in xml and scene to colorW, to make it consistent with the remainder of the code -- IF THE SPECIFICATION ALLOWS")
         console.warn("TODO: test if board appearances derived from colorA and colorB")
@@ -64,7 +67,7 @@ export class MyBoard extends CGFobject {
                 const y2 = bottomLeft[1] + rowHeight;
                 const x1 = bottomLeft[0] + (col * this.tileLen);
                 const x2 = bottomLeft[0] + ((col + 1) * this.tileLen);
-                
+
                 // push the new tile to the row's list
                 rowList.push(new MyTile(this.scene, tileID, x1, x2, y1, y2));
                 tileID++;
@@ -78,7 +81,7 @@ export class MyBoard extends CGFobject {
      * @method getTiles
      * @returns the board's tiles bidimensional array
      */
-    getTiles(){
+    getTiles() {
         return this.tiles;
     }
 
@@ -86,7 +89,7 @@ export class MyBoard extends CGFobject {
      * @method getBoardDimensions
      * @returns the board's dimensions
      */
-    getBoardDimensions(){
+    getBoardDimensions() {
         return this.boardDimensions;
     }
 
@@ -94,7 +97,7 @@ export class MyBoard extends CGFobject {
      * @method getappearanceW
      * @returns the board's appearance for player 0
      */
-    getAppearanceW(){
+    getAppearanceW() {
         return this.appearanceW;
     }
 
@@ -102,7 +105,7 @@ export class MyBoard extends CGFobject {
      * @method getAppearanceB
      * @returns the board's appearance for player 1
      */
-    getAppearanceB(){
+    getAppearanceB() {
         return this.appearanceB;
     }
 
@@ -111,6 +114,8 @@ export class MyBoard extends CGFobject {
      * Displays the object by calling each of its primitives' display function
      */
     display() {
+        this.scene.pushMatrix();
+        this.scene.multMatrix(this.boardTransformation);
         for (let row = 0; row < this.boardDimensions; row++) {
             for (let col = 0; col < this.boardDimensions; col++) {
                 // bottom right corner for both players must be white or the otherwise provided colorA
@@ -123,6 +128,7 @@ export class MyBoard extends CGFobject {
                 }
             }
         }
+        this.scene.popMatrix();
     }
 
     /**
