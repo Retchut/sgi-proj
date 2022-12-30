@@ -121,8 +121,6 @@ export class GameManager {
      * @returns The moves the player can make from the tile with ID tileID
      */
     getValidMoves(tileID){
-        console.warn("TODO: allow moving over pieces (and make it the only option)");
-
         // initialize the array with the tileID to allow for desselecting this tile later
         let possibleMoves = [tileID];
         let captures = [tileID];
