@@ -131,8 +131,8 @@ export class GameManager {
         if(!this.board.tileInLastCol(tileID)){
             // can move right
             const move = tileID + rowOffset + 1;
-            const movePiece = this.board.getTileAt(move).getPiece();
-            if(this.board.tileInsideBoard(move))
+            if(this.board.tileInsideBoard(move)){
+                const movePiece = this.board.getTileAt(move).getPiece();
                 if(movePiece === null)
                     possibleMoves.push(move);
                 else{
@@ -144,13 +144,14 @@ export class GameManager {
                             captures.push(captureMove);
                     }
                 }
+            }
         }
 
         if(!this.board.tileInFirstCol(tileID)){
             // can move left
             const move = tileID + rowOffset - 1;
-            const movePiece = this.board.getTileAt(move).getPiece();
-            if(this.board.tileInsideBoard(move))
+            if(this.board.tileInsideBoard(move)){
+                const movePiece = this.board.getTileAt(move).getPiece();
                 if(this.board.getTileAt(move).getPiece() === null)
                     possibleMoves.push(move);
                 else{
@@ -161,6 +162,7 @@ export class GameManager {
                             captures.push(captureMove);
                     }
                 }
+            }
         }
 
         // if a capture can be made (captures contains more than the original tileID), that's the only possible move the player can make
