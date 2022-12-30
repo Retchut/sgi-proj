@@ -139,6 +139,15 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method tileInEdgeCols
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the last or first column of the board, false otherwise
+     */
+    tileInEdgeCols(tileID){
+        return this.tileInFirstCol(tileID) || this.tileInLastCol(tileID);
+    }
+
+    /**
      * @method toggleHighlight Toggles the highlighting on the tile at tile with tileID
      * @param {Number} - id of the tile
      */

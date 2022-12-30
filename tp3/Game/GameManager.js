@@ -129,6 +129,7 @@ export class GameManager {
 
         // player 1 moves to a lower row, player 0 to an upper row
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+
         if(!this.board.tileInLastCol(tileID)){
             // can move right
             const move = tileID + rowOffset + 1;
@@ -138,13 +139,14 @@ export class GameManager {
                     possibleMoves.push(move);
                 else{
                     // can we capture it?
-                    if(movePiece.getPlayer() === this.getOpponent()){
+                    if(!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
                         const captureMove = move + rowOffset + 1;
                         if(this.board.getTileAt(captureMove).getPiece() === null)
                             captures.push(captureMove);
                     }
                 }
         }
+
         if(!this.board.tileInFirstCol(tileID)){
             // can move left
             const move = tileID + rowOffset - 1;
@@ -153,7 +155,7 @@ export class GameManager {
                 if(this.board.getTileAt(move).getPiece() === null)
                     possibleMoves.push(move);
                 else{
-                    if(movePiece.getPlayer() === this.getOpponent()){
+                    if(!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
                     // can we capture it?
                         const captureMove = move + rowOffset - 1;
                         if(this.board.getTileAt(captureMove).getPiece() === null)
