@@ -8,6 +8,7 @@ import { MyPatch } from '../Primitives/MyPatch.js';
 import { MyKeyframeAnimation } from '../Animation/MyKeyframeAnimation.js';
 import { MyKeyframe } from '../Animation/MyKeyframe.js';
 import { MyBoard } from '../Board/MyBoard.js';
+import { MyTimer } from '../Board/MyTimer.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -84,7 +85,7 @@ export class MySceneGraph {
         this.scene.interface.initLights();
         this.scene.interface.initShaders();
         this.scene.interface.initAnimations();
-        this.scene.initGameManager(this.primitives[this.idBoard]);
+        this.scene.initGameManager(this.primitives[this.idBoard], this.primitives[this.idTimer]);
         // this.scene.interface.initInterface();
     }
 
@@ -827,14 +828,11 @@ export class MySceneGraph {
             }
 
             grandChildren = children[i].children;
-            
+
             // Validate the primitive type
-            if (grandChildren.length != 1 ||
-                (grandChildren[0].nodeName != 'rectangle' && grandChildren[0].nodeName != 'triangle' &&
-                    grandChildren[0].nodeName != 'cylinder' && grandChildren[0].nodeName != 'sphere' &&
-                    grandChildren[0].nodeName != 'torus' && grandChildren[0].nodeName != 'patch'
-                    && grandChildren[0].nodeName != 'board')) {
-                return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere, torus, patch or board.)"
+            const allowedTypes = ['rectangle', 'triangle', 'cylinder', 'sphere', 'torus', 'patch', 'board', 'timer'];
+            if (grandChildren.length != 1 || !allowedTypes.includes(grandChildren[0].nodeName)) {
+                return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere, torus, patch, board or timer.)";
             }
 
             // Specifications for the current primitive.
@@ -1226,7 +1224,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
+
                 // z1
                 var param = 'z1';
                 var z1 = this.reader.getFloat(grandChildren[0], param);
@@ -1242,7 +1240,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
+
                 // rA
                 var param = 'rA';
                 var rA = this.reader.getFloat(grandChildren[0], param);
@@ -1250,7 +1248,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
+
                 // gA
                 var param = 'gA';
                 var gA = this.reader.getFloat(grandChildren[0], param);
@@ -1258,7 +1256,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
+
                 // bA
                 var param = 'bA';
                 var bA = this.reader.getFloat(grandChildren[0], param);
@@ -1266,7 +1264,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
+
                 // rB
                 var param = 'rB';
                 var rB = this.reader.getFloat(grandChildren[0], param);
@@ -1274,7 +1272,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
+
                 // gB
                 var param = 'gB';
                 var gB = this.reader.getFloat(grandChildren[0], param);
@@ -1282,7 +1280,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
                     continue;
                 }
-                
+
                 // bB
                 var param = 'bB';
                 var bB = this.reader.getFloat(grandChildren[0], param);
@@ -1300,9 +1298,41 @@ export class MySceneGraph {
                 this.idBoard = primitiveId;
                 this.primitives[primitiveId] = board;
             }
+            else if (primitiveType == 'timer') {
+                var position = this.parseCoordinates3D(grandChildren[0], "position for timer");
+                if (!Array.isArray(position)) {
+                    this.onXMLMinorError(position + ". Assuming position of [0,0,0]");
+                    position = vec3.create();
+                }
+
+                // size
+                var param = 'size';
+                var size = this.reader.getFloat(grandChildren[0], param);
+                if (!(size != null && !isNaN(size))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                // angle
+                var param = 'angle';
+                var angle = this.reader.getFloat(grandChildren[0], param);
+                if (!(angle != null && !isNaN(angle))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". Assuming 0.");
+                    angle = 0
+                }
+
+                var timer = new MyTimer(this.scene, position, size, angle);
+                this.idTimer = primitiveId;
+                this.primitives[primitiveId] = timer;
+            }
             else {
                 console.warn("To do: Parse other primitives.");
             }
+        }
+
+        // Check that the game elements were defined
+        if (!this.idBoard || !this.idTimer) {
+            return "All the game elements must be defined (board and timer). Aborting."
         }
 
         this.log("Parsed primitives");
@@ -1352,7 +1382,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("No instant defined for keyframe number " + j + " in animation with ID = " + animationID + ". This keyframe will be ignored.");
                     continue;
                 }
-                
+
                 if (keyframes.length != 0 && keyframes[keyframes.length - 1].instant >= instant) {
                     this.onXMLMinorError("Invalid instant defined for keyframe number " + j + " in animation with ID = " + animationID + ". Keyframes must be declared in ascending time order. This keyframe will be ignored.");
                     continue;
@@ -1655,7 +1685,7 @@ export class MySceneGraph {
             }
 
             const highlightedIndex = nodeNames.indexOf("highlighted");
-            if(highlightedIndex !== -1){
+            if (highlightedIndex !== -1) {
                 let highlightedProp = grandChildren[highlightedIndex];
 
                 var param = 'r';
@@ -1685,7 +1715,7 @@ export class MySceneGraph {
                     this.onXMLMinorError("Unable to parse " + param + " for highlighted tag of component " + componentID + ". Assuming 1.0.");
                     highlightedScale = 1.0;
                 }
-                
+
                 component.highlighted = {
                     r: highlightedR,
                     g: highlightedG,
@@ -1843,13 +1873,13 @@ export class MySceneGraph {
         const isHighlighted = (Object.keys(currentNode.highlighted).length > 0) && this.scene.shadersController.shadersActive;
 
         this.scene.multMatrix(currentNode.transformation);
-        
-        if(currentNode.animation !== null){
-            if(this.animations[currentNode.animation].apply() !== 0){
+
+        if (currentNode.animation !== null) {
+            if (this.animations[currentNode.animation].apply() !== 0) {
                 this.onXMLMinorError("Error animating component with id " + currentNode.id);
             }
         }
-        
+
 
         for (var i = 0; i < currentNode.children.componentRefs.length; i++) {
             // preserve current scene transformation matrix
@@ -1868,18 +1898,18 @@ export class MySceneGraph {
         currentAppearence.apply();
 
         // apply shader before drawing primitives        
-        if(isHighlighted){
+        if (isHighlighted) {
             const hasTexture = (texture.id !== "none");
             if (hasTexture) {
                 this.textures[texture.id].bind(1);
             }
             this.scene.shaders[this.selectedShader].setUniformsValues({
-                hasTexture : hasTexture,
-                ambientColor : this.materials[materialID].ambient,
-                diffuseColor : this.materials[materialID].diffuse,
-                specularColor : this.materials[materialID].specular,
-                shaderScaleFactor : currentNode.highlighted.scale,
-                highlightColor : vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
+                hasTexture: hasTexture,
+                ambientColor: this.materials[materialID].ambient,
+                diffuseColor: this.materials[materialID].diffuse,
+                specularColor: this.materials[materialID].specular,
+                shaderScaleFactor: currentNode.highlighted.scale,
+                highlightColor: vec3.fromValues(currentNode.highlighted.r, currentNode.highlighted.g, currentNode.highlighted.b)
             });
             this.scene.setActiveShader(this.scene.shaders[this.selectedShader]);
         }
@@ -1892,8 +1922,8 @@ export class MySceneGraph {
         }
 
         // reset to default scene shader
-        if(isHighlighted)
-		    this.scene.setActiveShader(this.scene.defaultShader);
+        if (isHighlighted)
+            this.scene.setActiveShader(this.scene.defaultShader);
     }
 
     /**
@@ -1912,7 +1942,7 @@ export class MySceneGraph {
 
         this.drawComponent(this.components[this.idRoot], null);
 
-        
+
 
         // restore the last preserved scene matrix
         this.scene.popMatrix();
