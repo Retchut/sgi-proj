@@ -148,6 +148,15 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method tileInEdgeCols
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is inside the bounds of the board, false otherwise
+     */
+    tileInsideBoard(tileID){
+        return tileID >= 1 && tileID <= Math.pow(this.boardDimensions, 2)
+    }
+
+    /**
      * @method toggleHighlight Toggles the highlighting on the tile at tile with tileID
      * @param {Number} - id of the tile
      */

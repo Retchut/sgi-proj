@@ -134,7 +134,7 @@ export class GameManager {
             // can move right
             const move = tileID + rowOffset + 1;
             const movePiece = this.board.getTileAt(move).getPiece();
-            if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
+            if(this.board.tileInsideBoard(move))
                 if(movePiece === null)
                     possibleMoves.push(move);
                 else{
@@ -151,7 +151,7 @@ export class GameManager {
             // can move left
             const move = tileID + rowOffset - 1;
             const movePiece = this.board.getTileAt(move).getPiece();
-            if(move >= 1 && move <= Math.pow(this.boardDimensions, 2))
+            if(this.board.tileInsideBoard(move))
                 if(this.board.getTileAt(move).getPiece() === null)
                     possibleMoves.push(move);
                 else{
