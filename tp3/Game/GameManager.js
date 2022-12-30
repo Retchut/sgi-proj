@@ -22,13 +22,14 @@ export class GameManager {
      * @method initGame Initializes the GameManager object, setting its fields to their defaults, and generating the board pieces
      */
     initGame(){
-        // TODO: implement the clear method later if necessary (resets board state to its defaults - would require changing the constructor)
+        console.warn("TODO: implement restarting game from buttonPrompt (GameManager's clear method)");
         // this.board.clear()
         this.turnPlayer = 0; // 0 - white, 1 - black
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
-        this.player0Pit = []; // TODO: Integrate this into the scoring and capturing of pieces
-        this.player1Pit = []; // TODO: Integrate this into the scoring and capturing of pieces
-        this.piecesInPlay = []; // TODO: Integrate this into the scoring and capturing of pieces
+        console.warn("TODO: implement scoring and capturing pieces");
+        this.player0Pit = [];
+        this.player1Pit = [];
+        this.piecesInPlay = [];
         this.availableMoves = [];
 
         const p0Appearance = this.board.getAppearanceW();
@@ -37,7 +38,7 @@ export class GameManager {
         const rowsToSpawn = 3;
         
         for(let row = 0; row < rowsToSpawn; row++){
-            // TODO: find a better way to create the pieces for both players
+            console.warn("TODO: improve the piece creation algorithm");
             // player 0
             for(const tile of tiles[row]){
                 if((tile.getID() + row % 2) % 2 == 1){

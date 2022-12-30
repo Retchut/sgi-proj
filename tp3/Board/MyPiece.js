@@ -34,7 +34,7 @@ export class MyPiece extends CGFobject {
         this.innerRingTransformation = mat4.create();
         mat4.scale(this.innerRingTransformation, this.innerRingTransformation, [1, 1, 0.2]);
 
-        // Todo: integrate this into the piece itself
+        console.warn("TODO: integrate tileLen into MyPiece, performing the scaling within MyPiece's display method");
         // this.scaleTransf = mat4.create();
         // mat4.scale(this.scaleTransf, this.scaleTransf, [this.tileLen * 0.9, this.tileLen * 0.9, this.tileLen * 0.9])
     }
@@ -55,6 +55,7 @@ export class MyPiece extends CGFobject {
         // this.appearance.apply();
         this.appearance.apply();
         
+        console.warn("TODO: clean up MyPiece's display method, if possible");
         this.side.display();
         this.scene.pushMatrix();
         this.scene.multMatrix(this.ringTransformation);
