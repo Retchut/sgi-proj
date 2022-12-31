@@ -198,7 +198,19 @@ export class GameManager {
      * @param {MyTile} tileID - tile to capture
      */
     capture(tileID){
-        this.board.getTileAt(tileID).setPiece(null);
+        const tile = this.board.getTileAt(tileID);
+
+        // player 1's turn
+        if(this.turnPlayer){
+            this.player1Pit.push(tile.getPiece());
+        }
+        // player 0's turn
+        else{
+            this.player0Pit.push(tile.getPiece());
+        }
+
+        // remove piece from tile
+        tile.setPiece(null);
     }
 
     /**
