@@ -117,8 +117,8 @@ export class XMLscene extends CGFscene {
         this.animationsController = { freezeAnimations : false };
     }
 
-    initGameManager(board, timer){
-        this.gameManager = new GameManager(this, board, timer);
+    initGameManager(board, timer, scoreKeeper){
+        this.gameManager = new GameManager(this, board, timer, scoreKeeper);
         this.gameManager.initGame();
     }
 

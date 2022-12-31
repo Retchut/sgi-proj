@@ -9,6 +9,7 @@ import { MyKeyframeAnimation } from '../Animation/MyKeyframeAnimation.js';
 import { MyKeyframe } from '../Animation/MyKeyframe.js';
 import { MyBoard } from '../Board/MyBoard.js';
 import { MyTimer } from '../Board/MyTimer.js';
+import { MyScoreKeeper } from '../Board/MyScoreKeeper.js';
 
 var DEGREE_TO_RAD = Math.PI / 180;
 
@@ -85,7 +86,7 @@ export class MySceneGraph {
         this.scene.interface.initLights();
         this.scene.interface.initShaders();
         this.scene.interface.initAnimations();
-        this.scene.initGameManager(this.primitives[this.idBoard], this.primitives[this.idTimer]);
+        this.scene.initGameManager(this.primitives[this.idBoard], this.primitives[this.idTimer], this.primitives[this.idScoreKeeper]);
         // this.scene.interface.initInterface();
     }
 
@@ -830,7 +831,7 @@ export class MySceneGraph {
             grandChildren = children[i].children;
 
             // Validate the primitive type
-            const allowedTypes = ['rectangle', 'triangle', 'cylinder', 'sphere', 'torus', 'patch', 'board', 'timer'];
+            const allowedTypes = ['rectangle', 'triangle', 'cylinder', 'sphere', 'torus', 'patch', 'board', 'timer', 'score'];
             if (grandChildren.length != 1 || !allowedTypes.includes(grandChildren[0].nodeName)) {
                 return "There must be exactly 1 primitive type (rectangle, triangle, cylinder, sphere, torus, patch, board or timer.)";
             }
@@ -1208,6 +1209,12 @@ export class MySceneGraph {
                 this.primitives[primitiveId] = patch;
             }
             else if (primitiveType == 'board') {
+                // Check if a game board already exists
+                if (this.idBoard) {
+                    this.onXMLMinorError("You can only define one game board. Ignoring primitive with ID = " + primitiveId + ".");
+                    continue;
+                }
+
                 // position1 = [0, 0, 0], position2 = [1, 1, 1], colorA = [0, 0, 0], colorB = [1, 1, 1]
                 // x1
                 var param = 'x1';
@@ -1293,12 +1300,18 @@ export class MySceneGraph {
                 const cA = vec3.fromValues(rA, gA, bA);
                 const cB = vec3.fromValues(rB, gB, bB);
 
-
                 var board = new MyBoard(this.scene, p1, size, cA, cB);
                 this.idBoard = primitiveId;
                 this.primitives[primitiveId] = board;
             }
             else if (primitiveType == 'timer') {
+                // Check if a game timer already exists
+                if (this.idTimer) {
+                    this.onXMLMinorError("You can only define one game timer. Ignoring primitive with ID = " + primitiveId + ".");
+                    continue;
+                }
+
+                // position
                 var position = this.parseCoordinates3D(grandChildren[0], "position for timer");
                 if (!Array.isArray(position)) {
                     this.onXMLMinorError(position + ". Assuming position of [0,0,0]");
@@ -1325,14 +1338,48 @@ export class MySceneGraph {
                 this.idTimer = primitiveId;
                 this.primitives[primitiveId] = timer;
             }
+            else if (primitiveType == 'score') {
+                // Check if a game score keeper already exists
+                if (this.idScoreKeeper) {
+                    this.onXMLMinorError("You can only define one game score keeper. Ignoring primitive with ID = " + primitiveId + ".");
+                    continue;
+                }
+
+                // position
+                var position = this.parseCoordinates3D(grandChildren[0], "position for score keeper");
+                if (!Array.isArray(position)) {
+                    this.onXMLMinorError(position + ". Assuming position of [0,0,0]");
+                    position = vec3.create();
+                }
+
+                // size
+                var param = 'size';
+                var size = this.reader.getFloat(grandChildren[0], param);
+                if (!(size != null && !isNaN(size))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". This primitive will be ignored.");
+                    continue;
+                }
+
+                // angle
+                var param = 'angle';
+                var angle = this.reader.getFloat(grandChildren[0], param);
+                if (!(angle != null && !isNaN(angle))) {
+                    this.onXMLMinorError("Unable to parse " + param + " of primitive with ID = " + primitiveId + ". Assuming 0.");
+                    angle = 0
+                }
+
+                var scoreKeeper = new MyScoreKeeper(this.scene, position, size, angle);
+                this.idScoreKeeper = primitiveId;
+                this.primitives[primitiveId] = scoreKeeper;
+            }
             else {
                 console.warn("To do: Parse other primitives.");
             }
         }
 
         // Check that the game elements were defined
-        if (!this.idBoard || !this.idTimer) {
-            return "All the game elements must be defined (board and timer). Aborting."
+        if (!this.idBoard || !this.idTimer || !this.idScoreKeeper) {
+            return "All the game elements must be defined (board, timer and score keeper). Aborting."
         }
 
         this.log("Parsed primitives");

@@ -12,10 +12,11 @@ export class GameManager {
      * @param {XMLscene} scene - The application's scene
      * @param {MyBoard} board - The board the game is played in
      */
-    constructor(scene, board, timer){
+    constructor(scene, board, timer, scoreKeeper){
         this.scene = scene;
         this.board = board;
         this.timer = timer;
+        this.scoreKeeper = scoreKeeper;
         this.boardDimensions = this.board.getBoardDimensions();
     }
 
@@ -64,6 +65,7 @@ export class GameManager {
         }
 
         this.timer.setTimes(300, 300);
+        this.scoreKeeper.setScores(0, 0);
     }
     
     /**
@@ -187,6 +189,8 @@ export class GameManager {
 
         oldTile.setPiece(null);
         newTile.setPiece(piece);
+
+        this.scoreKeeper.setScores(this.player0Pit.length, this.player1Pit.length);
     }
 
     /**
@@ -218,6 +222,6 @@ export class GameManager {
             this.player1LastTime = currTime;
         }
 
-        this.timer.setTimes(Math.floor(this.player0RemainingTime / 1000), Math.floor(this.player1RemainingTime / 1000));
+        this.timer.setTimes(Math.max(Math.floor(this.player0RemainingTime / 1000), 0), Math.max(Math.floor(this.player1RemainingTime / 1000), 0));
     }
 }
