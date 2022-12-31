@@ -3,9 +3,18 @@ import { MyRectangle } from "../Primitives/MyRectangle.js";
 import { MyTorus } from "../Primitives/MyTorus.js";
 import { MyTriangle } from "../Primitives/MyTriangle.js";
 import { MyScoreCard } from "./MyScoreCard.js";
-import { MyTimerDisplay } from "./MyTimerDisplay.js";
 
+/**
+ * Score keeper with score cards for two player
+ */
 export class MyScoreKeeper extends CGFobject {
+    /**
+     * @constructor
+     * @param {XMLscene} scene - Reference to MyScene object
+     * @param position - The position for the score keeper
+     * @param {Number} size - The length of the score keeper
+     * @param {Number} angle - The angle for the score keeper, relative to the y axis
+     */
     constructor(scene, position = [0, 0, 0], size = 1, angle = 0) {
         super(scene);
 
@@ -25,6 +34,9 @@ export class MyScoreKeeper extends CGFobject {
         this.setScores(0, 0);
     }
 
+    /**
+	* @method createBody creates the elements for the body of the score keeper
+	*/
     createBody() {
         this.rectangle = new MyRectangle(this.scene, 0, 0, this.length, 0, 4);
 
@@ -48,6 +60,9 @@ export class MyScoreKeeper extends CGFobject {
         this.bodyAppearence.setDiffuse(0.1, 0.1, 0.1, 1.0);
     }
 
+    /**
+	* @method createRings creates the elements for the rings of the score keeper
+	*/
     createRings() {
         this.ring = new MyTorus(this.scene, 0, 0.05, 0.2, 50, 50);
 
@@ -69,6 +84,9 @@ export class MyScoreKeeper extends CGFobject {
         this.ringAppearence.setShininess(10);
     }
 
+    /**
+	* @method createCards creates the elements for the cards of the score keeper
+	*/
     createCards() {
         this.scoreCard = new MyScoreCard(this.scene);
         this.blankCard = new MyRectangle(this.scene, 0, 0, 2, 0, 3.2);
@@ -94,6 +112,9 @@ export class MyScoreKeeper extends CGFobject {
         mat4.rotate(this.blankCardTransformation, this.blankCardTransformation, Math.PI, [0, 1, 0]);
     }
 
+    /**
+	* @method displayBody displays the body of the score keeper
+	*/
     displayBody() {
         this.bodyAppearence.apply();
 
@@ -116,6 +137,9 @@ export class MyScoreKeeper extends CGFobject {
         this.rightTriangle.display();
     }
 
+    /**
+	* @method displayRings displays the rings of the score keeper
+	*/
     displayRings() {
         this.ringAppearence.apply();
 
@@ -139,6 +163,9 @@ export class MyScoreKeeper extends CGFobject {
         this.scene.popMatrix();
     }
 
+    /**
+	* @method displayCards displays the cards of the score keeper
+	*/
     displayCards() {
         this.scene.pushMatrix();
         this.scene.multMatrix(this.cardTransformation);
@@ -169,8 +196,7 @@ export class MyScoreKeeper extends CGFobject {
     }
 
     /**
-    * @method display
-    * Displays the score keeper
+    * @method display displays the score keeper
     */
     display() {
         this.scene.pushMatrix();
@@ -183,6 +209,11 @@ export class MyScoreKeeper extends CGFobject {
         this.scene.popMatrix();
     }
 
+    /**
+     * @method setScores sets the score for each player
+     * @param {Number} playerWScore - the score for the white player
+     * @param {Number} playerBScore - the score for the black player
+     */
     setScores(playerWScore, playerBScore) {
         this.playerWScore = playerWScore;
         this.playerBScore = playerBScore;

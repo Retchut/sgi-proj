@@ -1,8 +1,6 @@
 import { CGFappearance, CGFobject } from '../../lib/CGF.js';
-import { XMLscene } from '../Scene/XMLscene.js';
 import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
-
 
 export class MyBoard extends CGFobject {
     /**

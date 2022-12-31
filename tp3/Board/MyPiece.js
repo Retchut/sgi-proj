@@ -52,7 +52,6 @@ export class MyPiece extends CGFobject {
     * Displays the piece
     */
     display() {
-        // this.appearance.apply();
         this.appearance.apply();
         
         console.warn("TODO: clean up MyPiece's display method, if possible");

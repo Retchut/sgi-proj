@@ -2,6 +2,10 @@ import { CGFappearance, CGFobject, CGFtexture } from "../../lib/CGF.js";
 import { MyDigitRectangle } from "./MyDigitRectangle.js";
 
 export class MyScoreCard extends CGFobject {
+    /**
+     * @constructor
+     * @param scene - Reference to MyScene object
+     */
     constructor(scene) {
         super(scene);
 
@@ -11,14 +15,17 @@ export class MyScoreCard extends CGFobject {
     }
 
     /**
-    * @method display
-    * Displays the timer display
+    * @method display displays the score card
     */
     display() {
         this.cardAppearence.apply();
         this.card.display();
     }
 
+    /**
+    * @method setScore sets the score for the score card
+    * @param {Number} score the score digit to be set
+    */
     setScore(score) {
         this.card.setDigit(score);
     }

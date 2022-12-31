@@ -3,25 +3,38 @@ import { MyRectangle } from "../Primitives/MyRectangle.js";
 import { MyTriangle } from "../Primitives/MyTriangle.js";
 import { MyTimerDisplay } from "./MyTimerDisplay.js";
 
+/**
+ * Timer displaying the time of the two players
+ */
 export class MyTimer extends CGFobject {
+    /**
+     * @constructor
+     * @param {XMLscene} scene - Reference to MyScene object
+     * @param position - The position for the timer
+     * @param {Number} size - The length of the timer
+     * @param {Number} angle - The angle for the timer, relative to the y axis
+     */
     constructor(scene, position = [0, 0, 0], size = 1, angle = 0) {
         super(scene);
 
         this.globalTransformation = mat4.create();
         mat4.translate(this.globalTransformation, this.globalTransformation, position);
         mat4.rotate(this.globalTransformation, this.globalTransformation, angle * Math.PI / 180, [0, 1, 0]);
-        mat4.scale(this.globalTransformation, this.globalTransformation, [1/13 * size, 1/13 * size, 1/13 * size]);
+        mat4.scale(this.globalTransformation, this.globalTransformation, [1 / 13 * size, 1 / 13 * size, 1 / 13 * size]);
 
+        this.createBody();
+        this.createDisplay();
+    }
+
+    /**
+	* @method createBody creates the elements for the body of the timer
+	*/
+    createBody() {
         this.bodyAppearence = new CGFappearance(this.scene);
         this.bodyAppearence.setAmbient(0.6, 0.2, 0.2, 1.0);
         this.bodyAppearence.setDiffuse(0.3, 0.1, 0.1, 1.0);
 
-        this.timerDisplay = new MyTimerDisplay(this.scene);
         this.faceRectangle = new MyRectangle(this.scene, 0, 0, 13, 0, 4);
-
-        this.displayTransformation = mat4.create();
-        mat4.translate(this.displayTransformation, this.displayTransformation, [0.5, 0.5, 0.01]);
-
         this.faceTransformation = mat4.create();
         mat4.rotate(this.faceTransformation, this.faceTransformation, -Math.PI / 4, [1, 0, 0]);
 
@@ -53,8 +66,17 @@ export class MyTimer extends CGFobject {
     }
 
     /**
-    * @method display
-    * Displays the timer
+	* @method createDisplay creates the elements for the display of the timer
+	*/
+    createDisplay() {
+        this.timerDisplay = new MyTimerDisplay(this.scene);
+
+        this.displayTransformation = mat4.create();
+        mat4.translate(this.displayTransformation, this.displayTransformation, [0.5, 0.5, 0.01]);
+    }
+
+    /**
+    * @method display displays the timer
     */
     display() {
         this.scene.pushMatrix();
@@ -102,6 +124,11 @@ export class MyTimer extends CGFobject {
         this.scene.popMatrix();
     }
 
+    /**
+     * @method setTimes sets the time for each player
+     * @param {Number} playerWTime - the time for the white player
+     * @param {Number} playerBTime - the time for the black player
+     */
     setTimes(playerWTime, playerBTime) {
         this.timerDisplay.setTimes(playerWTime, playerBTime);
     }

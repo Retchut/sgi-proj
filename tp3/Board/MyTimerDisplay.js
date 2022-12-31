@@ -1,7 +1,14 @@
 import { CGFappearance, CGFobject } from "../../lib/CGF.js";
 import { MyRectangle } from "../Primitives/MyRectangle.js";
 
+/**
+ * 8 segment display for the timer
+ */
 export class MyTimerDisplay extends CGFobject {
+    /**
+     * @constructor
+     * @param {XMLscene} scene - Reference to MyScene object
+     */
     constructor(scene) {
         super(scene);
 
@@ -62,8 +69,7 @@ export class MyTimerDisplay extends CGFobject {
     }
 
     /**
-    * @method display
-    * Displays the timer display
+    * @method display displays the timer display
     */
     display() {
         this.backgroundAppearence.apply();
@@ -87,6 +93,10 @@ export class MyTimerDisplay extends CGFobject {
         this.scene.popMatrix();
     }
 
+    /**
+     * @method displayDigit displays an 8 segment digit
+     * @param {Number} digit - the digit to display
+     */
     displayDigit(digit) {
         if (digit in this.digits) {
             for (const [segment, visible] of this.digits[digit].entries()) {
@@ -97,6 +107,10 @@ export class MyTimerDisplay extends CGFobject {
         }
     }
 
+    /**
+     * @method displayTime displays a time with one digit for the minutes and two for the seconds
+     * @param {Number} time - the time to display, in seconds
+     */
     displayTime(time) {
         const digit0 = Math.floor(time / 60) % 10;
         this.displayDigit(digit0);
@@ -117,6 +131,11 @@ export class MyTimerDisplay extends CGFobject {
         this.scene.popMatrix();
     }
 
+    /**
+     * @method setTimes sets the displayed time for each player
+     * @param {Number} playerWTime - the time for the white player (on the left of the display)
+     * @param {Number} playerBTime - the time for the black player (on the right of the display)
+     */
     setTimes(playerWTime, playerBTime) {
         this.playerWTime = playerWTime;
         this.playerBTime = playerBTime;

@@ -1,7 +1,4 @@
-import { XMLscene } from "../Scene/XMLscene.js";
-import { MyBoard } from "../Board/MyBoard.js";
 import { MyPiece } from "../Board/MyPiece.js";
-import { MyTile } from "../Board/MyTile.js";
 
 /**
  * GameManager class, manages the game state and handles user input.
@@ -11,6 +8,8 @@ export class GameManager {
      * @constructor
      * @param {XMLscene} scene - The application's scene
      * @param {MyBoard} board - The board the game is played in
+     * @param {MyTimer} timer - The timer for the game
+     * @param {MyScoreKeeper} scoreKeeper - The score keeper for the game
      */
     constructor(scene, board, timer, scoreKeeper){
         this.scene = scene;
@@ -204,8 +203,8 @@ export class GameManager {
 
 
     /**
-     * @method updateShaders updates the shaders of the board, by passing the new timefactor to be set into the board's method
-     * @param {Number} currTimeFactor - new value for the shader's timefactor
+     * @method updateShaders updates the shaders of the board and the game timer
+     * @param {Number} currTimeFactor - the current time
      */
     update(currTime){
         const tileIDs = this.availableMoves;
