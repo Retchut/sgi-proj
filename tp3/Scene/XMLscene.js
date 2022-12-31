@@ -189,6 +189,10 @@ export class XMLscene extends CGFscene {
                 this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTimeFactor });
             
             this.gameManager.updateShaders(currTimeFactor);
+
+            if(this.gameManager.gameOver()){
+                console.log(this.gameManager.getWinner());
+            }
         }
     }
 

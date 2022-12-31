@@ -229,4 +229,25 @@ export class GameManager {
         const tileIDs = this.availableMoves;
         this.board.updateShaders(tileIDs, currTimeFactor);
     }
+
+    /**
+     * @method gameOver checks if the game ended
+     * @returns true if the game ended, false otherwise
+     */
+    gameOver(){
+        console.warn("TODO: implement stalemate - gameOver");
+        const playerPieceNum = 3 * this.boardDimensions / 2;
+        return this.player0Pit.length === playerPieceNum || this.player1Pit.length === playerPieceNum;
+    }
+
+    /**
+     * @method getWinner calculates the winner of the game
+     * @returns the id of the winning player (0 or 1)
+     */
+    getWinner(){
+        console.warn("TODO: implement stalemate - getWinner");
+        const playerPieceNum = 3 * this.boardDimensions / 2;
+        // since this function is only called after a player won, if the following condition is false, then player 0 won
+        return (this.player1Pit.length === playerPieceNum) ? 1 : 0;
+    }
 }
