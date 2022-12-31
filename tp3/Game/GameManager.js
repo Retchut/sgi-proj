@@ -31,6 +31,7 @@ export class GameManager {
         this.player1Pit = [];
         this.piecesInPlay = [];
         this.availableMoves = [];
+        this.availableCaptures = {}; // maps move : piece being captured
 
         const p0Appearance = this.board.getAppearanceW();
         const p1Appearance = this.board.getAppearanceB();
@@ -89,7 +90,6 @@ export class GameManager {
 
             this.selectedTileID = tileID;
             this.availableMoves = this.getValidMoves(tileID);
-            console.log(this.availableMoves);
             this.resetHighlighting();
         }
         // initial tile selected
@@ -108,7 +108,8 @@ export class GameManager {
                 return;
             }
 
-            this.move(tileObj);
+            const capture = (Object.keys(this.availableCaptures).length !== 0);
+            this.move(tileObj, capture);
             this.selectedTileID = 0; // reset selected tile
             this.resetHighlighting()
             this.turnPlayer = this.getOpponent(); // change turn player
@@ -124,6 +125,7 @@ export class GameManager {
         // initialize the array with the tileID to allow for desselecting this tile later
         let possibleMoves = [tileID];
         let captures = [tileID];
+        this.availableCaptures = {};
 
         // player 1 moves to a lower row, player 0 to an upper row
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
@@ -140,8 +142,10 @@ export class GameManager {
                     if(!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
                         const captureMove = move + rowOffset + 1;
 
-                        if(this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null)
+                        if(this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null){
                             captures.push(captureMove);
+                            this.availableCaptures[captureMove] = move;
+                        }
                     }
                 }
             }
@@ -158,8 +162,10 @@ export class GameManager {
                     if(!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
                     // can we capture it?
                         const captureMove = move + rowOffset - 1;
-                        if(this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null)
+                        if(this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null){
                             captures.push(captureMove);
+                            this.availableCaptures[captureMove] = move;
+                        }
                     }
                 }
             }
@@ -174,14 +180,25 @@ export class GameManager {
 
     /**
      * @method move moves a piece from the selectedTileID field into the tile passed as a parameter
-     * @param {MyTile} newTile target tile of the movement
+     * @param {MyTile} newTile  - target tile of the movement
+     * @param {Number} capture  - id of the tile to capture
      */
-    move(newTile){
+    move(newTile, capture){
         const oldTile = this.board.getTileAt(this.selectedTileID);
         const piece = oldTile.getPiece();
 
         oldTile.setPiece(null);
         newTile.setPiece(piece);
+        if(capture)
+            this.capture(this.availableCaptures[newTile.getID()]);
+    }
+
+    /**
+     * @method capture captures the piece on tileID
+     * @param {MyTile} tileID - tile to capture
+     */
+    capture(tileID){
+        this.board.getTileAt(tileID).setPiece(null);
     }
 
     /**
