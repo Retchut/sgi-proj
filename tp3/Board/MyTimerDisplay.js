@@ -29,7 +29,7 @@ export class MyTimerDisplay extends CGFobject {
         this.segmentAppearence.setDiffuse(0.2, 0.2, 0.2, 1.0);
 
         this.digitsTransformation = mat4.create();
-        mat4.translate(this.digitsTransformation, this.digitsTransformation, [0, 0, 0.001]);
+        mat4.translate(this.digitsTransformation, this.digitsTransformation, [0, 0, 0.01]);
 
         this.digit1Transformation = mat4.create();
         mat4.translate(this.digit1Transformation, this.digit1Transformation, [2, 0, 0]);
@@ -88,9 +88,11 @@ export class MyTimerDisplay extends CGFobject {
     }
 
     displayDigit(digit) {
-        for (const [segment, visible] of this.digits[digit].entries()) {
-            if (visible){
-                this.segments[segment].display();
+        if (digit in this.digits) {
+            for (const [segment, visible] of this.digits[digit].entries()) {
+                if (visible) {
+                    this.segments[segment].display();
+                }
             }
         }
     }

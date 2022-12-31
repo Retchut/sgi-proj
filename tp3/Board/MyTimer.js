@@ -20,7 +20,7 @@ export class MyTimer extends CGFobject {
         this.faceRectangle = new MyRectangle(this.scene, 0, 0, 13, 0, 4);
 
         this.displayTransformation = mat4.create();
-        mat4.translate(this.displayTransformation, this.displayTransformation, [0.5, 0.5, 0.001]);
+        mat4.translate(this.displayTransformation, this.displayTransformation, [0.5, 0.5, 0.01]);
 
         this.faceTransformation = mat4.create();
         mat4.rotate(this.faceTransformation, this.faceTransformation, -Math.PI / 4, [1, 0, 0]);
