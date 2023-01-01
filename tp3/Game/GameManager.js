@@ -227,8 +227,11 @@ export class GameManager {
                 possibleMoves.push(move);
             else {
                 // a capture might be possible
-                if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent())
-                    captures = captures.concat(this.getCaptureOfPieceMoves(move, rowOffset, right))
+                if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
+                    const capture = this.getCaptureOfPieceMove(move, rowOffset, right);
+                    if(capture)
+                        captures.push(capture);
+                }
             }
         }
 
@@ -236,21 +239,21 @@ export class GameManager {
     }
 
     /**
-     * @method getCaptureOfPieceMoves 
+     * @method getCaptureOfPieceMove
      * @param {Number} piece     - id of the piece to be captured
      * @param {Number} rowOffset - offset used to calculate the next row
      * @param {boolean} right    - true if the piece captured is to the right of the original piece, false otherwise
+     * @returns the move to capture the piece, if it exists
      */
-    getCaptureOfPieceMoves(piece, rowOffset, right){
+    getCaptureOfPieceMove(piece, rowOffset, right){
         const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
-        const possibleCaptures = [];
         
         if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-            possibleCaptures.push(captureMove);
             this.availableCaptures[captureMove] = piece;
+            return captureMove;
         }
 
-        return possibleCaptures;
+        return 0;
     }
 
     /**
@@ -298,8 +301,6 @@ export class GameManager {
         for (const tileID of this.availableMoves)
             this.board.toggleHighlight(tileID);
     }
-
-
 
     /**
      * @method updateShaders updates the shaders of the board and the game timer
