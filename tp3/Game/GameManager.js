@@ -216,7 +216,7 @@ export class GameManager {
             else {
                 // a capture might be possible
                 if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent())
-                    captures = captures.concat(this.getCaptureMoves(move, rowOffset, right))
+                    captures = captures.concat(this.getCaptureOfPieceMoves(move, rowOffset, right))
             }
         }
 
@@ -224,12 +224,12 @@ export class GameManager {
     }
 
     /**
-     * @method getCaptureMoves 
+     * @method getCaptureOfPieceMoves 
      * @param {Number} piece     - id of the piece to be captured
      * @param {Number} rowOffset - offset used to calculate the next row
      * @param {boolean} right    - true if the piece captured is to the right of the original piece, false otherwise
      */
-    getCaptureMoves(piece, rowOffset, right){
+    getCaptureOfPieceMoves(piece, rowOffset, right){
         const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
         const possibleCaptures = [];
         
