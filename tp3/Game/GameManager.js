@@ -181,7 +181,7 @@ export class GameManager {
         // more captures can be made from this position
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
         const newCaptures = this.getCapturesFrom(tileID, rowOffset);
-        if(newCaptures.length !== 0){
+        if(capture && newCaptures.length !== 0){
             this.capturingMultiples = true;
             // disable highlighting on previously highlighted pieces
             this.disableHighlighting();
