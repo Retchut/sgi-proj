@@ -31,6 +31,7 @@ export class GameManager {
         // this.board.clear()
         this.turnPlayer = 0; // 0 - white, 1 - black
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
+        this.capturingMultiples = false;
         console.warn("TODO: implement scoring and capturing pieces");
         this.player0Pit = [];
         this.player1Pit = [];
@@ -171,6 +172,13 @@ export class GameManager {
             this.selectedTileID = 0;
             this.scene.toggleSpotlight();
             this.disableHighlighting();
+
+            // disabling multiple captures if the player so chooses, after capturing once
+            if(this.capturingMultiples){
+                this.capturingMultiples = false;
+                this.turnPlayer = this.getOpponent();
+            }
+
             return;
         }
 
@@ -181,6 +189,7 @@ export class GameManager {
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
         const newCaptures = this.getCapturesFrom(tileID, rowOffset);
         if(newCaptures.length !== 0){
+            this.capturingMultiples = true;
             // disable highlighting on previously highlighted pieces
             this.disableHighlighting();
 
