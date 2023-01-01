@@ -116,13 +116,14 @@ export class GameManager {
      */
     selectTile(tileID){
         const tileObj = this.board.getTileAt(tileID);
+        const tilePiece = tileObj.getPiece();
         // check for a piece on the selected tile
-        if (tileObj.getPiece() === null) {
+        if (tilePiece === null) {
             console.log("no piece on this tile");
             return;
         }
 
-        if (tileObj.getPiece().getPlayer() !== this.turnPlayer) {
+        if (tilePiece.getPlayer() !== this.turnPlayer) {
             console.log("that piece does not belong to the current turn player");
             return;
         }
@@ -132,7 +133,7 @@ export class GameManager {
         this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
         this.scene.toggleSpotlight();
 
-        this.availableMoves = this.getValidMoves(tileID);
+        this.availableMoves = this.getValidMovesSingle(tileID);
         this.enableHighlighting();
     }
 
@@ -179,7 +180,7 @@ export class GameManager {
             const tileCenter = this.board.getTileAt(this.selectedTileID).getCenterPos();
             this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
 
-            this.availableMoves = this.getValidMoves(tileID);
+            this.availableMoves = this.getValidMovesSingle(tileID);
             this.enableHighlighting();
         }
         else{
@@ -191,11 +192,11 @@ export class GameManager {
     }
 
     /**
-     * @method getValidMoves Calculates possible moves from the tileID sent as a parameter
+     * @method getValidMovesSingle Calculates possible moves from the tileID sent as a parameter
      * @param {Number} tileID id of the tile the moves are calculated from
-     * @returns The moves the player can make from the tile with ID tileID
+     * @returns The moves the player's single piece can make from the tile with ID tileID
      */
-    getValidMoves(tileID) {
+    getValidMovesSingle(tileID) {
 
         // reset available captures
         this.availableCaptures = {};
@@ -214,35 +215,36 @@ export class GameManager {
         let possibleMoves = [tileID];
 
         if (!this.board.tileInLastCol(tileID)) {
-            const rightMoves= this.getMoveToSide(tileID, rowOffset, true);
-            possibleMoves = possibleMoves.concat(rightMoves);
+            const rightMove = this.getMoveToSide(tileID, rowOffset, true);
+            if(rightMove !== 0)
+                possibleMoves.push(rightMove);
         }
 
         if (!this.board.tileInFirstCol(tileID)) {
-            const leftMoves = this.getMoveToSide(tileID, rowOffset, false);
-            possibleMoves = possibleMoves.concat(leftMoves);
+            const leftMove = this.getMoveToSide(tileID, rowOffset, false);
+            if(leftMove !== 0)
+                possibleMoves.push(leftMove);
         }
 
         return possibleMoves;
     }
 
     /**
-     * @method getMoveToSide calculates the moves and the captures that can be performed to one side
+     * @method getMoveToSide calculates the move that can be performed to one side
      * @param {Number} tileID    - id of the tile the moves are starting from
      * @param {Number} rowOffset - offset used to calculate the next row
      * @param {boolean} right    - true if the moves calculated are to the right of the original piece, false otherwise
-     * @returns an array with the possible moves and captures starting at this tile, and to the specified side
+     * @returns the possible move starting at this tile, and to the specified side, 0 if there is none available
      */
     getMoveToSide(tileID, rowOffset, right){
-        let possibleMoves = []
         const move = tileID + rowOffset  + ((right) ? 1 : -1);
         if (this.board.tileInsideBoard(move)) {
             const movePiece = this.board.getTileAt(move).getPiece();
             if (movePiece === null)
-                possibleMoves.push(move);
+                return move;
         }
 
-        return possibleMoves;
+        return 0;
     }
 
     /**
