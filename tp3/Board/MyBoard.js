@@ -131,12 +131,30 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method tileInSecondCol
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the second column of the board, false otherwise
+     */
+    tileInSecondCol(tileID){
+        return (tileID % this.boardDimensions) === 2;
+    }
+
+    /**
      * @method tileInLastCol
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the last column of the board, false otherwise
      */
     tileInLastCol(tileID){
         return (tileID % this.boardDimensions) === 0;
+    }
+
+    /**
+     * @method tileInPenultimateCol
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the penultimate column of the board, false otherwise
+     */
+    tileInPenultimateCol(tileID){
+        return (tileID % this.boardDimensions) === (this.boardDimensions - 1);
     }
 
     /**
