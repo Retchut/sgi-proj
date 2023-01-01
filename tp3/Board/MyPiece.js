@@ -19,6 +19,7 @@ export class MyPiece extends CGFobject {
 
         this.player = player;
         this.appearance = appearance;
+        this.king = false;
 
         this.side = new MyCylinder(this.scene, 0, 0.5, 0.5, 0.2, 50, 1);
         this.base = new MyCylinder(this.scene, 0, 0.5, 0, 0, 50, 2);
@@ -45,6 +46,14 @@ export class MyPiece extends CGFobject {
      */
     getPlayer(){
         return this.player;
+    }
+
+    /**
+     * @method isKing
+     * @returns true if the piece is a king, false otherwise
+     */
+    isKing(){
+        return this.king;
     }
 
     /**
