@@ -1,4 +1,5 @@
 import { CGFappearance } from "../../lib/CGF.js";
+import { MyBoard } from "../Board/MyBoard.js";
 import { MyPiece } from "../Board/MyPiece.js";
 
 /**
@@ -268,12 +269,15 @@ export class GameManager {
      * @param {Number}  rowOffset - offset used to calculate the next row
      * @param {Array}   path      - pieces captured thus far
      * @param {boolean} right     - true if the piece captured is to the right of the original piece, false otherwise
-     * @returns 
+     * @returns an array containing the possible captures
      */
     getCapturesToSide(rowOffset, tileID, path, right){
         let possibleSideCaptures = [];
 
         const diagonal = tileID + rowOffset + ((right) ? 1 : -1);
+        if(!this.board.tileInsideBoard(diagonal))
+            return [];
+            
         const diagonalPiece = this.board.getTileAt(diagonal).getPiece();
 
         if(diagonalPiece !== null && !this.board.tileInFirstCol(diagonal)){
