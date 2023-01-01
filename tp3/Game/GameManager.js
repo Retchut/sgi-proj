@@ -43,27 +43,10 @@ export class GameManager {
         this.player1RemainingTime = 300000;
         this.availableCaptures = {}; // maps move : list of pieces being captured
 
-        // this.initPieces(3);
-        this.initPiecesTest();
+        this.initPieces(3);
 
         this.timer.setTimes(300, 300);
         this.scoreKeeper.setScores(0, 0);
-    }
-
-    initPiecesTest(){
-        const p0Appearance = this.board.getAppearanceW();
-        const p1Appearance = this.board.getAppearanceB();
-
-        this.initPiece(this.board.getTileAt(5), 0, p0Appearance);
-        this.initPiece(this.board.getTileAt(14), 1, p1Appearance);
-        this.initPiece(this.board.getTileAt(7), 0, p0Appearance);
-        this.initPiece(this.board.getTileAt(16), 1, p1Appearance);
-        this.initPiece(this.board.getTileAt(3), 0, p0Appearance);
-        this.initPiece(this.board.getTileAt(10), 1, p1Appearance);
-        this.initPiece(this.board.getTileAt(12), 1, p1Appearance);
-        this.initPiece(this.board.getTileAt(28), 1, p1Appearance);
-        this.initPiece(this.board.getTileAt(44), 1, p1Appearance);
-        this.initPiece(this.board.getTileAt(58), 1, p1Appearance);
     }
 
     /**
