@@ -188,6 +188,13 @@ export class GameManager {
         return possibleMoves;
     }
 
+    /**
+     * @method getMoveToSide calculates the moves and the captures that can be performed to one side
+     * @param {Number} tileID    - id of the tile the moves are starting from
+     * @param {Number} rowOffset - offset used to calculate the next row
+     * @param {boolean} right    - true if the moves calculated are to the right of the original piece, false otherwise
+     * @returns an array with the possible moves and captures starting at this tile, and to the specified side
+     */
     getMoveToSide(tileID, rowOffset, right){
         const captures = [];
         const possibleMoves = []
