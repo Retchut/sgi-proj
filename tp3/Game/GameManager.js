@@ -129,7 +129,7 @@ export class GameManager {
 
     /**
      * @method selectTile selects a tile to start a move from
-     * @param {*} tileID the id of the tile selected
+     * @param {Number} tileID the id of the tile selected
      */
     selectTile(tileID){
         const tileObj = this.board.getTileAt(tileID);
@@ -155,7 +155,7 @@ export class GameManager {
 
     /**
      * @method selectMove selects a move to be made
-     * @param {*} tileID the final position selected for the move
+     * @param {Number} tileID the final position selected for the move
      */
     selectMove(tileID){
         const tileObj = this.board.getTileAt(tileID);
@@ -239,9 +239,10 @@ export class GameManager {
 
     /**
      * @method getCaptureOfPieceMove
-     * @param {Number} piece     - id of the piece to be captured
-     * @param {Number} rowOffset - offset used to calculate the next row
-     * @param {boolean} right    - true if the piece captured is to the right of the original piece, false otherwise
+     * @param {Number}  piece     - id of the piece to be captured
+     * @param {Number}  rowOffset - offset used to calculate the next row
+     * @param {Array}   path      - pieces captured thus far
+     * @param {boolean} right     - true if the piece captured is to the right of the original piece, false otherwise
      * @returns the move to capture the piece, if it exists
      */
     getCaptureOfPieceMove(piece, rowOffset, path, right){
@@ -257,8 +258,10 @@ export class GameManager {
 
     /**
      * @method getCapturesFrom calculates all possible capture moves from a specific tile
-     * @param {Number} tileID - id of the tile from where we're calculating captures
+     * @param {Number} tileID    - id of the tile from where we're calculating captures
      * @param {Number} rowOffset - offset used to calculate the next row
+     * @param {Array}  path      - pieces captured thus far
+     * @returns an array containing the possible moves that involve captures
      */
      getCapturesFrom(tileID, rowOffset, path = []){
         let possibleCaptures = []
