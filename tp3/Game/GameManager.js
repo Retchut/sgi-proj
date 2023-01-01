@@ -39,7 +39,7 @@ export class GameManager {
         this.player1LastTime = null;
         this.player0RemainingTime = 300000;
         this.player1RemainingTime = 300000;
-        this.availableCaptures = {}; // maps move : piece being captured
+        this.availableCaptures = {}; // maps move : list of pieces being captured
 
         // this.initPieces(3);
         this.initPiecesTest();
@@ -244,11 +244,11 @@ export class GameManager {
      * @param {boolean} right    - true if the piece captured is to the right of the original piece, false otherwise
      * @returns the move to capture the piece, if it exists
      */
-    getCaptureOfPieceMove(piece, rowOffset, right){
+    getCaptureOfPieceMove(piece, rowOffset, path, right){
         const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
         
         if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-            this.availableCaptures[captureMove] = piece;
+            this.availableCaptures[captureMove] = path;
             return captureMove;
         }
 
@@ -260,7 +260,7 @@ export class GameManager {
      * @param {Number} tileID - id of the tile from where we're calculating captures
      * @param {Number} rowOffset - offset used to calculate the next row
      */
-     getCapturesFrom(tileID, rowOffset){
+     getCapturesFrom(tileID, rowOffset, path = []){
         let possibleCaptures = []
 
         const nextRowTile = tileID + rowOffset;
@@ -271,10 +271,11 @@ export class GameManager {
             const diagonalLeftPiece = this.board.getTileAt(diagonalLeft).getPiece();
 
             if(diagonalLeftPiece !== null && !this.board.tileInFirstCol(diagonalLeft)){
-                const capture = this.getCaptureOfPieceMove(diagonalLeft, rowOffset, false);
+                let newPath = [...path, diagonalLeft]
+                const capture = this.getCaptureOfPieceMove(diagonalLeft, rowOffset, newPath, false);
                 if(capture){
                     possibleCaptures.push(capture);
-                    const moreCaptures = this.getCapturesFrom(capture, rowOffset);
+                    const moreCaptures = this.getCapturesFrom(capture, rowOffset, newPath);
                     possibleCaptures = possibleCaptures.concat(moreCaptures);
                 }
             }
@@ -286,10 +287,12 @@ export class GameManager {
             const diagonalRightPiece = this.board.getTileAt(diagonalRight).getPiece();
 
             if(diagonalRightPiece !== null && !this.board.tileInLastCol(diagonalRight)){
-                const capture = this.getCaptureOfPieceMove(diagonalRight, rowOffset, true);
+                let newPath = [...path, diagonalRight]
+                const capture = this.getCaptureOfPieceMove(diagonalRight, rowOffset, newPath, true);
                 if(capture){
                     possibleCaptures.push(capture);
-                    const moreCaptures = this.getCapturesFrom(capture, rowOffset);
+                    path.push(diagonalRight)
+                    const moreCaptures = this.getCapturesFrom(capture, rowOffset, newPath);
                     possibleCaptures = possibleCaptures.concat(moreCaptures);
                 }
             }
@@ -318,22 +321,24 @@ export class GameManager {
 
     /**
      * @method capture captures the piece on tileID
-     * @param {MyTile} tileID - tile to capture
+     * @param {Array} tileIDs - tiles to capture
      */
-    capture(tileID) {
-        const tile = this.board.getTileAt(tileID);
-
-        // player 1's turn
-        if (this.turnPlayer) {
-            this.player1Pit.push(tile.getPiece());
+    capture(tileIDs) {
+        for(const tileID of tileIDs){
+            const tile = this.board.getTileAt(tileID);
+    
+            // player 1's turn
+            if (this.turnPlayer) {
+                this.player1Pit.push(tile.getPiece());
+            }
+            // player 0's turn
+            else {
+                this.player0Pit.push(tile.getPiece());
+            }
+    
+            // remove piece from tile
+            tile.setPiece(null);
         }
-        // player 0's turn
-        else {
-            this.player0Pit.push(tile.getPiece());
-        }
-
-        // remove piece from tile
-        tile.setPiece(null);
     }
 
     /**
