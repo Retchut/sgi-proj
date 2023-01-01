@@ -16,6 +16,7 @@ export class MyBoard extends CGFobject {
         this.tiles = [];
 
         this.boardTransformation = mat4.create();
+        mat4.translate(this.boardTransformation, this.boardTransformation, [0, position[1], 0]);
         mat4.rotate(this.boardTransformation, this.boardTransformation, -Math.PI / 2, [1, 0, 0]);
 
         // generate appearances for both player's tiles
