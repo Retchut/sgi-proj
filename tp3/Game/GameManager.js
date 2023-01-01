@@ -83,52 +83,70 @@ export class GameManager {
      * @param {Number} tileID id of the picked object
      */
     handlePick(tileID) {
-        const tileObj = this.board.getTileAt(tileID);
 
         // tile not yet selected (tile ids are in range [1, boardDimensions^2])
         if (this.selectedTileID === 0) {
-            // check for a piece on the selected tile
-            if (tileObj.getPiece() === null) {
-                console.log("no piece on this tile");
-                return;
-            }
-
-            if (tileObj.getPiece().getPlayer() !== this.turnPlayer) {
-                console.log("that piece does not belong to the current turn player");
-                return;
-            }
-
-            this.selectedTileID = tileID;
-            const tileCenter = tileObj.getCenterPos();
-            this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
-            this.scene.toggleSpotlight();
-            this.availableMoves = this.getValidMoves(tileID);
-            this.resetHighlighting();
+            this.selectTile(tileID);
         }
         // initial tile selected
         else {
-            // check if the tile selected corresponds to one of the possible moves
-            if (!this.availableMoves.includes(tileID)) {
-                console.log("that's not one of the available moves");
-                return;
-            }
-
-
-            if (tileID === this.selectedTileID) {
-                console.log("desselecting selected tile");
-                this.selectedTileID = 0;
-                this.scene.toggleSpotlight();
-                this.resetHighlighting();
-                return;
-            }
-
-            const capture = (Object.keys(this.availableCaptures).length !== 0);
-            this.move(tileObj, capture);
-            this.selectedTileID = 0; // reset selected tile
-            this.scene.toggleSpotlight();
-            this.resetHighlighting()
-            this.turnPlayer = this.getOpponent(); // change turn player
+            this.selectMove(tileID)
         }
+    }
+
+    /**
+     * @method selectTile selects a tile to start a move from
+     * @param {*} tileID the id of the tile selected
+     */
+    selectTile(tileID){
+        const tileObj = this.board.getTileAt(tileID);
+        // check for a piece on the selected tile
+        if (tileObj.getPiece() === null) {
+            console.log("no piece on this tile");
+            return;
+        }
+
+        if (tileObj.getPiece().getPlayer() !== this.turnPlayer) {
+            console.log("that piece does not belong to the current turn player");
+            return;
+        }
+
+        this.selectedTileID = tileID;
+        const tileCenter = tileObj.getCenterPos();
+        this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
+        this.scene.toggleSpotlight();
+
+        this.availableMoves = this.getValidMoves(tileID);
+        this.resetHighlighting();
+    }
+
+    /**
+     * @method selectMove selects a move to be made
+     * @param {*} tileID the final position selected for the move
+     */
+    selectMove(tileID){
+        const tileObj = this.board.getTileAt(tileID);
+        // check if the tile selected corresponds to one of the possible moves
+        if (!this.availableMoves.includes(tileID)) {
+            console.log("that's not one of the available moves");
+            return;
+        }
+
+
+        if (tileID === this.selectedTileID) {
+            console.log("desselecting selected tile");
+            this.selectedTileID = 0;
+            this.scene.toggleSpotlight();
+            this.resetHighlighting();
+            return;
+        }
+
+        const capture = (Object.keys(this.availableCaptures).length !== 0);
+        this.move(tileObj, capture);
+        this.selectedTileID = 0; // reset selected tile
+        this.scene.toggleSpotlight();
+        this.resetHighlighting()
+        this.turnPlayer = this.getOpponent(); // change turn player
     }
 
     /**
