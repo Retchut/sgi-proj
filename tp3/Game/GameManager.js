@@ -165,20 +165,14 @@ export class GameManager {
 
         if (!this.board.tileInLastCol(tileID)) {
             const [rightMoves, rightCaptures] = this.getMoveToSide(tileID, rowOffset, true);
-            for(const move of rightMoves)
-                possibleMoves.push(move);
-
-            for(const capture of rightCaptures)
-                captures.push(capture);
+            possibleMoves = possibleMoves.concat(rightMoves);
+            captures = captures.concat(rightCaptures);
         }
 
         if (!this.board.tileInFirstCol(tileID)) {
             const [leftMoves, leftCaptures] = this.getMoveToSide(tileID, rowOffset, false);
-            for(const move of leftMoves)
-                possibleMoves.push(move);
-
-            for(const capture of leftCaptures)
-                captures.push(capture);
+            possibleMoves = possibleMoves.concat(leftMoves);
+            captures = captures.concat(leftCaptures);
         }
 
         // if a capture can be made (captures contains more than the original tileID), that's the only possible move the player can make
@@ -196,19 +190,17 @@ export class GameManager {
      * @returns an array with the possible moves and captures starting at this tile, and to the specified side
      */
     getMoveToSide(tileID, rowOffset, right){
-        const captures = [];
-        const possibleMoves = []
+        let captures = [];
+        let possibleMoves = []
         const move = tileID + rowOffset  + ((right) ? 1 : -1);
         if (this.board.tileInsideBoard(move)) {
             const movePiece = this.board.getTileAt(move).getPiece();
             if (movePiece === null)
                 possibleMoves.push(move);
             else {
-                // can we capture it?
-                if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
-                    for(const capture of this.getCaptureMoves(move, rowOffset, right))
-                        captures.push(capture);
-                }
+                // a capture might be possible
+                if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent())
+                    captures = captures.concat(this.getCaptureMoves(move, rowOffset, right))
             }
         }
 
