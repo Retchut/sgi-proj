@@ -199,6 +199,23 @@ export class XMLscene extends CGFscene {
         }
     }
 
+    /**
+     * @method disableSpotlight disables the spotlight over the object
+     */
+    disableSpotlight(){
+        this.lights[this.spotlightKey].enabled = false;
+    }
+
+    /**
+     * @method enableSpotlight enables the spotlight over the object
+     */
+    enableSpotlight(){
+        this.lights[this.spotlightKey].enabled = false;
+    }
+
+    /**
+     * @method toggleSpotlight toggle the spotlight over the object
+     */
     toggleSpotlight() {
         this.lights[this.spotlightKey].enabled = !this.lights[this.spotlightKey].enabled;
     }
