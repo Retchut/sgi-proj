@@ -32,7 +32,6 @@ export class GameManager {
         this.turnPlayer = 0; // 0 - white, 1 - black
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
         this.capturingMultiples = false;
-        console.warn("TODO: implement scoring and capturing pieces");
         this.player0Pit = [];
         this.player1Pit = [];
         this.piecesInPlay = [];
