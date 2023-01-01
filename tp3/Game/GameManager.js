@@ -304,8 +304,13 @@ export class GameManager {
             return [];
             
         const diagonalPiece = this.board.getTileAt(diagonal).getPiece();
+        if(diagonalPiece === null)
+            return [];
 
-        if(diagonalPiece !== null && !this.board.tileInFirstCol(diagonal)){
+        if(diagonalPiece.getPlayer() !== this.getOpponent())
+            return [];
+
+        if(!this.board.tileInFirstCol(diagonal)){
             let newPath = [...path, diagonal]
             const capture = this.getCaptureOfPiece(diagonal, rowOffset, newPath, right);
             if(capture){
