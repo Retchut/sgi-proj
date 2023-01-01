@@ -15,6 +15,7 @@ export class GameManager {
     constructor(scene, board){
         this.scene = scene;
         this.board = board;
+        this.spotlightHeight = 5;
         this.boardDimensions = this.board.getBoardDimensions();
     }
 
@@ -89,6 +90,8 @@ export class GameManager {
             }
 
             this.selectedTileID = tileID;
+            const tileCenter = tileObj.getCenterPos();
+            this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
             this.availableMoves = this.getValidMoves(tileID);
             this.resetHighlighting();
         }

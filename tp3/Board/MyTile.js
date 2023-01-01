@@ -27,12 +27,14 @@ export class MyTile extends CGFobject {
             matColor : vec4.create()
         });
 
+        const tileLen = x2-x1;
+        this.centerPos = [x1 + tileLen/2,y1 + tileLen/2,0];
+
         // initialize this tile's piece's values
         this.piece = null;
         this.pieceTransformation = mat4.create();
-        const tileLen = x2-x1;
         // positioning of this piece
-        mat4.translate(this.pieceTransformation, this.pieceTransformation, [x1 + tileLen/2,y1 + tileLen/2,0]);
+        mat4.translate(this.pieceTransformation, this.pieceTransformation, this.centerPos);
         // scale of this scale
         mat4.scale(this.pieceTransformation, this.pieceTransformation, [tileLen * 0.9, tileLen * 0.9, tileLen * 0.9])
     }
@@ -43,6 +45,14 @@ export class MyTile extends CGFobject {
      */
     getID(){
         return this.tileID;
+    }
+
+    /**
+     * @method getCenterPos 
+     * @returns this tile's center position
+     */
+    getCenterPos(){
+        return this.centerPos;
     }
 
     /**
