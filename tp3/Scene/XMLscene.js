@@ -73,6 +73,10 @@ export class XMLscene extends CGFscene {
 
             if (this.graph.lights.hasOwnProperty(key)) {
                 var light = this.graph.lights[key];
+                const lightID = light[light.length - 1];
+
+                if(lightID === this.graph.idSpotlight)
+                    this.spotlightKey = i;
 
                 this.lights[i].setPosition(light[2][0], light[2][1], light[2][2], light[2][3]);
                 this.lights[i].setAmbient(light[3][0], light[3][1], light[3][2], light[3][3]);
@@ -194,6 +198,15 @@ export class XMLscene extends CGFscene {
                 console.log(this.gameManager.getWinner());
             }
         }
+    }
+
+    /**
+     * @method moveSpotlight moves the spotlight light to the specified position
+     * @param {vec3} newPosition - position to move the spotlight to
+     */
+    moveSpotlight(newPosition){
+        const spotlight = this.lights[this.spotlightKey]
+        spotlight.setPosition(newPosition[0], newPosition[1], newPosition[2], spotlight.position[3]);
     }
 
     /**
