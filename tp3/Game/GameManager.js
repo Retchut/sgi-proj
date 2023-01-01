@@ -117,7 +117,6 @@ export class GameManager {
      * @param {Number} tileID id of the picked object
      */
     handlePick(tileID) {
-
         // tile not yet selected (tile ids are in range [1, boardDimensions^2])
         if (this.selectedTileID === 0) {
             this.selectTile(tileID);
@@ -151,7 +150,7 @@ export class GameManager {
         this.scene.toggleSpotlight();
 
         this.availableMoves = this.getValidMoves(tileID);
-        this.resetHighlighting();
+        this.enableHighlighting();
     }
 
     /**
@@ -171,16 +170,33 @@ export class GameManager {
             console.log("desselecting selected tile");
             this.selectedTileID = 0;
             this.scene.toggleSpotlight();
-            this.resetHighlighting();
+            this.disableHighlighting();
             return;
         }
 
         const capture = (Object.keys(this.availableCaptures).length !== 0);
         this.move(tileObj, capture);
-        this.selectedTileID = 0; // reset selected tile
-        this.scene.toggleSpotlight();
-        this.resetHighlighting()
-        this.turnPlayer = this.getOpponent(); // change turn player
+
+        // more captures can be made from this position
+        const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+        const newCaptures = this.getCapturesFrom(tileID, rowOffset);
+        if(newCaptures.length !== 0){
+            // disable highlighting on previously highlighted pieces
+            this.disableHighlighting();
+
+            this.selectedTileID = tileID;
+            const tileCenter = this.board.getTileAt(this.selectedTileID).getCenterPos();
+            this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
+
+            this.availableMoves = this.getValidMoves(tileID);
+            this.enableHighlighting();
+        }
+        else{
+            this.selectedTileID = 0; // reset selected tile
+            this.scene.toggleSpotlight();
+            this.disableHighlighting()
+            this.turnPlayer = this.getOpponent(); // change turn player
+        }
     }
 
     /**
@@ -350,6 +366,22 @@ export class GameManager {
             // remove piece from tile
             tile.setPiece(null);
         }
+    }
+
+    /**
+     * @method disableHighlighting disables the highlighting applied to tiles the player may interact with
+     */
+    disableHighlighting(){
+        for (const tileID of this.availableMoves)
+            this.board.disableHighlight(tileID);
+    }
+
+    /**
+     * @method enableHighlighting enable the highlighting applied to tiles the player may interact with
+     */
+    enableHighlighting(){
+        for (const tileID of this.availableMoves)
+            this.board.enableHighlight(tileID);
     }
 
     /**
