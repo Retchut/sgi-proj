@@ -15,6 +15,7 @@ export class GameManager {
     constructor(scene, board){
         this.scene = scene;
         this.board = board;
+        this.scene.toggleSpotlight(); // disable spotlight at the beginning of the game (it's enabled by default)
         this.spotlightHeight = 5;
         this.boardDimensions = this.board.getBoardDimensions();
     }
@@ -92,6 +93,7 @@ export class GameManager {
             this.selectedTileID = tileID;
             const tileCenter = tileObj.getCenterPos();
             this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
+            this.scene.toggleSpotlight();
             this.availableMoves = this.getValidMoves(tileID);
             this.resetHighlighting();
         }
@@ -107,6 +109,7 @@ export class GameManager {
             if(tileID === this.selectedTileID){
                 console.log("desselecting selected tile");
                 this.selectedTileID = 0;
+                this.scene.toggleSpotlight();
                 this.resetHighlighting();
                 return;
             }
@@ -114,6 +117,7 @@ export class GameManager {
             const capture = (Object.keys(this.availableCaptures).length !== 0);
             this.move(tileObj, capture);
             this.selectedTileID = 0; // reset selected tile
+            this.scene.toggleSpotlight();
             this.resetHighlighting()
             this.turnPlayer = this.getOpponent(); // change turn player
         }

@@ -200,6 +200,10 @@ export class XMLscene extends CGFscene {
         }
     }
 
+    toggleSpotlight(){
+        this.lights[this.spotlightKey].enabled = !this.lights[this.spotlightKey].enabled;
+    }
+
     /**
      * @method moveSpotlight moves the spotlight light to the specified position
      * @param {vec3} newPosition - position to move the spotlight to
