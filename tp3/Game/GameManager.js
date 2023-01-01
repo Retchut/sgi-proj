@@ -173,12 +173,8 @@ export class GameManager {
                 else {
                     // can we capture it?
                     if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
-                        const captureMove = move + rowOffset + 1;
-
-                        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-                            captures.push(captureMove);
-                            this.availableCaptures[captureMove] = move;
-                        }
+                        for(const capture of this.getCaptureMoves(move, rowOffset, true))
+                            captures.push(capture);
                     }
                 }
             }
@@ -192,13 +188,10 @@ export class GameManager {
                 if (this.board.getTileAt(move).getPiece() === null)
                     possibleMoves.push(move);
                 else {
+                    // can we capture it?
                     if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
-                        // can we capture it?
-                        const captureMove = move + rowOffset - 1;
-                        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-                            captures.push(captureMove);
-                            this.availableCaptures[captureMove] = move;
-                        }
+                        for(const capture of this.getCaptureMoves(move, rowOffset, false))
+                            captures.push(capture);
                     }
                 }
             }
@@ -209,6 +202,24 @@ export class GameManager {
             possibleMoves = captures;
 
         return possibleMoves;
+    }
+
+    /**
+     * @method getCaptureMoves 
+     * @param {Number} piece     - id of the piece to be captured
+     * @param {Number} rowOffset - offset used to calculate the next row
+     * @param {boolean} right    - true if the piece captured is to the right of the original piece, false otherwise
+     */
+    getCaptureMoves(move, rowOffset, right){
+        const captureMove = move + rowOffset  + ((right) ? 1 : -1);
+        const possibleCaptures = [];
+        
+        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
+            possibleCaptures.push(captureMove);
+            this.availableCaptures[captureMove] = move;
+        }
+
+        return possibleCaptures;
     }
 
     /**
