@@ -60,6 +60,10 @@ export class MyPiece extends CGFobject {
         return this.king;
     }
 
+    /**
+     * @method displaySingle
+     * Displays a single piece on the object
+     */
     displaySingle(){
         console.warn("TODO: clean up MyPiece's display method, if possible");
         this.side.display();
