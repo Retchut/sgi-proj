@@ -43,6 +43,7 @@ export class MySceneGraph {
 
         this.idRoot = null;                    // The id of the root element.
         this.idBoard = null;
+        this.idSpotlight = "spotlight";
 
         this.axisCoords = [];
         this.axisCoords['x'] = [1, 0, 0];
@@ -556,6 +557,7 @@ export class MySceneGraph {
                 global.push(...[angle, exponent, targetLight])
             }
 
+            global.push(lightId); // push the id so we can access the spotlight light from within the scene
             this.lights[lightId] = global;
             numLights++;
         }
@@ -564,6 +566,9 @@ export class MySceneGraph {
             return "at least one light must be defined";
         else if (numLights > 8)
             this.onXMLMinorError("too many lights defined; WebGL imposes a limit of 8 lights");
+
+        if(this.lights[this.idSpotlight] === null)
+            return "no light with id \"" + this.idSpotlight + "\" was defined";
 
         this.scene.numLights = numLights;
         this.log("Parsed lights");

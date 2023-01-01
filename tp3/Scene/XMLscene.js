@@ -1,5 +1,5 @@
 import { CGFscene, CGFshader } from '../../lib/CGF.js';
-import { CGFaxis,CGFcamera } from '../../lib/CGF.js';
+import { CGFaxis, CGFcamera } from '../../lib/CGF.js';
 import { GameManager } from '../Game/GameManager.js';
 
 
@@ -73,6 +73,10 @@ export class XMLscene extends CGFscene {
 
             if (this.graph.lights.hasOwnProperty(key)) {
                 var light = this.graph.lights[key];
+                const lightID = light[light.length - 1];
+
+                if (lightID === this.graph.idSpotlight)
+                    this.spotlightKey = i;
 
                 this.lights[i].setPosition(light[2][0], light[2][1], light[2][2], light[2][3]);
                 this.lights[i].setAmbient(light[3][0], light[3][1], light[3][2], light[3][3]);
@@ -98,47 +102,46 @@ export class XMLscene extends CGFscene {
         }
     }
 
-    initShaders(){
+    initShaders() {
         this.shaders = [
             new CGFshader(this.gl, 'scenes/shaders/simplePulsing.vert', 'scenes/shaders/simplePulsing.frag')
         ];
         this.selectedShader = 0;
         // dat.gui does not let us work with primitive values, so we have to wrap the boolean inside an object
-        this.shadersController = { shadersActive : true, freezeShader : false };
+        this.shadersController = { shadersActive: true, freezeShader: false };
         this.shaders[this.selectedShader].setUniformsValues({
-            shaderTimeFactor : 0,
-            shaderScaleFactor : this.graph.shaderScale,
-            factors : vec3.create(),
-            matColor : vec4.create()
+            shaderTimeFactor: 0,
+            shaderScaleFactor: this.graph.shaderScale,
+            factors: vec3.create(),
+            matColor: vec4.create()
         });
     }
 
-    initAnimations(){
-        this.animationsController = { freezeAnimations : false };
+    initAnimations() {
+        this.animationsController = { freezeAnimations: false };
     }
 
-    initGameManager(board, timer, scoreKeeper){
+    initGameManager(board, timer, scoreKeeper) {
         this.gameManager = new GameManager(this, board, timer, scoreKeeper);
         this.gameManager.initGame();
     }
 
-	logPicking(){
-		if (this.pickMode == false) {
-			// results can only be retrieved when picking mode is false
-			if (this.pickResults != null && this.pickResults.length > 0) {
-				for (var i=0; i< this.pickResults.length; i++) {
-					var obj = this.pickResults[i][0];
-					if (obj)
-					{
-						var customId = this.pickResults[i][1];
-						// console.log("Picked object: " + obj + ", with pick id " + customId);
+    logPicking() {
+        if (this.pickMode == false) {
+            // results can only be retrieved when picking mode is false
+            if (this.pickResults != null && this.pickResults.length > 0) {
+                for (var i = 0; i < this.pickResults.length; i++) {
+                    var obj = this.pickResults[i][0];
+                    if (obj) {
+                        var customId = this.pickResults[i][1];
+                        // console.log("Picked object: " + obj + ", with pick id " + customId);
                         this.gameManager.handlePick(customId);
-					}
-				}
-				this.pickResults.splice(0,this.pickResults.length);
-			}		
-		}
-	}
+                    }
+                }
+                this.pickResults.splice(0, this.pickResults.length);
+            }
+        }
+    }
 
     setDefaultAppearance() {
         this.setAmbient(0.2, 0.4, 0.8, 1.0);
@@ -146,7 +149,7 @@ export class XMLscene extends CGFscene {
         this.setSpecular(0.2, 0.4, 0.8, 1.0);
         this.setShininess(10.0);
     }
-    
+
     /** Handler called when the graph is finally loaded. 
      * As loading is asynchronous, this may be called already after the application has started the run loop
      */
@@ -170,13 +173,13 @@ export class XMLscene extends CGFscene {
      * Method called periodically, used when it is necessary to update some internal state independent of the rendering display of the scene.
      * @param {Number} currTime
      */
-    update(currTime){
-        if(this.sceneInited){
+    update(currTime) {
+        if (this.sceneInited) {
             let elapsedTime;
 
-            if(this.runTime == null) 
+            if (this.runTime == null)
                 elapsedTime = 0;
-            else 
+            else
                 elapsedTime = (this.animationsController.freezeAnimations) ? 0 : (currTime - this.runTime);
 
             this.runTime = currTime;
@@ -185,11 +188,28 @@ export class XMLscene extends CGFscene {
                 this.graph.animations[anim].update(elapsedTime / 1000);
 
             const currTimeFactor = currTime / 1000 % 100;
-            if(this.shadersController.shadersActive && !this.shadersController.freezeShader)
+            if (this.shadersController.shadersActive && !this.shadersController.freezeShader)
                 this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTimeFactor });
-            
+
             this.gameManager.update(currTime);
+
+            if (this.gameManager.gameOver()) {
+                console.log(this.gameManager.getWinner());
+            }
         }
+    }
+
+    toggleSpotlight() {
+        this.lights[this.spotlightKey].enabled = !this.lights[this.spotlightKey].enabled;
+    }
+
+    /**
+     * @method moveSpotlight moves the spotlight light to the specified position
+     * @param {vec3} newPosition - position to move the spotlight to
+     */
+    moveSpotlight(newPosition) {
+        const spotlight = this.lights[this.spotlightKey]
+        spotlight.setPosition(newPosition[0], newPosition[1], newPosition[2], spotlight.position[3]);
     }
 
     /**
@@ -197,8 +217,8 @@ export class XMLscene extends CGFscene {
      */
     display() {
         // ---- BEGIN Background, camera and axis setup
-		this.logPicking();
-		this.clearPickRegistration();
+        this.logPicking();
+        this.clearPickRegistration();
 
         // Clear image and depth buffer everytime we update the scene
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
