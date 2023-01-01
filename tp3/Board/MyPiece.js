@@ -61,6 +61,13 @@ export class MyPiece extends CGFobject {
     }
 
     /**
+     * @method promote promotes the piece
+     */
+    promote(){
+        this.king = true;
+    }
+
+    /**
      * @method displaySingle
      * Displays a single piece on the object
      */

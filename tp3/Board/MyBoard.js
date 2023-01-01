@@ -122,6 +122,33 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method tileInFirstRow
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the first row of the board, false otherwise
+     */
+    tileInFirstRow(tileID){
+        return Math.floor((tileID - 1) / this.boardDimensions) === 0;
+    }
+    
+    /**
+     * @method tileInLastRow
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the last row of the board, false otherwise
+     */
+    tileInLastRow(tileID){
+        return Math.floor((tileID - 1) / this.boardDimensions) === (this.boardDimensions - 1);
+    }
+
+    /**
+     * @method tileInEdgeRows
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the last or first row of the board, false otherwise
+     */
+    tileInEdgeRows(tileID){
+        return this.tileInFirstRow(tileID) || this.tileInLastRow(tileID);
+    }
+
+    /**
      * @method tileInFirstCol
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the first column of the board, false otherwise

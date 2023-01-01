@@ -338,6 +338,11 @@ export class GameManager {
 
         if (capture)
             this.capture(this.availableCaptures[newTile.getID()]);
+        
+        // if the tile moved to the edge rows and wasn't promoted yet
+        if(this.board.tileInEdgeRows(newTile.getID()) && !piece.isKing()){
+            piece.promote();
+        }
 
         this.scoreKeeper.setScores(this.player0Pit.length, this.player1Pit.length);
     }
