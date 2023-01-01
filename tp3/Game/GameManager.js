@@ -1,3 +1,4 @@
+import { CGFappearance } from "../../lib/CGF.js";
 import { MyPiece } from "../Board/MyPiece.js";
 
 /**
@@ -60,21 +61,29 @@ export class GameManager {
             // player 0
             for (const tile of tiles[row]) {
                 if ((tile.getID() + row % 2) % 2 == 1) {
-                    var newPiece = new MyPiece(this.scene, this.boardDimensions, 0, p0Appearance);
-                    this.piecesInPlay.push(newPiece);
-                    tile.setPiece(newPiece);
+                    this.initPiece(tile, 0, p0Appearance);
                 }
             }
 
             // player 1
             for (const tile of tiles[tiles.length - row - 1]) {
                 if ((tile.getID() - 1 + row % 2) % 2 == 1) {
-                    var newPiece = new MyPiece(this.scene, this.boardDimensions, 1, p1Appearance);
-                    this.piecesInPlay.push(newPiece);
-                    tile.setPiece(newPiece);
+                    this.initPiece(tile, 1, p1Appearance);
                 }
             }
         }
+    }
+
+    /**
+     * @method initPiece initializes a piece
+     * @param {MyTile} tile              - tile to initialize the piece at
+     * @param {Number} player            - id of the owner of the piece
+     * @param {CGFappearance} appearance - appearance of the piece
+     */
+    initPiece(tile, player, appearance){
+        var newPiece = new MyPiece(this.scene, this.boardDimensions, player, appearance);
+        this.piecesInPlay.push(newPiece);
+        tile.setPiece(newPiece);
     }
 
     /**
