@@ -40,10 +40,20 @@ export class GameManager {
         this.player1RemainingTime = 300000;
         this.availableCaptures = {}; // maps move : piece being captured
 
+        this.initPieces(3);
+
+        this.timer.setTimes(300, 300);
+        this.scoreKeeper.setScores(0, 0);
+    }
+
+    /**
+     * @method initPieces initializes the pieces of the board
+     * @param {Number} - number of rows to create for each player
+     */
+    initPieces(rowsToSpawn){
         const p0Appearance = this.board.getAppearanceW();
         const p1Appearance = this.board.getAppearanceB();
         const tiles = this.board.getTiles();
-        const rowsToSpawn = 3;
 
         for (let row = 0; row < rowsToSpawn; row++) {
             console.warn("TODO: improve the piece creation algorithm");
@@ -65,9 +75,6 @@ export class GameManager {
                 }
             }
         }
-
-        this.timer.setTimes(300, 300);
-        this.scoreKeeper.setScores(0, 0);
     }
 
     /**
