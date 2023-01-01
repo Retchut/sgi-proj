@@ -238,25 +238,6 @@ export class GameManager {
     }
 
     /**
-     * @method getCaptureOfPieceMove
-     * @param {Number}  piece     - id of the piece to be captured
-     * @param {Number}  rowOffset - offset used to calculate the next row
-     * @param {Array}   path      - pieces captured thus far
-     * @param {boolean} right     - true if the piece captured is to the right of the original piece, false otherwise
-     * @returns the move to capture the piece, if it exists
-     */
-    getCaptureOfPieceMove(piece, rowOffset, path, right){
-        const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
-        
-        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-            this.availableCaptures[captureMove] = path;
-            return captureMove;
-        }
-
-        return 0;
-    }
-
-    /**
      * @method getCapturesFrom calculates all possible capture moves from a specific tile
      * @param {Number} tileID    - id of the tile from where we're calculating captures
      * @param {Number} rowOffset - offset used to calculate the next row
@@ -266,42 +247,65 @@ export class GameManager {
      getCapturesFrom(tileID, rowOffset, path = []){
         let possibleCaptures = []
 
-        const nextRowTile = tileID + rowOffset;
-
         // to the left
         if (!this.board.tileInSecondCol(tileID)) {
-            const diagonalLeft = nextRowTile - 1;
-            const diagonalLeftPiece = this.board.getTileAt(diagonalLeft).getPiece();
-
-            if(diagonalLeftPiece !== null && !this.board.tileInFirstCol(diagonalLeft)){
-                let newPath = [...path, diagonalLeft]
-                const capture = this.getCaptureOfPieceMove(diagonalLeft, rowOffset, newPath, false);
-                if(capture){
-                    possibleCaptures.push(capture);
-                    const moreCaptures = this.getCapturesFrom(capture, rowOffset, newPath);
-                    possibleCaptures = possibleCaptures.concat(moreCaptures);
-                }
-            }
+            const capturesToLeft = this.getCapturesToSide(rowOffset, tileID, path, false);
+            possibleCaptures = possibleCaptures.concat(capturesToLeft);
         }
 
         // to the right
         if (!this.board.tileInPenultimateCol(tileID)) {
-            const diagonalRight = nextRowTile + 1;
-            const diagonalRightPiece = this.board.getTileAt(diagonalRight).getPiece();
-
-            if(diagonalRightPiece !== null && !this.board.tileInLastCol(diagonalRight)){
-                let newPath = [...path, diagonalRight]
-                const capture = this.getCaptureOfPieceMove(diagonalRight, rowOffset, newPath, true);
-                if(capture){
-                    possibleCaptures.push(capture);
-                    path.push(diagonalRight)
-                    const moreCaptures = this.getCapturesFrom(capture, rowOffset, newPath);
-                    possibleCaptures = possibleCaptures.concat(moreCaptures);
-                }
-            }
+            const capturesToRight = this.getCapturesToSide(rowOffset, tileID, path, true);
+            possibleCaptures = possibleCaptures.concat(capturesToRight);
         }
 
         return possibleCaptures;
+    }
+
+    /**
+     * @method getCapturesToSide calculates all the possible captures for a given diagonal
+     * @param {Number}  tileID    - id of the tile from where we're calculating captures
+     * @param {Number}  rowOffset - offset used to calculate the next row
+     * @param {Array}   path      - pieces captured thus far
+     * @param {boolean} right     - true if the piece captured is to the right of the original piece, false otherwise
+     * @returns 
+     */
+    getCapturesToSide(rowOffset, tileID, path, right){
+        let possibleSideCaptures = [];
+
+        const diagonal = tileID + rowOffset + ((right) ? 1 : -1);
+        const diagonalPiece = this.board.getTileAt(diagonal).getPiece();
+
+        if(diagonalPiece !== null && !this.board.tileInFirstCol(diagonal)){
+            let newPath = [...path, diagonal]
+            const capture = this.getCaptureOfPiece(diagonal, rowOffset, newPath, right);
+            if(capture){
+                possibleSideCaptures.push(capture);
+                const moreCaptures = this.getCapturesFrom(capture, rowOffset, newPath);
+                possibleSideCaptures = possibleSideCaptures.concat(moreCaptures);
+            }
+        }
+
+        return possibleSideCaptures;
+    }
+
+    /**
+     * @method getCaptureOfPiece
+     * @param {Number}  piece     - id of the piece to be captured
+     * @param {Number}  rowOffset - offset used to calculate the next row
+     * @param {Array}   path      - pieces captured thus far
+     * @param {boolean} right     - true if the piece captured is to the right of the original piece, false otherwise
+     * @returns the move to capture the piece, if it exists
+     */
+    getCaptureOfPiece(piece, rowOffset, path, right){
+        const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
+        
+        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
+            this.availableCaptures[captureMove] = path;
+            return captureMove;
+        }
+
+        return 0;
     }
 
     /**
