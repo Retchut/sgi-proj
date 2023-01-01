@@ -176,6 +176,22 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method disableHighlight Disables the highlighting on the tile at tile with tileID
+     * @param {Number} - id of the tile
+     */
+    disableHighlight(tileID){
+        this.getTileAt(tileID).disableHighlight();
+    }
+
+    /**
+     * @method enableHighlight Enables the highlighting on the tile at tile with tileID
+     * @param {Number} - id of the tile
+     */
+    enableHighlight(tileID){
+        this.getTileAt(tileID).enableHighlight();
+    }
+
+    /**
      * @method toggleHighlight Toggles the highlighting on the tile at tile with tileID
      * @param {Number} - id of the tile
      */
