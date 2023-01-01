@@ -54,9 +54,9 @@ export class GameManager {
 
         this.initPiece(this.board.getTileAt(5), 0, p0Appearance);
         this.initPiece(this.board.getTileAt(14), 1, p1Appearance);
-        // this.initPiece(this.board.getTileAt(12), 1, p1Appearance);
-        // this.initPiece(this.board.getTileAt(28), 1, p1Appearance);
-        // this.initPiece(this.board.getTileAt(44), 1, p1Appearance);
+        this.initPiece(this.board.getTileAt(12), 1, p1Appearance);
+        this.initPiece(this.board.getTileAt(28), 1, p1Appearance);
+        this.initPiece(this.board.getTileAt(44), 1, p1Appearance);
     }
 
     /**
@@ -183,29 +183,32 @@ export class GameManager {
      * @returns The moves the player can make from the tile with ID tileID
      */
     getValidMoves(tileID) {
-        // initialize the array with the tileID to allow for desselecting this tile later
-        let possibleMoves = [tileID];
-        let captures = [tileID];
+
+        // reset available captures
         this.availableCaptures = {};
 
         // player 1 moves to a lower row, player 0 to an upper row
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
 
+        // if any captures can be made, they're the only moves available
+        const possibleCaptures = this.getCapturesFrom(tileID, rowOffset);
+        if(possibleCaptures.length !== 0){
+            return [tileID, ...possibleCaptures];
+        }
+
+        // no captures can be made, so we check for a normal move
+        // initialize the arrays with the tileID to allow for desselecting this tile later
+        let possibleMoves = [tileID];
+
         if (!this.board.tileInLastCol(tileID)) {
-            const [rightMoves, rightCaptures] = this.getMoveToSide(tileID, rowOffset, true);
+            const rightMoves= this.getMoveToSide(tileID, rowOffset, true);
             possibleMoves = possibleMoves.concat(rightMoves);
-            captures = captures.concat(rightCaptures);
         }
 
         if (!this.board.tileInFirstCol(tileID)) {
-            const [leftMoves, leftCaptures] = this.getMoveToSide(tileID, rowOffset, false);
+            const leftMoves = this.getMoveToSide(tileID, rowOffset, false);
             possibleMoves = possibleMoves.concat(leftMoves);
-            captures = captures.concat(leftCaptures);
         }
-
-        // if a capture can be made (captures contains more than the original tileID), that's the only possible move the player can make
-        if (captures.length !== 1)
-            possibleMoves = captures;
 
         return possibleMoves;
     }
@@ -218,24 +221,15 @@ export class GameManager {
      * @returns an array with the possible moves and captures starting at this tile, and to the specified side
      */
     getMoveToSide(tileID, rowOffset, right){
-        let captures = [];
         let possibleMoves = []
         const move = tileID + rowOffset  + ((right) ? 1 : -1);
         if (this.board.tileInsideBoard(move)) {
             const movePiece = this.board.getTileAt(move).getPiece();
             if (movePiece === null)
                 possibleMoves.push(move);
-            else {
-                // a capture might be possible
-                if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()){
-                    const capture = this.getCaptureOfPieceMove(move, rowOffset, right);
-                    if(capture)
-                        captures.push(capture);
-                }
-            }
         }
 
-        return [possibleMoves, captures];
+        return possibleMoves;
     }
 
     /**
@@ -254,6 +248,49 @@ export class GameManager {
         }
 
         return 0;
+    }
+
+    /**
+     * @method getCapturesFrom calculates all possible capture moves from a specific tile
+     * @param {Number} tileID - id of the tile from where we're calculating captures
+     * @param {Number} rowOffset - offset used to calculate the next row
+     */
+     getCapturesFrom(tileID, rowOffset){
+        let possibleCaptures = []
+
+        const nextRowTile = tileID + rowOffset;
+
+        // to the left
+        if (!this.board.tileInSecondCol(tileID)) {
+            const diagonalLeft = nextRowTile - 1;
+            const diagonalLeftPiece = this.board.getTileAt(diagonalLeft).getPiece();
+
+            if(diagonalLeftPiece !== null && !this.board.tileInFirstCol(diagonalLeft)){
+                const capture = this.getCaptureOfPieceMove(diagonalLeft, rowOffset, false);
+                if(capture){
+                    possibleCaptures.push(capture);
+                    const moreCaptures = this.getCapturesFrom(capture, rowOffset);
+                    possibleCaptures = possibleCaptures.concat(moreCaptures);
+                }
+            }
+        }
+
+        // to the right
+        if (!this.board.tileInPenultimateCol(tileID)) {
+            const diagonalRight = nextRowTile + 1;
+            const diagonalRightPiece = this.board.getTileAt(diagonalRight).getPiece();
+
+            if(diagonalRightPiece !== null && !this.board.tileInLastCol(diagonalRight)){
+                const capture = this.getCaptureOfPieceMove(diagonalRight, rowOffset, true);
+                if(capture){
+                    possibleCaptures.push(capture);
+                    const moreCaptures = this.getCapturesFrom(capture, rowOffset);
+                    possibleCaptures = possibleCaptures.concat(moreCaptures);
+                }
+            }
+        }
+
+        return possibleCaptures;
     }
 
     /**
