@@ -164,37 +164,21 @@ export class GameManager {
         const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
 
         if (!this.board.tileInLastCol(tileID)) {
-            // can move right
-            const move = tileID + rowOffset + 1;
-            if (this.board.tileInsideBoard(move)) {
-                const movePiece = this.board.getTileAt(move).getPiece();
-                if (movePiece === null)
-                    possibleMoves.push(move);
-                else {
-                    // can we capture it?
-                    if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
-                        for(const capture of this.getCaptureMoves(move, rowOffset, true))
-                            captures.push(capture);
-                    }
-                }
-            }
+            const [rightMoves, rightCaptures] = this.getMoveToSide(tileID, rowOffset, true);
+            for(const move of rightMoves)
+                possibleMoves.push(move);
+
+            for(const capture of rightCaptures)
+                captures.push(capture);
         }
 
         if (!this.board.tileInFirstCol(tileID)) {
-            // can move left
-            const move = tileID + rowOffset - 1;
-            if (this.board.tileInsideBoard(move)) {
-                const movePiece = this.board.getTileAt(move).getPiece();
-                if (this.board.getTileAt(move).getPiece() === null)
-                    possibleMoves.push(move);
-                else {
-                    // can we capture it?
-                    if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
-                        for(const capture of this.getCaptureMoves(move, rowOffset, false))
-                            captures.push(capture);
-                    }
-                }
-            }
+            const [leftMoves, leftCaptures] = this.getMoveToSide(tileID, rowOffset, false);
+            for(const move of leftMoves)
+                possibleMoves.push(move);
+
+            for(const capture of leftCaptures)
+                captures.push(capture);
         }
 
         // if a capture can be made (captures contains more than the original tileID), that's the only possible move the player can make
@@ -204,19 +188,39 @@ export class GameManager {
         return possibleMoves;
     }
 
+    getMoveToSide(tileID, rowOffset, right){
+        const captures = [];
+        const possibleMoves = []
+        const move = tileID + rowOffset  + ((right) ? 1 : -1);
+        if (this.board.tileInsideBoard(move)) {
+            const movePiece = this.board.getTileAt(move).getPiece();
+            if (movePiece === null)
+                possibleMoves.push(move);
+            else {
+                // can we capture it?
+                if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
+                    for(const capture of this.getCaptureMoves(move, rowOffset, right))
+                        captures.push(capture);
+                }
+            }
+        }
+
+        return [possibleMoves, captures];
+    }
+
     /**
      * @method getCaptureMoves 
      * @param {Number} piece     - id of the piece to be captured
      * @param {Number} rowOffset - offset used to calculate the next row
      * @param {boolean} right    - true if the piece captured is to the right of the original piece, false otherwise
      */
-    getCaptureMoves(move, rowOffset, right){
-        const captureMove = move + rowOffset  + ((right) ? 1 : -1);
+    getCaptureMoves(piece, rowOffset, right){
+        const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
         const possibleCaptures = [];
         
         if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
             possibleCaptures.push(captureMove);
-            this.availableCaptures[captureMove] = move;
+            this.availableCaptures[captureMove] = piece;
         }
 
         return possibleCaptures;
