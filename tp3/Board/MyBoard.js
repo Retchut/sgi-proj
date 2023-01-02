@@ -1,4 +1,5 @@
 import { CGFappearance, CGFobject } from '../../lib/CGF.js';
+import { MyRectangle } from '../Primitives/MyRectangle.js';
 import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
 
@@ -75,6 +76,15 @@ export class MyBoard extends CGFobject {
 
             this.tiles.push(rowList);
         }
+
+        this.tray = new MyRectangle(this.scene, 0, -2 * this.tileLen, 2 * this.tileLen, -this.size * 0.6 - this.tileLen, -this.size * 0.6);
+
+        this.trayAppearence = new CGFappearance(this.scene);
+        this.trayAppearence.setAmbient(0.05, 0.05, 0.05, 1.0);
+        this.trayAppearence.setDiffuse(0.3, 0.1, 0.1, 1.0);
+
+        this.trayTransformation = mat4.create();
+        mat4.rotate(this.trayTransformation, this.trayTransformation, Math.PI, [0, 0, 1]);
     }
 
     /**
@@ -201,6 +211,12 @@ export class MyBoard extends CGFobject {
                 }
             }
         }
+        this.trayAppearence.apply();
+        this.tray.display()
+        this.scene.pushMatrix();
+        this.scene.multMatrix(this.trayTransformation);
+        this.tray.display();
+        this.scene.popMatrix();
         this.scene.popMatrix();
     }
 
