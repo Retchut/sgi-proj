@@ -96,7 +96,7 @@ export class MyPiece extends CGFobject {
      * Displays a single piece on the object
      */
     displaySingle(){
-        console.warn("TODO: clean up MyPiece's display method, if possible");
+        //console.warn("TODO: clean up MyPiece's display method, if possible");
         this.side.display();
         this.scene.pushMatrix();
         this.scene.multMatrix(this.ringTransformation);

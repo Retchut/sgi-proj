@@ -1,10 +1,17 @@
 <sxs>
     <scene root="roomRoot" axis_length="10" />
 
-    <views default="defaultCamera">
-        <perspective id="defaultCamera" near="0.1" far="500" angle="45">
-            <!-- <from x="20" y="15" z="20" /> -->
+    <views default="initialView">
+        <perspective id="initialView" near="0.1" far="500" angle="45">
+            <from x="15" y="25" z="30" />
+            <to x="5" y="11" z="0" />
+        </perspective>
+        <perspective id="playerW" near="0.1" far="500" angle="45">
             <from x="0" y="20" z="12" />
+            <to x="0" y="11" z="0" />
+        </perspective>
+        <perspective id="playerB" near="0.1" far="500" angle="45">
+            <from x="0" y="20" z="-12" />
             <to x="0" y="11" z="0" />
         </perspective>
     </views>
@@ -20,6 +27,12 @@
             <ambient r="0.2" g="0.2" b="0.2" a="1.0" />
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
             <specular r="1.0" g="1.0" b="1.0" a="1.0" />
+        </omni>
+        <omni id="fillLight" enabled="1">
+            <location x="17" y="25" z="30" w="1.0" />
+            <ambient r="0.0" g="0.0" b="0.0" a="1.0" />
+            <diffuse r="0.5" g="0.5" b="0.5" a="1.0" />
+            <specular r="0.5" g="0.5" b="0.5" a="1.0" />
         </omni>
         <spot id="spotlight" enabled="1" angle="10" exponent="10">
             <location x="-3" y="13" z="0" w="1.0" />

@@ -121,8 +121,8 @@ export class XMLscene extends CGFscene {
         this.animationsController = { freezeAnimations: false };
     }
 
-    initGameManager(board, timer, scoreKeeper) {
-        this.gameManager = new GameManager(this, board, timer, scoreKeeper);
+    initGameManager(board, timer, scoreKeeper, views) {
+        this.gameManager = new GameManager(this, board, timer, scoreKeeper, views);
         this.gameManager.initGame();
     }
 
@@ -134,7 +134,7 @@ export class XMLscene extends CGFscene {
                     var obj = this.pickResults[i][0];
                     if (obj) {
                         var customId = this.pickResults[i][1];
-                        // console.log("Picked object: " + obj + ", with pick id " + customId);
+                        console.log("Picked object: " + obj + ", with pick id " + customId);
                         this.gameManager.handlePick(customId);
                     }
                 }
@@ -191,10 +191,10 @@ export class XMLscene extends CGFscene {
             if (this.shadersController.shadersActive && !this.shadersController.freezeShader)
                 this.shaders[this.selectedShader].setUniformsValues({ shaderTimeFactor: currTimeFactor });
 
-            this.gameManager.update(currTime);
-
-            if (this.gameManager.gameOver()) {
-                console.log(this.gameManager.getWinner());
+            if (this.gameManager) {
+                this.gameManager.update(currTime);
+            } else {
+                console.warn("No game manager set!");
             }
         }
     }
