@@ -250,9 +250,7 @@ export class GameManager {
      * @returns The capture moves the player's king piece can make from the tile with ID tileID
      */
     getKingCaptures(tileID){
-        console.log(tileID);
         let possibleCaptures = [];
-        let singleCaptures = [];
 
         for(const rowOffset of this.rowOffsets){
             if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
@@ -273,8 +271,11 @@ export class GameManager {
                     }
                 }
                 else{
-                    // try to do a simple capture
-                    singleCaptures = this.getCapturesFrom(tileID, rowOffset);
+                    // capture from self
+                    const captures = this.getKingCapturesToSide(tileID, tileID, true);
+                    if(captures.length !== 0){
+                        possibleCaptures = possibleCaptures.concat(captures)
+                    }
                 }
             }
     
@@ -290,15 +291,14 @@ export class GameManager {
                     }
                 }
                 else{
-                    singleCaptures = this.getCapturesFrom(tileID, rowOffset);
+                    // capture from self
+                    const captures = this.getKingCapturesToSide(tileID, tileID, false);
+                    if(captures.length !== 0){
+                        possibleCaptures = possibleCaptures.concat(captures)
+                    }
                 }
             }
         }
-        console.log(possibleCaptures);
-        if(singleCaptures.length !== 0){
-            possibleCaptures = possibleCaptures.concat(singleCaptures);
-        }
-
 
         return possibleCaptures;
     }
