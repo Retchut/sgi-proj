@@ -14,25 +14,31 @@ export class MyPiece extends CGFobject {
      * @param {Number} player            - Player who owns the piece - 0/1
      * @param {CGFappearance} appearance - The material for this piece
      */
-    constructor(scene, tileLen, player, appearance) {
+    constructor(scene, tileID, tileLen, player, appearance) {
         super(scene);
 
         this.player = player;
+        this.tileID = tileID;
         this.appearance = appearance;
+        this.king = false;
 
-        this.side = new MyCylinder(this.scene, 0, 0.5, 0.5, 0.2, 50, 1);
+        const pieceHeight = 0.2;
+        this.side = new MyCylinder(this.scene, 0, 0.5, 0.5, pieceHeight, 50, 1);
         this.base = new MyCylinder(this.scene, 0, 0.5, 0, 0.01, 50, 10);
         this.topTransformation = mat4.create();
-        mat4.translate(this.topTransformation, this.topTransformation, [0, 0, 0.2]);
+        mat4.translate(this.topTransformation, this.topTransformation, [0, 0, pieceHeight]);
         this.bottomTransformation = mat4.create();
         mat4.rotate(this.bottomTransformation, this.bottomTransformation, Math.PI, [1, 0, 0]);
         this.outerRing = new MyTorus(this.scene, 0, 0.02, 0.48, 10, 50);
         this.middleRing = new MyTorus(this.scene, 0, 0.02, 0.3, 10, 50);
         this.innerRing = new MyTorus(this.scene, 0, 0.12, 0.06, 10, 50);
         this.ringTransformation = mat4.create();
-        mat4.translate(this.ringTransformation, this.ringTransformation, [0, 0, 0.2]);
+        mat4.translate(this.ringTransformation, this.ringTransformation, [0, 0, pieceHeight]);
         this.innerRingTransformation = mat4.create();
-        mat4.scale(this.innerRingTransformation, this.innerRingTransformation, [1, 1, 0.2]);
+        mat4.scale(this.innerRingTransformation, this.innerRingTransformation, [1, 1, pieceHeight]);
+
+        this.kingTransformation = mat4.create();
+        mat4.translate(this.kingTransformation, this.kingTransformation, [0, 0, pieceHeight]);
 
         console.warn("TODO: integrate tileLen into MyPiece, performing the scaling within MyPiece's display method");
         // this.scaleTransf = mat4.create();
@@ -48,13 +54,49 @@ export class MyPiece extends CGFobject {
     }
 
     /**
-    * @method display
-    * Displays the piece
-    */
-    display() {
-        this.appearance.apply();
-        
-        // console.warn("TODO: clean up MyPiece's display method, if possible");
+     * @method getTileID
+     * @returns this piece's current tile's ID
+     */
+    getTileID(){
+        return this.tileID;
+    }
+
+    /**
+     * @method isKing
+     * @returns true if the piece is a king, false otherwise
+     */
+    isKing(){
+        return this.king;
+    }
+
+    /**
+     * @method getTileID
+     * @returns this piece's tileID
+     */
+    getTileID(){
+        return this.tileID;
+    }
+
+    /**
+     * @method setTileID sets the piece's tileID
+     */
+    setTileID(newTileID){
+        this.tileID = newTileID;
+    }
+
+    /**
+     * @method promote promotes the piece
+     */
+    promote(){
+        this.king = true;
+    }
+
+    /**
+     * @method displaySingle
+     * Displays a single piece on the object
+     */
+    displaySingle(){
+        //console.warn("TODO: clean up MyPiece's display method, if possible");
         this.side.display();
         this.scene.pushMatrix();
         this.scene.multMatrix(this.ringTransformation);
@@ -71,5 +113,20 @@ export class MyPiece extends CGFobject {
         this.scene.multMatrix(this.topTransformation);
         this.base.display();
         this.scene.popMatrix();
+    }
+
+    /**
+    * @method display
+    * Displays the piece
+    */
+    display() {
+        this.appearance.apply();
+        this.displaySingle();
+        if(this.king){
+            this.scene.pushMatrix()
+            this.scene.multMatrix(this.kingTransformation)
+            this.displaySingle();
+            this.scene.popMatrix()
+        }
     }
 }

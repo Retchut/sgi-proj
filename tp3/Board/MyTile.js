@@ -72,6 +72,20 @@ export class MyTile extends CGFobject {
     }
 
     /**
+     * Disables the highlighting on the piece in this tile
+     */
+    disableHighlight(){
+        this.displayShader = false;
+    }
+
+    /**
+     * Enables the highlighting on the piece in this tile
+     */
+    enableHighlight(){
+        this.displayShader = true;
+    }
+
+    /**
      * Toggles the highlighting on the piece in this tile
      */
     toggleHighlight() {
