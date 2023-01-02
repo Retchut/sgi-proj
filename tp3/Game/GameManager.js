@@ -295,6 +295,9 @@ export class GameManager {
                                 else{
                                     const diagonalMoves = this.getKingMovesToDiagonal(landingTile, rightDiagonalOffset);
                                     possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
+                                    for(const captureMove of possibleCaptures){
+                                        this.applyCapture(captureMove, [diagonalTile])
+                                    }
                                 }
                             }
                         }
@@ -317,6 +320,9 @@ export class GameManager {
                                 else{
                                     const diagonalMoves = this.getKingMovesToDiagonal(landingTile, leftDiagonalOffset);
                                     possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
+                                    for(const captureMove of possibleCaptures){
+                                        this.applyCapture(captureMove, [diagonalTile])
+                                    }
                                 }
                             }
                         }
@@ -507,7 +513,7 @@ export class GameManager {
     }
 
     /**
-     * @method getCaptureOfPiece
+     * @method getCaptureOfPiece  calculates the move to capture a piece, if possible
      * @param {Number}  piece     - id of the piece to be captured
      * @param {Number}  rowOffset - offset used to calculate the next row
      * @param {Array}   path      - pieces captured thus far
@@ -518,11 +524,21 @@ export class GameManager {
         const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
         
         if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-            this.availableCaptures[captureMove] = path;
+            applyCapture(captureMove, path);
+            
             return captureMove;
         }
 
         return 0;
+    }
+
+    /**
+     * @method applyCapture applies the result of a capture
+     * @param {Number} captureMove - the move to be registered to capture the tile
+     * @param {Array}  path        - path of pieces captured until captureMove
+     */
+    applyCapture(captureMove, path){
+        this.availableCaptures[captureMove] = path;
     }
 
     /**
