@@ -24,6 +24,7 @@
   - Board and auxiliary board
   - Captures counter
   - Time clock
+  - Ability to undo a move by pressing the 'U' key on the keyboard
   - Textured tables
   - Textured paintings
 
