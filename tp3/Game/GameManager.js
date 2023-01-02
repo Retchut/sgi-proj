@@ -284,13 +284,14 @@ export class GameManager {
             if(rightDiagonalOffset !== ignoreDiagonalOffset && right){
                 if (!this.board.tileInLastCol(tileID)) {
                     const diagonalTile = tileID + rightDiagonalOffset;
-                    if(!this.board.tileInLastCol(diagonalTile)){
+                    if(!this.board.tileInLastCol(diagonalTile) && ! this.board.tileInEdgeRows(diagonalTile)){
                         const diagonalPiece = this.board.getTileAt(diagonalTile).getPiece();
                         if(diagonalPiece !== null && diagonalPiece.getPlayer() === this.getOpponent()){
                             const landingTile = diagonalTile + rightDiagonalOffset;
                             if(this.board.getTileAt(landingTile).getPiece() === null){
                                 if(this.board.tileInEdgeCols(landingTile)){
                                     possibleCaptures.push(landingTile);
+                                    this.applyCapture(landingTile, [diagonalTile])
                                 }
                                 else{
                                     const diagonalMoves = this.getKingMovesToDiagonal(landingTile, rightDiagonalOffset);
@@ -309,13 +310,14 @@ export class GameManager {
             if(leftDiagonalOffset !== ignoreDiagonalOffset && !right){
                 if (!this.board.tileInFirstCol(tileID)) {
                     const diagonalTile = tileID + leftDiagonalOffset;
-                    if(!this.board.tileInFirstCol(diagonalTile)){
+                    if(!this.board.tileInFirstCol(diagonalTile) && ! this.board.tileInEdgeRows(diagonalTile)){
                         const diagonalPiece = this.board.getTileAt(diagonalTile).getPiece();
                         if(diagonalPiece !== null && diagonalPiece.getPlayer() === this.getOpponent()){
                             const landingTile = diagonalTile + leftDiagonalOffset;
                             if(this.board.getTileAt(landingTile).getPiece() === null){
                                 if(this.board.tileInEdgeCols(landingTile)){
                                     possibleCaptures.push(landingTile);
+                                    this.applyCapture(landingTile, [diagonalTile])
                                 }
                                 else{
                                     const diagonalMoves = this.getKingMovesToDiagonal(landingTile, leftDiagonalOffset);
@@ -524,7 +526,7 @@ export class GameManager {
         const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
         
         if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-            applyCapture(captureMove, path);
+            this.applyCapture(captureMove, path);
             
             return captureMove;
         }
