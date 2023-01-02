@@ -10,21 +10,19 @@
         return this.moves;
     }
 
-    push(from, to, capturedPieces){
-        this.moves.push([from, to, capturedPieces]);
+    push(from, to, piece, capturedPieces){
+        this.moves.push([from, to, piece, capturedPieces]);
     }
 
     pop(){
+        if(this.moves.length == 0) return null;
         const oldMove = this.moves.pop();
-        if(oldMove !== null)
-            return oldMove;
-        else
-            return [];
+        return oldMove
     }
 
     peek() {
         if(this.items.length > 0)
             return this.moves[this.moves.length - 1];
-        return [];
+        return null;
     }
  }

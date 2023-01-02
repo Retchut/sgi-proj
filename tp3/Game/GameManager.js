@@ -41,7 +41,7 @@ export class GameManager {
         this.gameStack = (oldGame === null) ? new GameStack() : new GameStack(oldGame);
     }
 
-    runGameFromStack(){
+    runGameFromStack() {
         // TODO: initgame from stack
     }
 
@@ -72,6 +72,8 @@ export class GameManager {
 
         this.timer.setTimes(300, 300);
         this.scoreKeeper.setScores(0, 0);
+
+        this.gameStack = new GameStack();
     }
 
     /**
@@ -164,7 +166,7 @@ export class GameManager {
      * @method selectTile selects a tile to start a move froms
      * @param {Number} tileID the id of the tile selected
      */
-    selectTile(tileID){
+    selectTile(tileID) {
         const tileObj = this.board.getTileAt(tileID);
         const tilePiece = tileObj.getPiece();
         // check for a piece on the selected tile
@@ -677,19 +679,20 @@ export class GameManager {
     move(newTile, capture) {
         const oldTile = this.board.getTileAt(this.selectedTileID);
         const piece = oldTile.getPiece();
+        const oldPiece = piece;
 
         oldTile.setPiece(null);
         newTile.setPiece(piece);
         piece.setTileID(newTile.getID());
 
         let capturedPieces = [];
-        if (capture){
+        if (capture) {
             capturedPieces = this.availableCaptures[newTile.getID()];
             this.capture(capturedPieces);
         }
 
-        this.gameStack.push(oldTile.getID(), newTile.getID(), capturedPieces);
-        
+        this.gameStack.push(oldTile.getID(), newTile.getID(), oldPiece, capturedPieces);
+
         // if the tile moved to the edge rows and wasn't promoted yet
         if (this.board.tileInEdgeRows(newTile.getID()) && !piece.isKing()) {
             piece.promote();
@@ -710,13 +713,12 @@ export class GameManager {
             // player 1's turn
             if (this.turnPlayer) {
                 this.player1Pit.push(piece);
-                this.board.playerBTray.setPieces(this.player1Pit);
             }
             // player 0's turn
             else {
                 this.player0Pit.push(piece);
-                this.board.playerWTray.setPieces(this.player0Pit);
             }
+            this.updateTrays();
 
             // remove tile from piece
             piece.setTileID(0);
@@ -727,6 +729,53 @@ export class GameManager {
             // remove piece from board
             this.piecesInPlay = removeItemFromArray(this.piecesInPlay, piece)
         }
+    }
+
+    /**
+     * @method updateTrays update's the player's trays
+     */
+    updateTrays() {
+        this.board.playerBTray.setPieces(this.player1Pit);
+        this.board.playerWTray.setPieces(this.player0Pit);
+    }
+
+    /**
+     * @method undo undoes the last move
+     */
+    undo() {
+        if (this.state == stateEnum.selectMove || this.state == stateEnum.animating || this.inCameraAnimation || this.turnPlayer < 0) return;
+        let lastMove = this.gameStack.pop();
+        if (lastMove === null) {
+            console.warn("There is no move to undo!");
+            return;
+        }
+
+        // Replace captured pieces
+        for (const tileID of lastMove[3]) {
+            let piece;
+            if (this.turnPlayer == 0) {
+                piece = this.player1Pit.pop();
+            }
+            else {
+                piece = this.player0Pit.pop();
+            }
+            this.updateTrays();
+            piece.setTileID(tileID);
+            this.board.getTileAt(tileID).setPiece(piece);
+        }
+
+        this.inCameraAnimation = true;
+        if (this.turnPlayer == 0) {
+            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerBCamera, 1000);
+        }
+        else {
+            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerWCamera, 1000);
+        }
+        this.turnPlayer = this.getOpponent();
+
+        this.board.getTileAt(lastMove[1]).setPiece(null);
+        this.board.getTileAt(lastMove[0]).setPiece(lastMove[2]);
+        lastMove[2].setTileID(lastMove[0]);
     }
 
     /**

@@ -108,5 +108,8 @@ export class MyInterface extends CGFinterface {
         if(keyCode === "KeyM"){
             this.scene.graph.currentMaterial++;
         }
+        if(keyCode === "KeyU"){
+            this.scene.gameManager.undo();
+        }
     }
 }
