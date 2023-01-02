@@ -206,22 +206,23 @@ export class GameManager {
      */
     getValidMovesKing(tileID){
         let possibleMoves = [tileID];
-        
-        const rowOffset = this.rowOffsets[this.turnPlayer];
 
-        // right
-        if (!this.board.tileInLastCol(tileID)) {
-            const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
-            if(rightMoves.length !== 0)
-                possibleMoves = possibleMoves.concat(rightMoves)
+        for(const rowOffset of this.rowOffsets){
+            // right
+            if (!this.board.tileInLastCol(tileID)) {
+                const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
+                if(rightMoves.length !== 0)
+                    possibleMoves = possibleMoves.concat(rightMoves)
+            }
+    
+            // left
+            if (!this.board.tileInFirstCol(tileID)) {
+                const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
+                if(leftMoves.length !== 0)
+                    possibleMoves = possibleMoves.concat(leftMoves)
+            }
         }
 
-        // left
-        if (!this.board.tileInFirstCol(tileID)) {
-            const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
-            if(leftMoves.length !== 0)
-                possibleMoves = possibleMoves.concat(leftMoves)
-        }
 
         return possibleMoves;
     }
