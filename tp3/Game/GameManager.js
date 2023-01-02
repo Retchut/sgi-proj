@@ -44,7 +44,7 @@ export class GameManager {
 
         // accessed through the turn player variable value
         this.rowOffsets = [ this.boardDimensions, -this.boardDimensions ];
-        
+
         this.initPieces(3);
 
         this.timer.setTimes(300, 300);
@@ -208,20 +208,16 @@ export class GameManager {
         // reset available captures
         this.availableCaptures = {};
 
-        // player 1 moves to a lower row, player 0 to an upper row
-        // const rowOffset = this.rowOffsets[this.turnPlayer];
-
-        // if any captures can be made, they're the only moves available
-        // const possibleCaptures = this.getKingCapturesFrom(tileID, rowOffset);
-        // console.log(possibleCaptures);
-        // if(possibleCaptures.length !== 0){
-        //     return [tileID, ...possibleCaptures];
-        // }
-
-
         let possibleMoves = [tileID];
+        let possibleCaptures = [tileID];
 
         for(const rowOffset of this.rowOffsets){
+            if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+                continue;
+
+            if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+                continue;
+
             // right
             if (!this.board.tileInLastCol(tileID)) {
                 const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
@@ -229,8 +225,14 @@ export class GameManager {
                     const lastMoveTile = rightMoves[rightMoves.length - 1];
                     const prevTile = (rightMoves.length === 1) ? tileID : rightMoves[rightMoves.length - 2];
                     const captures = this.getKingCaptures(lastMoveTile, prevTile, true);
-                    // possibleMoves = possibleMoves.concat(rightMoves)
+                    possibleMoves = possibleMoves.concat(rightMoves)
                     possibleMoves = possibleMoves.concat(captures)
+                    if(captures.length !== 0){
+                        possibleCaptures = possibleCaptures.concat(captures)
+                    }
+                    else{
+                        possibleMoves = possibleMoves.concat(rightMoves)
+                    }
                 }
             }
     
@@ -241,10 +243,18 @@ export class GameManager {
                     const lastMoveTile = leftMoves[leftMoves.length - 1];
                     const prevTile = (leftMoves.length === 1) ? tileID : leftMoves[leftMoves.length - 2];
                     const captures = this.getKingCaptures(lastMoveTile, prevTile, false);
-                    // possibleMoves = possibleMoves.concat(leftMoves)
-                    possibleMoves = possibleMoves.concat(captures)
+                    if(captures.length !== 0){
+                        possibleCaptures = possibleCaptures.concat(captures)
+                    }
+                    else{
+                        possibleMoves = possibleMoves.concat(leftMoves)
+                    }
                 }
             }
+        }
+
+        if(possibleCaptures.length !== 1){
+            possibleMoves = possibleCaptures;
         }
 
 
@@ -264,7 +274,6 @@ export class GameManager {
         const ignoreDiagonalOffset = prevTileID - tileID;
 
         for(const rowOffset of this.rowOffsets){
-            console.log("hi")
             if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
                 continue;
 
@@ -285,7 +294,6 @@ export class GameManager {
                                 }
                                 else{
                                     const diagonalMoves = this.getKingMovesToDiagonal(landingTile, rightDiagonalOffset);
-                                    console.log("right:", diagonalMoves)
                                     possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
                                 }
                             }
@@ -308,7 +316,6 @@ export class GameManager {
                                 }
                                 else{
                                     const diagonalMoves = this.getKingMovesToDiagonal(landingTile, leftDiagonalOffset);
-                                    console.log("left:", diagonalMoves)
                                     possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
                                 }
                             }
@@ -317,7 +324,7 @@ export class GameManager {
                 }
             }
         }
-
+        
         return possibleCaptures;
     }
     
