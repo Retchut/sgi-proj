@@ -11,6 +11,9 @@ export class MyScoreCard extends CGFobject {
 
         this.card = new MyDigitRectangle(this.scene, 0, 0, 2, 0, 3.2);
         this.cardAppearence = new CGFappearance(this.scene);
+        this.cardAppearence.setAmbient(0.5, 0.5, 0.5, 1.0);
+        this.cardAppearence.setDiffuse(0.8, 0.8, 0.8, 1.0);
+        this.cardAppearence.setSpecular(0.8, 0.8, 0.8, 1.0);
         this.cardAppearence.setTexture(new CGFtexture(this.scene, "scenes/images/spritesheet.png"));
     }
 
