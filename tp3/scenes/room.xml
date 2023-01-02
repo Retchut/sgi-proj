@@ -16,18 +16,18 @@
 
     <lights>
         <omni id="lightFront" enabled="1">
-            <location x="10" y="20" z="10" w="1.0" />
-            <ambient r="0" g="0" b="0" a="1.0" />
+            <location x="-2" y="14" z="-2" w="1.0" />
+            <ambient r="0.2" g="0.2" b="0.2" a="1.0" />
             <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
             <specular r="1.0" g="1.0" b="1.0" a="1.0" />
         </omni>
-        <spot id="spotlight" enabled="1" angle="60" exponent="0.5">
-            <location x="-3" y="2" z="0" w="1.0" />
-            <target x="0" y="0" z="0" w="1.0" />
-            <ambient r="0.2" g="0.2" b="0.2" a="1.0" />
-            <diffuse r="0.5" g="0.0" b="0.0" a="1.0" />
-            <specular r="0.5" g="0.0" b="0.0" a="1.0" />
-            <attenuation constant="1.0" linear="0.0" quadratic="0.0" />
+        <spot id="spotlight" enabled="1" angle="10" exponent="10">
+            <location x="-3" y="13" z="0" w="1.0" />
+            <target x="0" y="-1" z="0" w="1.0" />
+            <ambient r="0" g="0" b="0" a="1.0" />
+            <diffuse r="1" g="0.0" b="0.0" a="1.0" />
+            <specular r="1" g="0.0" b="0.0" a="1.0" />
+            <attenuation constant="0" linear="0" quadratic="1" />
         </spot>
     </lights>
 
@@ -58,13 +58,13 @@
             <rectangle x1="-0.5" y1="-0.5" x2="0.5" y2="0.5" />
         </primitive>
         <primitive id="floor">
-            <rectangle x1="-30" y1="-30" x2="30" y2="30" />
+            <rectangle x1="-50" y1="-30" x2="30" y2="30" />
         </primitive>
         <primitive id="wall">
-            <rectangle x1="-30" y1="0" x2="30" y2="20" />
+            <rectangle x1="-50" y1="0" x2="30" y2="30" />
         </primitive>
-        <primitive id="door">
-            <rectangle x1="-4" y1="0" x2="4" y2="19" />
+        <primitive id="wall2">
+            <rectangle x1="-30" y1="0" x2="30" y2="30" />
         </primitive>
         <primitive id="square">
             <rectangle x1="0" y1="0" x2="1" y2="1" />
@@ -107,9 +107,11 @@
                 <componentref id="floor" />
                 <componentref id="shelf" />
                 <componentref id="wall" />
+                <componentref id="wall2" />
                 <componentref id="door" />
                 <componentref id="frame" />
                 <componentref id="frame2" />
+                <componentref id="tableSet" />
                 <componentref id="table" />
                 <componentref id="chair" />
                 <componentref id="chair2" />
@@ -125,14 +127,27 @@
             <materials>
                 <material id="inherit" />
             </materials>
-            <texture id="wall" length_s="10" length_t="20" />
+            <texture id="wall" length_s="30" length_t="25" />
             <children>
                 <primitiveref id="wall" />
             </children>
         </component>
+        <component id="wall2">
+            <transformation>
+                <translate x="-50" y="0" z="0" />
+                <rotate axis="y" angle="90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="wall" length_s="30" length_t="25" />
+            <children>
+                <primitiveref id="wall2" />
+            </children>
+        </component>
         <component id="frame">
             <transformation>
-                <translate x="10" y="10" z="-29.99" />
+                <translate x="12" y="15" z="-29.99" />
                 <scale x="10" y="7.6" z="1" />
             </transformation>
             <materials>
@@ -145,7 +160,7 @@
         </component>
         <component id="frame2">
             <transformation>
-                <translate x="-20" y="10" z="-29.99" />
+                <translate x="-32" y="15" z="-29.99" />
                 <scale x="10" y="7.6" z="1" />
             </transformation>
             <materials>
@@ -159,13 +174,15 @@
         <component id="door">
             <transformation>
                 <translate x="0" y="0" z="-29.99" />
+                <scale x="11" y="25" z="1" />
+                <translate x="-0.5" y="0" z="0" />
             </transformation>
             <materials>
                 <material id="inherit" />
             </materials>
-            <texture id="door" length_s="19" length_t="8" />
+            <texture id="door" length_s="1" length_t="1" />
             <children>
-                <primitiveref id="door" />
+                <primitiveref id="square" />
             </children>
         </component>
         <component id="shelf">
@@ -178,7 +195,7 @@
             </materials>
             <texture id="shelf" length_s="10" length_t="20" />
             <children>
-                <primitiveref id="wall" />
+                <primitiveref id="wall2" />
             </children>
         </component>
         <component id="floor">
@@ -207,8 +224,9 @@
         </component>
         <component id="chair">
             <transformation>
+                <translate x="0" y="0" z="-10" />
                 <scale x="0.5" y="0.5" z="0.5" />
-                <translate x="0" y="11" z="-20" />
+                <translate x="0" y="11" z="0" />
             </transformation>
             <materials>
                 <material id="inherit" />
@@ -372,6 +390,76 @@
             <texture id="table" length_s="1" length_t="1" />
             <children>
                 <componentref id="cube" />
+            </children>
+        </component>
+        <component id="tableSet">
+            <transformation>
+                <translate x="-25" y="0" z="0" />
+                <rotate axis="y" angle="90" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="table2" />
+                <componentref id="table2chair1" />
+                <componentref id="table2chair2" />
+                <componentref id="table2chair3" />
+            </children>
+        </component>
+        <component id="table2">
+            <transformation>
+                <scale x="2" y="1" z="1" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="table" />
+            </children>
+        </component>
+        <component id="table2chair1">
+            <transformation>
+                <translate x="-4" y="0" z="-7" />
+                <scale x="0.5" y="0.5" z="0.5" />
+                <translate x="0" y="11" z="0" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="chairBack" />
+                <componentref id="chairSeat" />
+                <componentref id="chairLeg1" />
+                <componentref id="chairLeg2" />
+            </children>
+        </component>
+        <component id="table2chair3">
+            <transformation>
+                <rotate axis="y" angle="180" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="table2chair1" />
+                <componentref id="table2chair2" />
+            </children>
+        </component>
+        <component id="table2chair2">
+            <transformation>
+                <translate x="8" y="0" z="0" />
+            </transformation>
+            <materials>
+                <material id="inherit" />
+            </materials>
+            <texture id="none" />
+            <children>
+                <componentref id="table2chair1" />
             </children>
         </component>
         <component id="cube">
