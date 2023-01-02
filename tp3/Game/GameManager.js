@@ -343,10 +343,10 @@ export class GameManager {
                         const nextPiece = this.board.getTileAt(nextTile).getPiece();
                         if(nextPiece !== null){
                             if(nextPiece.getPlayer() === this.getOpponent()){
-                                const nextNextTile = nextTile + diagonalOffset;
-                                if(this.board.tileInsideBoard(nextNextTile)){
-                                    if(this.board.getTileAt(nextNextTile).getPiece() === null){
-                                        const captures = this.getKingCapturesToDiagonal(nextNextTile, nextTile, diagonalOffset);
+                                const landingTile = nextTile + diagonalOffset;
+                                if(this.board.tileInsideBoard(landingTile)){
+                                    if(this.board.getTileAt(landingTile).getPiece() === null){
+                                        const captures = this.getKingCapturesToDiagonal(landingTile, nextTile, diagonalOffset);
                                         if(captures.length !== 0){
                                             possibleCaptures = possibleCaptures.concat(captures)
                                         }
@@ -391,7 +391,7 @@ export class GameManager {
 
         if(this.board.tileInLastRow(tileID) && rowOffset > 0)
         return [];
-
+        
         if(this.board.tileInLastCol(tileID)){
             console.log("inside tileinlast col getkingcapturestodiagonal")
             possibleCaptures.push(tileID);
