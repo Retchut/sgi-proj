@@ -133,7 +133,12 @@ export class GameManager {
         this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
         this.scene.toggleSpotlight();
 
-        this.availableMoves = this.getValidMovesSingle(tileID);
+        if(tilePiece.isKing()){
+            this.availableMoves = this.getValidMovesKing(tileID);
+        }
+        else{
+            this.availableMoves = this.getValidMovesSingle(tileID);
+        }
         this.enableHighlighting();
     }
 
@@ -189,6 +194,55 @@ export class GameManager {
             this.disableHighlighting()
             this.turnPlayer = this.getOpponent(); // change turn player
         }
+    }
+
+    /**
+     * @method getValidMovesKing
+     * @param {Number} tileID id of the tile the moves are calculated from
+     * @returns The moves the player's king piece can make from the tile with ID tileID
+     */
+    getValidMovesKing(tileID){
+        let possibleMoves = [tileID];
+        
+        const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+
+        // right
+        if (!this.board.tileInLastCol(tileID)) {
+            const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
+            if(rightMoves.length !== 0)
+                possibleMoves = possibleMoves.concat(rightMoves)
+        }
+
+        // left
+        if (!this.board.tileInFirstCol(tileID)) {
+            const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
+            if(leftMoves.length !== 0)
+                possibleMoves = possibleMoves.concat(leftMoves)
+        }
+
+        return possibleMoves;
+    }
+    
+    /**
+     * @method getMovesToSideKing
+     * @param {Number} tileID id of the tile the moves are calculated from
+     * @param {Number} rowOffset - offset used to calculate the next row
+     * @param {boolean} right    - true if the moves calculated are to the right of the original piece, false otherwise
+     * @returns The moves the player's king piece can make from the tile with ID tileID to the diagonal to the specified side
+     */
+     getMovesToSideKing(tileID, rowOffset, right){
+        let possibleMoves = [];
+        const condition = right ? !this.board.tileInLastCol(tileID) : !this.board.tileInFirstCol(tileID);
+
+        if (condition) {
+            const sideMove = this.getMoveToSide(tileID, rowOffset, right);
+            if(sideMove !== 0){
+                possibleMoves.push(sideMove);
+                possibleMoves = possibleMoves.concat(this.getMovesToSideKing(sideMove, rowOffset, right));
+            }
+        }
+
+        return possibleMoves;
     }
 
     /**
