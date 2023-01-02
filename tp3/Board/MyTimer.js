@@ -31,7 +31,7 @@ export class MyTimer extends CGFobject {
 	*/
     createBody() {
         this.bodyAppearence = new CGFappearance(this.scene);
-        this.bodyAppearence.setAmbient(0.6, 0.2, 0.2, 1.0);
+        this.bodyAppearence.setAmbient(0.05, 0.05, 0.05, 1.0);
         this.bodyAppearence.setDiffuse(0.3, 0.1, 0.1, 1.0);
 
         this.faceRectangle = new MyRectangle(this.scene, 0, 0, 13, 0, 4);

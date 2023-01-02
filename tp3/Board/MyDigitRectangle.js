@@ -16,7 +16,7 @@ export class MyDigitRectangle extends MyRectangle {
 	}
 
 	/**
-	* @method setDigit sets the texture coordinated for a certain digit in the spritesheet
+	* @method setDigit sets the texture coordinates for a certain digit in the spritesheet
 	* @param {Number} digit the digit to be set
 	*/
 	setDigit(digit) {
