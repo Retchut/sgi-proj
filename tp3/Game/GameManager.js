@@ -295,18 +295,18 @@ export class GameManager {
             // right
             if (!this.board.tileInLastCol(tileID)) {
                 const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
+                const diagonalOffset = rowOffset + 1;
                 if(rightMoves.length !== 0){
                     const lastMoveTile = rightMoves[rightMoves.length - 1];
-                    const diagonalOffset = rowOffset + 1;
                     const nextTile = lastMoveTile + diagonalOffset;
                     if(this.board.tileInsideBoard(nextTile) && !this.board.tileInLastCol(nextTile)){
                         const nextPiece = this.board.getTileAt(nextTile).getPiece();
                         if(nextPiece !== null){
                             if(nextPiece.getPlayer() === this.getOpponent()){
-                                const nextNextTile = nextTile + diagonalOffset;
-                                if(this.board.tileInsideBoard(nextNextTile)){
-                                    if(this.board.getTileAt(nextNextTile).getPiece() === null){
-                                        const captures = this.getKingCapturesToSide(nextNextTile, nextTile, true);
+                                const landingTile = nextTile + diagonalOffset;
+                                if(this.board.tileInsideBoard(landingTile)){
+                                    if(this.board.getTileAt(landingTile).getPiece() === null){
+                                        const captures = this.getKingCapturesToDiagonal(landingTile, nextTile, diagonalOffset);
                                         if(captures.length !== 0){
                                             possibleCaptures = possibleCaptures.concat(captures)
                                         }
@@ -318,9 +318,16 @@ export class GameManager {
                 }
                 else{
                     // capture from self
-                    const captures = this.getKingCapturesToSide(tileID, tileID, true);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    if(!this.board.tileInLastCol(tileID)){
+                        const blockingTile = tileID + diagonalOffset;
+                        const blockingPiece = this.board.getTileAt(blockingTile).getPiece();
+                        if(!this.board.tileInLastCol(blockingTile) && (blockingPiece.getPlayer() === this.getOpponent())){
+                            const landingTile = blockingTile + diagonalOffset;
+                            const captures = this.getKingCapturesToDiagonal(landingTile, blockingTile, diagonalOffset);
+                            if(captures.length !== 0){
+                                possibleCaptures = possibleCaptures.concat(captures)
+                            }
+                        }
                     }
                 }
             }
@@ -328,9 +335,9 @@ export class GameManager {
             // left
             if (!this.board.tileInFirstCol(tileID)) {
                 const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
+                const diagonalOffset = rowOffset - 1;
                 if(leftMoves.length !== 0){
                     const lastMoveTile = leftMoves[leftMoves.length - 1];
-                    const diagonalOffset = rowOffset - 1;
                     const nextTile = lastMoveTile + diagonalOffset;
                     if(this.board.tileInsideBoard(nextTile) && !this.board.tileInFirstCol(nextTile)){
                         const nextPiece = this.board.getTileAt(nextTile).getPiece();
@@ -339,7 +346,7 @@ export class GameManager {
                                 const nextNextTile = nextTile + diagonalOffset;
                                 if(this.board.tileInsideBoard(nextNextTile)){
                                     if(this.board.getTileAt(nextNextTile).getPiece() === null){
-                                        const captures = this.getKingCapturesToSide(nextNextTile, nextTile, false);
+                                        const captures = this.getKingCapturesToDiagonal(nextNextTile, nextTile, diagonalOffset);
                                         if(captures.length !== 0){
                                             possibleCaptures = possibleCaptures.concat(captures)
                                         }
@@ -351,67 +358,42 @@ export class GameManager {
                 }
                 else{
                     // capture from self
-                    const captures = this.getKingCapturesToSide(tileID, tileID, false);
+                    const captures = this.getKingCapturesToDiagonal(tileID, tileID, diagonalOffset);
                     if(captures.length !== 0){
                         possibleCaptures = possibleCaptures.concat(captures)
                     }
                 }
             }
         }
-
+        
         return possibleCaptures;
     }
 
     /**
-     * @method getKingCapturesToSide
-     * @param {Number} tileID     - id of the tile the moves are calculated from
-     * @param {Number} prevTileID - id of the previous tile, used to calculate the direction we're ignoring
-     * @param {boolean} right     - indicates if captures start at the right or left
+     * @method getKingCapturesToDiagonal
+     * @param {Number} tileID     - id of the tile the capture moves are calculated from
+     * @param {Number} prevTileID - id of the previous tile in the diagonal
+     * @param {diagonalOffset}    - offset used to calculate the next tile diagonally
      * @returns The captures the player's king piece can make from the tile with ID tileID, not passing through tileID
      */
-    getKingCapturesToSide(tileID, prevTileID, right){
+    getKingCapturesToDiagonal(tileID, prevTileID, diagonalOffset){
         let possibleCaptures = []
 
-        const ignoreDiagonalOffset = prevTileID - tileID;
-        console.log(prevTileID, tileID);
+        if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+            return [];
 
-        for(const rowOffset of this.rowOffsets){
-            if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
-                continue;
+        if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+        return [];
 
-            if(this.board.tileInLastRow(tileID) && rowOffset > 0)
-                continue;
-
-            const rightDiagonalOffset = rowOffset  + 1;
-            if(rightDiagonalOffset !== ignoreDiagonalOffset && right){
-                if(this.board.tileInLastCol(tileID)){
-                    possibleCaptures.push(tileID);
-                    this.applyCapture(tileID, [prevTileID])
-                }
-                else{
-                    const diagonalMoves = this.getKingMovesToDiagonal(tileID, rightDiagonalOffset);
-                    console.log("right:",diagonalMoves)
-                    possibleCaptures = possibleCaptures.concat([tileID, ...diagonalMoves])
-                    for(const captureMove of possibleCaptures){
-                        this.applyCapture(captureMove, [prevTileID])
-                    }
-                }
-            }
-
-            const leftDiagonalOffset = rowOffset - 1;
-            if(leftDiagonalOffset !== ignoreDiagonalOffset && !right){
-                if(this.board.tileInFirstCol(tileID)){
-                    possibleCaptures.push(tileID);
-                    this.applyCapture(tileID, [prevTileID])
-                }
-                else{
-                    const diagonalMoves = this.getKingMovesToDiagonal(tileID, leftDiagonalOffset);
-                    console.log("right:",diagonalMoves)
-                    possibleCaptures = possibleCaptures.concat([tileID, ...diagonalMoves])
-                    for(const captureMove of possibleCaptures){
-                        this.applyCapture(captureMove, [prevTileID])
-                    }
-                }
+        if(this.board.tileInLastCol(tileID)){
+            possibleCaptures.push(tileID);
+            this.applyCapture(tileID, [prevTileID])
+        }
+        else{
+            const diagonalMoves = this.getKingMovesToDiagonal(tileID, diagonalOffset);
+            possibleCaptures = possibleCaptures.concat([tileID, ...diagonalMoves])
+            for(const captureMove of possibleCaptures){
+                this.applyCapture(captureMove, [prevTileID])
             }
         }
         
