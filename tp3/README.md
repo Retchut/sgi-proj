@@ -20,13 +20,13 @@
 - Some basic shading performed for the highlighting of objects in the scene
 - Use of multiple textures in order to better simulate an environment
 
-- Room Scene
+### Room Scene
   - Board and auxiliary board
   - Captures counter
   - Time clock
   - Textured tables
   - Textured paintings
-  
+
 ----
 ## Issues/Problems
 
