@@ -178,9 +178,8 @@ export class GameManager {
 
         // more captures can be made from this position
         const rowOffset = this.rowOffsets[this.turnPlayer];
-        // const movingPiece = this.board.getTileAt(this.selectedTileID).getPiece();
-        // const newCaptures = (movingPiece.isKing()) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
-        const newCaptures = this.getCapturesFrom(tileID, rowOffset)
+        const movingPiece = this.board.getTileAt(tileID).getPiece();
+        const newCaptures = (movingPiece.isKing()) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
         if(capture && newCaptures.length !== 0){
             this.capturingMultiples = true;
             // disable highlighting on previously highlighted pieces
@@ -190,7 +189,7 @@ export class GameManager {
             const tileCenter = this.board.getTileAt(this.selectedTileID).getCenterPos();
             this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
 
-            this.availableMoves = this.getValidMovesSingle(tileID);
+            this.availableMoves = (movingPiece.isKing()) ? this.getValidMovesKing(tileID) : this.getValidMovesSingle(tileID);
             this.enableHighlighting();
         }
         else{
@@ -251,6 +250,7 @@ export class GameManager {
      * @returns The capture moves the player's king piece can make from the tile with ID tileID
      */
     getKingCaptures(tileID){
+        console.log(tileID);
         let possibleCaptures = [];
         let singleCaptures = [];
 
@@ -294,7 +294,7 @@ export class GameManager {
                 }
             }
         }
-
+        console.log(possibleCaptures);
         if(singleCaptures.length !== 0){
             possibleCaptures = possibleCaptures.concat(singleCaptures);
         }
