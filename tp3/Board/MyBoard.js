@@ -1,7 +1,7 @@
 import { CGFappearance, CGFobject } from '../../lib/CGF.js';
-import { MyRectangle } from '../Primitives/MyRectangle.js';
 import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
+import { MyTray } from './MyTray.js';
 
 export class MyBoard extends CGFobject {
     /**
@@ -77,14 +77,15 @@ export class MyBoard extends CGFobject {
             this.tiles.push(rowList);
         }
 
-        this.tray = new MyRectangle(this.scene, 0, -2 * this.tileLen, 2 * this.tileLen, -this.size * 0.6 - this.tileLen, -this.size * 0.6);
+        this.playerWTrayTransformation = mat4.create();
+        mat4.translate(this.playerWTrayTransformation, this.playerWTrayTransformation, [0, -this.size * 0.6, 0]);
 
-        this.trayAppearence = new CGFappearance(this.scene);
-        this.trayAppearence.setAmbient(0.05, 0.05, 0.05, 1.0);
-        this.trayAppearence.setDiffuse(0.3, 0.1, 0.1, 1.0);
+        this.playerBTrayTransformation = mat4.create();
+        mat4.translate(this.playerBTrayTransformation, this.playerBTrayTransformation, [0, this.size * 0.6, 0]);
+        mat4.rotate(this.playerBTrayTransformation, this.playerBTrayTransformation, Math.PI, [0, 0, 1]);
 
-        this.trayTransformation = mat4.create();
-        mat4.rotate(this.trayTransformation, this.trayTransformation, Math.PI, [0, 0, 1]);
+        this.playerWTray = new MyTray(this.scene, this.tileLen);
+        this.playerBTray = new MyTray(this.scene, this.tileLen);
     }
 
     /**
@@ -137,16 +138,16 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the first row of the board, false otherwise
      */
-    tileInFirstRow(tileID){
+    tileInFirstRow(tileID) {
         return Math.floor((tileID - 1) / this.boardDimensions) === 0;
     }
-    
+
     /**
      * @method tileInLastRow
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the last row of the board, false otherwise
      */
-    tileInLastRow(tileID){
+    tileInLastRow(tileID) {
         return Math.floor((tileID - 1) / this.boardDimensions) === (this.boardDimensions - 1);
     }
 
@@ -155,7 +156,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the last or first row of the board, false otherwise
      */
-    tileInEdgeRows(tileID){
+    tileInEdgeRows(tileID) {
         return this.tileInFirstRow(tileID) || this.tileInLastRow(tileID);
     }
 
@@ -173,7 +174,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the second column of the board, false otherwise
      */
-    tileInSecondCol(tileID){
+    tileInSecondCol(tileID) {
         return (tileID % this.boardDimensions) === 2;
     }
 
@@ -191,7 +192,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the penultimate column of the board, false otherwise
      */
-    tileInPenultimateCol(tileID){
+    tileInPenultimateCol(tileID) {
         return (tileID % this.boardDimensions) === (this.boardDimensions - 1);
     }
 
@@ -217,7 +218,7 @@ export class MyBoard extends CGFobject {
      * @method disableHighlight Disables the highlighting on the tile at tile with tileID
      * @param {Number} - id of the tile
      */
-    disableHighlight(tileID){
+    disableHighlight(tileID) {
         this.getTileAt(tileID).disableHighlight();
     }
 
@@ -225,7 +226,7 @@ export class MyBoard extends CGFobject {
      * @method enableHighlight Enables the highlighting on the tile at tile with tileID
      * @param {Number} - id of the tile
      */
-    enableHighlight(tileID){
+    enableHighlight(tileID) {
         this.getTileAt(tileID).enableHighlight();
     }
 
@@ -272,12 +273,18 @@ export class MyBoard extends CGFobject {
                 }
             }
         }
-        this.trayAppearence.apply();
-        this.tray.display()
+        this.appearanceB.apply();
         this.scene.pushMatrix();
-        this.scene.multMatrix(this.trayTransformation);
-        this.tray.display();
+        this.scene.multMatrix(this.playerWTrayTransformation);
+        this.playerWTray.display();
         this.scene.popMatrix();
+
+        this.appearanceW.apply();
+        this.scene.pushMatrix();
+        this.scene.multMatrix(this.playerBTrayTransformation);
+        this.playerBTray.display();
+        this.scene.popMatrix();
+
         this.scene.popMatrix();
     }
 

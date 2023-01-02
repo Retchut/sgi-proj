@@ -699,10 +699,12 @@ export class GameManager {
             // player 1's turn
             if (this.turnPlayer) {
                 this.player1Pit.push(piece);
+                this.board.playerBTray.setPieces(this.player1Pit);
             }
             // player 0's turn
             else {
                 this.player0Pit.push(piece);
+                this.board.playerWTray.setPieces(this.player0Pit);
             }
 
             // remove tile from piece
