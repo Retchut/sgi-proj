@@ -691,7 +691,7 @@ export class GameManager {
             this.capture(capturedPieces);
         }
 
-        this.gameStack.push(oldTile.getID(), newTile.getID(), oldPiece, capturedPieces);
+        this.gameStack.push(oldTile.getID(), newTile.getID(), oldPiece, capturedPieces, this.player0RemainingTime, this.player1RemainingTime);
 
         // if the tile moved to the edge rows and wasn't promoted yet
         if (this.board.tileInEdgeRows(newTile.getID()) && !piece.isKing()) {
@@ -766,16 +766,21 @@ export class GameManager {
 
         this.inCameraAnimation = true;
         if (this.turnPlayer == 0) {
-            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerBCamera, 1000);
+            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerBCamera, 700);
         }
         else {
-            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerWCamera, 1000);
+            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerWCamera, 700);
         }
         this.turnPlayer = this.getOpponent();
 
         this.board.getTileAt(lastMove[1]).setPiece(null);
         this.board.getTileAt(lastMove[0]).setPiece(lastMove[2]);
         lastMove[2].setTileID(lastMove[0]);
+
+        this.player0RemainingTime = lastMove[4];
+        this.player1RemainingTime = lastMove[5];
+
+        this.scoreKeeper.setScores(this.player0Pit.length, this.player1Pit.length);
     }
 
     /**

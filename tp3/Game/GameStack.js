@@ -10,8 +10,8 @@
         return this.moves;
     }
 
-    push(from, to, piece, capturedPieces){
-        this.moves.push([from, to, piece, capturedPieces]);
+    push(from, to, piece, capturedPieces, playerWTime, playerBTime){
+        this.moves.push([from, to, piece, capturedPieces, playerWTime, playerBTime]);
     }
 
     pop(){
