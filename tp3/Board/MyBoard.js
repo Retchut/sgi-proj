@@ -15,6 +15,7 @@ export class MyBoard extends CGFobject {
         super(scene);
         this.tiles = [];
 
+        this.position = position;
         this.boardTransformation = mat4.create();
         mat4.translate(this.boardTransformation, this.boardTransformation, [0, position[1], 0]);
         mat4.rotate(this.boardTransformation, this.boardTransformation, -Math.PI / 2, [1, 0, 0]);
@@ -23,7 +24,7 @@ export class MyBoard extends CGFobject {
         console.warn("TODO: rename colorA in xml and scene to colorW, to make it consistent with the remainder of the code -- IF THE SPECIFICATION ALLOWS")
         let vecW = vec3.fromValues(...colorA);
         let vecAmbientW = vec3.create(), vecDiffuseW = vec3.create(), vecSpecularW = vec3.create();
-        vec3.scale(vecAmbientW, vecW, 1);
+        vec3.scale(vecAmbientW, vecW, 0.2);
         vec3.scale(vecDiffuseW, vecW, 0.6);
         vec3.add(vecDiffuseW, vecDiffuseW, vec3.fromValues(0.3, 0.3, 0.3));
         vec3.scale(vecSpecularW, vecW, 0.3);
@@ -36,7 +37,7 @@ export class MyBoard extends CGFobject {
 
         let vecB = vec3.fromValues(...colorB);
         let vecAmbientB = vec3.create(), vecDiffuseB = vec3.create(), vecSpecularB = vec3.create();
-        vec3.scale(vecAmbientB, vecB, 1);
+        vec3.scale(vecAmbientB, vecB, 0.2);
         vec3.scale(vecDiffuseB, vecB, 0.6);
         vec3.add(vecDiffuseB, vecDiffuseB, vec3.fromValues(0.3, 0.3, 0.3));
         vec3.scale(vecSpecularB, vecB, 0.3);
@@ -113,7 +114,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns the MyTile object at tileID on the board
      */
-    getTileAt(tileID){
+    getTileAt(tileID) {
         // tile IDs are between [1, boardDimensions^2], array indices are between [0, boardDimensions - 1]
         const index = tileID - 1;
         const tileRow = Math.floor(index / this.boardDimensions);
@@ -126,7 +127,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the first column of the board, false otherwise
      */
-    tileInFirstCol(tileID){
+    tileInFirstCol(tileID) {
         return (tileID % this.boardDimensions) === 1;
     }
 
@@ -135,7 +136,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the last column of the board, false otherwise
      */
-    tileInLastCol(tileID){
+    tileInLastCol(tileID) {
         return (tileID % this.boardDimensions) === 0;
     }
 
@@ -144,7 +145,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the last or first column of the board, false otherwise
      */
-    tileInEdgeCols(tileID){
+    tileInEdgeCols(tileID) {
         return this.tileInFirstCol(tileID) || this.tileInLastCol(tileID);
     }
 
@@ -153,7 +154,7 @@ export class MyBoard extends CGFobject {
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is inside the bounds of the board, false otherwise
      */
-    tileInsideBoard(tileID){
+    tileInsideBoard(tileID) {
         return tileID >= 1 && tileID <= Math.pow(this.boardDimensions, 2)
     }
 
@@ -161,7 +162,7 @@ export class MyBoard extends CGFobject {
      * @method toggleHighlight Toggles the highlighting on the tile at tile with tileID
      * @param {Number} - id of the tile
      */
-    toggleHighlight(tileID){
+    toggleHighlight(tileID) {
         this.getTileAt(tileID).toggleHighlight();
     }
 
@@ -170,8 +171,8 @@ export class MyBoard extends CGFobject {
      * @param {Array}  tileIDs        - IDs of the tiles with active shaders
      * @param {Number} currTimeFactor - new value for the shader's timefactor
      */
-    updateShaders(tileIDs, currTimeFactor){
-        for(const tileID of tileIDs){
+    updateShaders(tileIDs, currTimeFactor) {
+        for (const tileID of tileIDs) {
             this.getTileAt(tileID).updateShader(currTimeFactor);
         }
     }
@@ -186,8 +187,13 @@ export class MyBoard extends CGFobject {
         for (let row = 0; row < this.boardDimensions; row++) {
             for (let col = 0; col < this.boardDimensions; col++) {
                 // bottom right corner for both players must be white or the otherwise provided colorA
-                if ((row + col) % 2 == 0) this.appearanceB.apply();
-                else this.appearanceW.apply();
+                let appearance;
+                if ((row + col) % 2 == 0) appearance = this.appearanceB;
+                else appearance = this.appearanceW;
+                appearance.apply();
+                // this.tiles[row][col].tileShader.setUniformsValues({
+                //     matColor: appearance.diffuse,
+                // });
                 this.tiles[row][col].display();
 
                 if ((row + col) % 2 == 0) {

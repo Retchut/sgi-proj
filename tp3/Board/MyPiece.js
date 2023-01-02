@@ -21,7 +21,7 @@ export class MyPiece extends CGFobject {
         this.appearance = appearance;
 
         this.side = new MyCylinder(this.scene, 0, 0.5, 0.5, 0.2, 50, 1);
-        this.base = new MyCylinder(this.scene, 0, 0.5, 0, 0, 50, 2);
+        this.base = new MyCylinder(this.scene, 0, 0.5, 0, 0.01, 50, 10);
         this.topTransformation = mat4.create();
         mat4.translate(this.topTransformation, this.topTransformation, [0, 0, 0.2]);
         this.bottomTransformation = mat4.create();
