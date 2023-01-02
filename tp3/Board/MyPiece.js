@@ -19,7 +19,7 @@ export class MyPiece extends CGFobject {
 
         this.player = player;
         this.appearance = appearance;
-        this.king = false;
+        this.king = true;
 
         const pieceHeight = 0.2;
         this.side = new MyCylinder(this.scene, 0, 0.5, 0.5, pieceHeight, 50, 1);
