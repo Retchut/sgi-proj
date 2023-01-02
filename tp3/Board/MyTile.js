@@ -1,4 +1,4 @@
-import { CGFobject, CGFshader } from "../../lib/CGF.js";
+import { CGFobject, CGFshader, CGFtexture } from "../../lib/CGF.js";
 import { XMLscene } from "../Scene/XMLscene.js";
 import { MyRectangle } from "../Primitives/MyRectangle.js";
 import { MyPiece } from "./MyPiece.js";
@@ -19,12 +19,15 @@ export class MyTile extends CGFobject {
         this.tile = new MyRectangle(this.scene, id, x1, x2, y1, y2);
 
         this.displayShader = false;
-        this.tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlight.frag');
+        this.distortionMap = new CGFtexture(this.scene, 'scenes/images/highlight.png');
+        this.tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightTile.frag');
         this.tileShader.setUniformsValues({
-            shaderTimeFactor: 0,
-            shaderScaleFactor: 1,
-            factors: vec3.create(),
-            matColor: vec4.create()
+            shaderTimeFactor: 0
+        });
+
+        this.pieceShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightPiece.frag');
+        this.tileShader.setUniformsValues({
+            shaderTimeFactor: 0
         });
 
         const tileLen = x2 - x1;
@@ -108,6 +111,7 @@ export class MyTile extends CGFobject {
      */
     updateShader(currTimeFactor) {
         this.tileShader.setUniformsValues({ shaderTimeFactor: currTimeFactor });
+        this.pieceShader.setUniformsValues({ shaderTimeFactor: currTimeFactor });
     }
 
     /**
@@ -121,6 +125,11 @@ export class MyTile extends CGFobject {
             this.scene.setActiveShader(this.tileShader);
 
         this.tile.display();
+
+        if (this.displayShader){
+            this.scene.setActiveShader(this.pieceShader);
+            this.distortionMap.bind(1);
+        }
 
         // display piece if this tile currently contains one
         if (this.piece !== null) {

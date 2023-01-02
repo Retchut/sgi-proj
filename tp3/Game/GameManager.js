@@ -31,7 +31,7 @@ export class GameManager {
         this.timer = timer;
         this.scoreKeeper = scoreKeeper;
         this.scene.toggleSpotlight(); // disable spotlight at the beginning of the game (it's enabled by default)
-        this.spotlightHeight = 1;
+        this.spotlightHeight = 0.1;
         this.boardDimensions = this.board.getBoardDimensions();
         this.state = stateEnum.selectPiece;
         this.inCameraAnimation = false;
