@@ -1,6 +1,8 @@
 import { CGFappearance } from "../../lib/CGF.js";
 import { MyBoard } from "../Board/MyBoard.js";
+import { MyTile } from "../Board/MyTile.js";
 import { MyPiece } from "../Board/MyPiece.js";
+import { removeItemFromArray } from "../Utils/ArrayUtils.js";
 
 const stateEnum = {
     "selectPiece" : 0,
@@ -92,7 +94,7 @@ export class GameManager {
      * @param {CGFappearance} appearance - appearance of the piece
      */
     initPiece(tile, player, appearance){
-        var newPiece = new MyPiece(this.scene, this.boardDimensions, player, appearance);
+        var newPiece = new MyPiece(this.scene, tile.getID(), this.boardDimensions, player, appearance);
         this.piecesInPlay.push(newPiece);
         tile.setPiece(newPiece);
     }
@@ -126,7 +128,7 @@ export class GameManager {
     }
 
     /**
-     * @method selectTile selects a tile to start a move from
+     * @method selectTile selects a tile to start a move froms
      * @param {Number} tileID the id of the tile selected
      */
     selectTile(tileID){
@@ -143,6 +145,12 @@ export class GameManager {
             return;
         }
 
+        const selectableTiles = this.getSelectableTiles();
+        if(!selectableTiles.includes(tileID)){
+            console.log("Since one is available, you must perform a capture move this round.")
+            return;
+        }
+
         this.selectedTileID = tileID;
         this.state = stateEnum.selectMove;
         const tileCenter = tileObj.getCenterPos();
@@ -156,6 +164,30 @@ export class GameManager {
             this.availableMoves = this.getValidMovesSingle(tileID);
         }
         this.enableHighlighting();
+    }
+
+    /**
+     * @method getSelectableTiles calculates the possible selections for pieces in the board
+     */
+    getSelectableTiles(){
+        const moveSelections = [];
+        const captureSelections = [];
+        for(const piece of this.piecesInPlay){
+            if(piece.getPlayer() !== this.turnPlayer)
+                continue;
+
+            const pieceTileID = piece.getTileID();
+            const rowOffset = this.rowOffsets[this.turnPlayer];
+            const availableCaptures = piece.isKing() ? this.getKingCaptures(pieceTileID) : this.getCapturesFrom(pieceTileID, rowOffset);
+            
+            // if captures are available, we make note of it
+            if(availableCaptures.length !== 0)
+                captureSelections.push(pieceTileID);
+
+            moveSelections.push(pieceTileID);
+        }
+
+        return (captureSelections.length !== 0) ? captureSelections : moveSelections;
     }
 
     /**
@@ -278,19 +310,39 @@ export class GameManager {
             // right
             if (!this.board.tileInLastCol(tileID)) {
                 const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
+                const diagonalOffset = rowOffset + 1;
                 if(rightMoves.length !== 0){
                     const lastMoveTile = rightMoves[rightMoves.length - 1];
-                    const prevTile = (rightMoves.length === 1) ? tileID : rightMoves[rightMoves.length - 2];
-                    const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, true);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    const nextTile = lastMoveTile + diagonalOffset;
+                    if(this.board.tileInsideBoard(nextTile) && !this.board.tileInLastCol(nextTile)){
+                        const nextPiece = this.board.getTileAt(nextTile).getPiece();
+                        if(nextPiece !== null){
+                            if(nextPiece.getPlayer() === this.getOpponent()){
+                                const landingTile = nextTile + diagonalOffset;
+                                if(this.board.tileInsideBoard(landingTile)){
+                                    if(this.board.getTileAt(landingTile).getPiece() === null){
+                                        const captures = this.getKingCapturesToDiagonal(landingTile, nextTile, diagonalOffset);
+                                        if(captures.length !== 0){
+                                            possibleCaptures = possibleCaptures.concat(captures)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 else{
                     // capture from self
-                    const captures = this.getKingCapturesToSide(tileID, tileID, true);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    if(!this.board.tileInLastCol(tileID)){
+                        const blockingTile = tileID + diagonalOffset;
+                        const blockingPiece = this.board.getTileAt(blockingTile).getPiece();
+                        if(!this.board.tileInLastCol(blockingTile) && (blockingPiece.getPlayer() === this.getOpponent())){
+                            const landingTile = blockingTile + diagonalOffset;
+                            const captures = this.getKingCapturesToDiagonal(landingTile, blockingTile, diagonalOffset);
+                            if(captures.length !== 0){
+                                possibleCaptures = possibleCaptures.concat(captures)
+                            }
+                        }
                     }
                 }
             }
@@ -298,96 +350,72 @@ export class GameManager {
             // left
             if (!this.board.tileInFirstCol(tileID)) {
                 const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
+                const diagonalOffset = rowOffset - 1;
                 if(leftMoves.length !== 0){
                     const lastMoveTile = leftMoves[leftMoves.length - 1];
-                    const prevTile = (leftMoves.length === 1) ? tileID : leftMoves[leftMoves.length - 2];
-                    const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, false);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    const nextTile = lastMoveTile + diagonalOffset;
+                    if(this.board.tileInsideBoard(nextTile) && !this.board.tileInFirstCol(nextTile)){
+                        const nextPiece = this.board.getTileAt(nextTile).getPiece();
+                        if(nextPiece !== null){
+                            if(nextPiece.getPlayer() === this.getOpponent()){
+                                const landingTile = nextTile + diagonalOffset;
+                                if(this.board.tileInsideBoard(landingTile)){
+                                    if(this.board.getTileAt(landingTile).getPiece() === null){
+                                        const captures = this.getKingCapturesToDiagonal(landingTile, nextTile, diagonalOffset);
+                                        if(captures.length !== 0){
+                                            possibleCaptures = possibleCaptures.concat(captures)
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 else{
                     // capture from self
-                    const captures = this.getKingCapturesToSide(tileID, tileID, false);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    if(!this.board.tileInFirstCol(tileID)){
+                        const blockingTile = tileID + diagonalOffset;
+                        const blockingPiece = this.board.getTileAt(blockingTile).getPiece();
+                        if(!this.board.tileInFirstCol(blockingTile) && (blockingPiece.getPlayer() === this.getOpponent())){
+                            const landingTile = blockingTile + diagonalOffset;
+                            const captures = this.getKingCapturesToDiagonal(landingTile, blockingTile, diagonalOffset);
+                            if(captures.length !== 0){
+                                possibleCaptures = possibleCaptures.concat(captures)
+                            }
+                        }
                     }
                 }
             }
         }
-
+        
         return possibleCaptures;
     }
 
     /**
-     * @method getKingCapturesToSide
-     * @param {Number} tileID     - id of the tile the moves are calculated from
-     * @param {Number} prevTileID - id of the previous tile, used to calculate the direction we're ignoring
-     * @param {boolean} right     - indicates if captures start at the right or left
+     * @method getKingCapturesToDiagonal
+     * @param {Number} tileID     - id of the tile the capture moves are calculated from
+     * @param {Number} prevTileID - id of the previous tile in the diagonal
+     * @param {diagonalOffset}    - offset used to calculate the next tile diagonally
      * @returns The captures the player's king piece can make from the tile with ID tileID, not passing through tileID
      */
-    getKingCapturesToSide(tileID, prevTileID, right){
+    getKingCapturesToDiagonal(tileID, prevTileID, diagonalOffset){
         let possibleCaptures = []
 
-        const ignoreDiagonalOffset = prevTileID - tileID;
+        if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+            return [];
 
-        for(const rowOffset of this.rowOffsets){
-            if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
-                continue;
-
-            if(this.board.tileInLastRow(tileID) && rowOffset > 0)
-                continue;
-
-            const rightDiagonalOffset = rowOffset  + 1;
-            if(rightDiagonalOffset !== ignoreDiagonalOffset && right){
-                if (!this.board.tileInLastCol(tileID)) {
-                    const diagonalTile = tileID + rightDiagonalOffset;
-                    if(!this.board.tileInLastCol(diagonalTile) && ! this.board.tileInEdgeRows(diagonalTile)){
-                        const diagonalPiece = this.board.getTileAt(diagonalTile).getPiece();
-                        if(diagonalPiece !== null && diagonalPiece.getPlayer() === this.getOpponent()){
-                            const landingTile = diagonalTile + rightDiagonalOffset;
-                            if(this.board.getTileAt(landingTile).getPiece() === null){
-                                if(this.board.tileInEdgeCols(landingTile)){
-                                    possibleCaptures.push(landingTile);
-                                    this.applyCapture(landingTile, [diagonalTile])
-                                }
-                                else{
-                                    const diagonalMoves = this.getKingMovesToDiagonal(landingTile, rightDiagonalOffset);
-                                    possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
-                                    for(const captureMove of possibleCaptures){
-                                        this.applyCapture(captureMove, [diagonalTile])
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            const leftDiagonalOffset = rowOffset - 1;
-            if(leftDiagonalOffset !== ignoreDiagonalOffset && !right){
-                if (!this.board.tileInFirstCol(tileID)) {
-                    const diagonalTile = tileID + leftDiagonalOffset;
-                    if(!this.board.tileInFirstCol(diagonalTile) && ! this.board.tileInEdgeRows(diagonalTile)){
-                        const diagonalPiece = this.board.getTileAt(diagonalTile).getPiece();
-                        if(diagonalPiece !== null && diagonalPiece.getPlayer() === this.getOpponent()){
-                            const landingTile = diagonalTile + leftDiagonalOffset;
-                            if(this.board.getTileAt(landingTile).getPiece() === null){
-                                if(this.board.tileInEdgeCols(landingTile)){
-                                    possibleCaptures.push(landingTile);
-                                    this.applyCapture(landingTile, [diagonalTile])
-                                }
-                                else{
-                                    const diagonalMoves = this.getKingMovesToDiagonal(landingTile, leftDiagonalOffset);
-                                    possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
-                                    for(const captureMove of possibleCaptures){
-                                        this.applyCapture(captureMove, [diagonalTile])
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+        return [];
+        
+        if(this.board.tileInEdgeCols(tileID)){
+            possibleCaptures.push(tileID);
+            this.applyCapture(tileID, [prevTileID])
+        }
+        else{
+            const diagonalMoves = this.getKingMovesToDiagonal(tileID, diagonalOffset);
+            possibleCaptures = possibleCaptures.concat([tileID, ...diagonalMoves])
+            for(const captureMove of possibleCaptures){
+                this.applyCapture(captureMove, [prevTileID])
             }
         }
         
@@ -612,6 +640,7 @@ export class GameManager {
 
         oldTile.setPiece(null);
         newTile.setPiece(piece);
+        piece.setTileID(newTile.getID());
 
         if (capture)
             this.capture(this.availableCaptures[newTile.getID()]);
@@ -631,18 +660,25 @@ export class GameManager {
     capture(tileIDs) {
         for(const tileID of tileIDs){
             const tile = this.board.getTileAt(tileID);
+            const piece = tile.getPiece();
     
             // player 1's turn
             if (this.turnPlayer) {
-                this.player1Pit.push(tile.getPiece());
+                this.player1Pit.push(piece);
             }
             // player 0's turn
             else {
-                this.player0Pit.push(tile.getPiece());
+                this.player0Pit.push(piece);
             }
+
+            // remove tile from piece
+            piece.setTileID(0);
     
             // remove piece from tile
             tile.setPiece(null);
+
+            // remove piece from board
+            this.piecesInPlay = removeItemFromArray(this.piecesInPlay, piece)
         }
     }
 
