@@ -17,7 +17,7 @@ export class GameManager {
         this.timer = timer;
         this.scoreKeeper = scoreKeeper;
         this.scene.toggleSpotlight(); // disable spotlight at the beginning of the game (it's enabled by default)
-        this.spotlightHeight = 5;
+        this.spotlightHeight = 1;
         this.boardDimensions = this.board.getBoardDimensions();
     }
 
@@ -100,7 +100,7 @@ export class GameManager {
 
             this.selectedTileID = tileID;
             const tileCenter = tileObj.getCenterPos();
-            this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
+            this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight + this.board.position[1], tileCenter[2]));
             this.scene.toggleSpotlight();
             this.availableMoves = this.getValidMoves(tileID);
             this.resetHighlighting();
