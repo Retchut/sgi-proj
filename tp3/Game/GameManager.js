@@ -150,6 +150,7 @@ export class GameManager {
      * @param {Number} tileID the final position selected for the move
      */
     selectMove(tileID){
+        const originalTileObj = this.board.getTileAt(this.selectedTileID);
         const tileObj = this.board.getTileAt(tileID);
         // check if the tile selected corresponds to one of the possible moves
         if (!this.availableMoves.includes(tileID)) {
@@ -174,22 +175,22 @@ export class GameManager {
         }
 
         const capture = (Object.keys(this.availableCaptures).length !== 0);
+        const wasKing = originalTileObj.getPiece().isKing();
         this.move(tileObj, capture);
 
         // more captures can be made from this position
         const rowOffset = this.rowOffsets[this.turnPlayer];
-        const movingPiece = this.board.getTileAt(tileID).getPiece();
-        const newCaptures = (movingPiece.isKing()) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
+        const newCaptures = (wasKing) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
         if(capture && newCaptures.length !== 0){
             this.capturingMultiples = true;
             // disable highlighting on previously highlighted pieces
             this.disableHighlighting();
 
             this.selectedTileID = tileID;
-            const tileCenter = this.board.getTileAt(this.selectedTileID).getCenterPos();
+            const tileCenter = tileObj.getCenterPos();
             this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
 
-            this.availableMoves = (movingPiece.isKing()) ? this.getValidMovesKing(tileID) : this.getValidMovesSingle(tileID);
+            this.availableMoves = (wasKing) ? this.getValidMovesKing(tileID) : this.getValidMovesSingle(tileID);
             this.enableHighlighting();
         }
         else{
