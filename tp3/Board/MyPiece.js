@@ -14,10 +14,11 @@ export class MyPiece extends CGFobject {
      * @param {Number} player            - Player who owns the piece - 0/1
      * @param {CGFappearance} appearance - The material for this piece
      */
-    constructor(scene, tileLen, player, appearance) {
+    constructor(scene, tileID, tileLen, player, appearance) {
         super(scene);
 
         this.player = player;
+        this.tileID = tileID;
         this.appearance = appearance;
         this.king = false;
 
@@ -53,11 +54,34 @@ export class MyPiece extends CGFobject {
     }
 
     /**
+     * @method getTileID
+     * @returns this piece's tileID
+     */
+    getTileID(){
+        return this.tileID;
+    }
+
+    /**
      * @method isKing
      * @returns true if the piece is a king, false otherwise
      */
     isKing(){
         return this.king;
+    }
+
+    /**
+     * @method getTileID
+     * @returns this piece's tileID
+     */
+    getTileID(){
+        return this.tileID;
+    }
+
+    /**
+     * @method setTileID sets the piece's tileID
+     */
+    setTileID(newTileID){
+        this.tileID = newTileID;
     }
 
     /**

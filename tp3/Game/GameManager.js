@@ -1,6 +1,7 @@
 import { CGFappearance } from "../../lib/CGF.js";
 import { MyBoard } from "../Board/MyBoard.js";
 import { MyPiece } from "../Board/MyPiece.js";
+import { removeItemFromArray } from "../Utils/ArrayUtils.js";
 
 /**
  * GameManager class, manages the game state and handles user input.
@@ -85,7 +86,7 @@ export class GameManager {
      * @param {CGFappearance} appearance - appearance of the piece
      */
     initPiece(tile, player, appearance){
-        var newPiece = new MyPiece(this.scene, this.boardDimensions, player, appearance);
+        var newPiece = new MyPiece(this.scene, tile.getID(), this.boardDimensions, player, appearance);
         this.piecesInPlay.push(newPiece);
         tile.setPiece(newPiece);
     }
@@ -601,6 +602,7 @@ export class GameManager {
 
         oldTile.setPiece(null);
         newTile.setPiece(piece);
+        piece.setTileID(newTile.getID());
 
         if (capture)
             this.capture(this.availableCaptures[newTile.getID()]);
@@ -620,18 +622,25 @@ export class GameManager {
     capture(tileIDs) {
         for(const tileID of tileIDs){
             const tile = this.board.getTileAt(tileID);
+            const piece = tile.getPiece();
     
             // player 1's turn
             if (this.turnPlayer) {
-                this.player1Pit.push(tile.getPiece());
+                this.player1Pit.push(piece);
             }
             // player 0's turn
             else {
-                this.player0Pit.push(tile.getPiece());
+                this.player0Pit.push(piece);
             }
+
+            // remove tile from piece
+            piece.setTileID(0);
     
             // remove piece from tile
             tile.setPiece(null);
+
+            // remove piece from board
+            this.piecesInPlay = removeItemFromArray(this.piecesInPlay, piece)
         }
     }
 
