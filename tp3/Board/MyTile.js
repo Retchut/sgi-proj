@@ -1,4 +1,4 @@
-import { CGFobject, CGFshader } from "../../lib/CGF.js";
+import { CGFobject, CGFshader, CGFtexture } from "../../lib/CGF.js";
 import { XMLscene } from "../Scene/XMLscene.js";
 import { MyRectangle } from "../Primitives/MyRectangle.js";
 import { MyPiece } from "./MyPiece.js";
@@ -19,6 +19,7 @@ export class MyTile extends CGFobject {
         this.tile = new MyRectangle(this.scene, id, x1, x2, y1, y2);
 
         this.displayShader = false;
+        this.distortionMap = new CGFtexture(this.scene, 'scenes/images/highlight.png');
         this.tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightTile.frag');
         this.tileShader.setUniformsValues({
             shaderTimeFactor: 0
@@ -115,8 +116,10 @@ export class MyTile extends CGFobject {
 
         this.tile.display();
 
-        if (this.displayShader)
+        if (this.displayShader){
             this.scene.setActiveShader(this.pieceShader);
+            this.distortionMap.bind(1);
+        }
 
         // display piece if this tile currently contains one
         if (this.piece !== null) {
