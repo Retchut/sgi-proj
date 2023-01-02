@@ -265,10 +265,12 @@ export class GameManager {
                 const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
                 if(rightMoves.length !== 0){
                     const lastMoveTile = rightMoves[rightMoves.length - 1];
-                    const prevTile = (rightMoves.length === 1) ? tileID : rightMoves[rightMoves.length - 2];
-                    const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, true);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    if(this.board.tileInsideBoard(lastMoveTile + rowOffset + 1)){
+                        const prevTile = (rightMoves.length === 1) ? tileID : rightMoves[rightMoves.length - 2];
+                        const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, true);
+                        if(captures.length !== 0){
+                            possibleCaptures = possibleCaptures.concat(captures)
+                        }
                     }
                 }
                 else{
@@ -285,10 +287,12 @@ export class GameManager {
                 const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
                 if(leftMoves.length !== 0){
                     const lastMoveTile = leftMoves[leftMoves.length - 1];
-                    const prevTile = (leftMoves.length === 1) ? tileID : leftMoves[leftMoves.length - 2];
-                    const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, false);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    if(this.board.tileInsideBoard(lastMoveTile + rowOffset - 1)){
+                        const prevTile = (leftMoves.length === 1) ? tileID : leftMoves[leftMoves.length - 2];
+                        const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, false);
+                        if(captures.length !== 0){
+                            possibleCaptures = possibleCaptures.concat(captures)
+                        }
                     }
                 }
                 else{
