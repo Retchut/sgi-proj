@@ -3,7 +3,6 @@
  */
  export class GameStack {
     constructor(oldStack = []){
-        console.log(oldStack)
         this.moves = oldStack;
     }
 
@@ -21,5 +20,11 @@
             return oldMove;
         else
             return [];
+    }
+
+    peek() {
+        if(this.items.length > 0)
+            return this.moves[this.moves.length - 1];
+        return [];
     }
  }
