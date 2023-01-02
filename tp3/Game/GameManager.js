@@ -1,4 +1,14 @@
+import { CGFappearance } from "../../lib/CGF.js";
+import { MyBoard } from "../Board/MyBoard.js";
+import { MyTile } from "../Board/MyTile.js";
 import { MyPiece } from "../Board/MyPiece.js";
+import { removeItemFromArray } from "../Utils/ArrayUtils.js";
+
+const stateEnum = {
+    "selectPiece" : 0,
+    "selectMove" : 1,
+    "animating" : 2
+}
 
 /**
  * GameManager class, manages the game state and handles user input.
@@ -28,8 +38,9 @@ export class GameManager {
         console.warn("TODO: implement restarting game from buttonPrompt (GameManager's clear method)");
         // this.board.clear()
         this.turnPlayer = 0; // 0 - white, 1 - black
+        this.state = stateEnum.selectPiece;
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
-        console.warn("TODO: implement scoring and capturing pieces");
+        this.capturingMultiples = false;
         this.player0Pit = [];
         this.player1Pit = [];
         this.piecesInPlay = [];
@@ -38,36 +49,54 @@ export class GameManager {
         this.player1LastTime = null;
         this.player0RemainingTime = 300000;
         this.player1RemainingTime = 300000;
-        this.availableCaptures = {}; // maps move : piece being captured
+        this.availableCaptures = {}; // maps move : list of pieces being captured
 
+        // accessed through the turn player variable value
+        this.rowOffsets = [ this.boardDimensions, -this.boardDimensions ];
+
+        this.initPieces(3);
+
+        this.timer.setTimes(300, 300);
+        this.scoreKeeper.setScores(0, 0);
+    }
+
+    /**
+     * @method initPieces initializes the pieces of the board
+     * @param {Number} - number of rows to create for each player
+     */
+    initPieces(rowsToSpawn){
         const p0Appearance = this.board.getAppearanceW();
         const p1Appearance = this.board.getAppearanceB();
         const tiles = this.board.getTiles();
-        const rowsToSpawn = 3;
 
         for (let row = 0; row < rowsToSpawn; row++) {
             console.warn("TODO: improve the piece creation algorithm");
             // player 0
             for (const tile of tiles[row]) {
                 if ((tile.getID() + row % 2) % 2 == 1) {
-                    var newPiece = new MyPiece(this.scene, this.boardDimensions, 0, p0Appearance);
-                    this.piecesInPlay.push(newPiece);
-                    tile.setPiece(newPiece);
+                    this.initPiece(tile, 0, p0Appearance);
                 }
             }
 
             // player 1
             for (const tile of tiles[tiles.length - row - 1]) {
                 if ((tile.getID() - 1 + row % 2) % 2 == 1) {
-                    var newPiece = new MyPiece(this.scene, this.boardDimensions, 1, p1Appearance);
-                    this.piecesInPlay.push(newPiece);
-                    tile.setPiece(newPiece);
+                    this.initPiece(tile, 1, p1Appearance);
                 }
             }
         }
+    }
 
-        this.timer.setTimes(300, 300);
-        this.scoreKeeper.setScores(0, 0);
+    /**
+     * @method initPiece initializes a piece
+     * @param {MyTile} tile              - tile to initialize the piece at
+     * @param {Number} player            - id of the owner of the piece
+     * @param {CGFappearance} appearance - appearance of the piece
+     */
+    initPiece(tile, player, appearance){
+        var newPiece = new MyPiece(this.scene, tile.getID(), this.boardDimensions, player, appearance);
+        this.piecesInPlay.push(newPiece);
+        tile.setPiece(newPiece);
     }
 
     /**
@@ -83,114 +112,521 @@ export class GameManager {
      * @param {Number} tileID id of the picked object
      */
     handlePick(tileID) {
+        switch (this.state) {
+            case stateEnum.selectPiece:
+                this.selectTile(tileID);
+                break;
+            case stateEnum.selectMove:
+                this.selectMove(tileID)
+                break;
+            case stateEnum.animating:
+                console.warn("TODO: implementAnimations");
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * @method selectTile selects a tile to start a move froms
+     * @param {Number} tileID the id of the tile selected
+     */
+    selectTile(tileID){
         const tileObj = this.board.getTileAt(tileID);
+        const tilePiece = tileObj.getPiece();
+        // check for a piece on the selected tile
+        if (tilePiece === null) {
+            console.log("no piece on this tile");
+            return;
+        }
 
-        // tile not yet selected (tile ids are in range [1, boardDimensions^2])
-        if (this.selectedTileID === 0) {
-            // check for a piece on the selected tile
-            if (tileObj.getPiece() === null) {
-                console.log("no piece on this tile");
-                return;
+        if (tilePiece.getPlayer() !== this.turnPlayer) {
+            console.log("that piece does not belong to the current turn player");
+            return;
+        }
+
+        const selectableTiles = this.getSelectableTiles();
+        if(!selectableTiles.includes(tileID)){
+            console.log("Since one is available, you must perform a capture move this round.")
+            return;
+        }
+
+        this.selectedTileID = tileID;
+        this.state = stateEnum.selectMove;
+        const tileCenter = tileObj.getCenterPos();
+        this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
+        this.scene.toggleSpotlight();
+
+        if(tilePiece.isKing()){
+            this.availableMoves = this.getValidMovesKing(tileID);
+        }
+        else{
+            this.availableMoves = this.getValidMovesSingle(tileID);
+        }
+        this.enableHighlighting();
+    }
+
+    /**
+     * @method getSelectableTiles calculates the possible selections for pieces in the board
+     */
+    getSelectableTiles(){
+        const moveSelections = [];
+        const captureSelections = [];
+        for(const piece of this.piecesInPlay){
+            if(piece.getPlayer() !== this.turnPlayer)
+                continue;
+
+            const pieceTileID = piece.getTileID();
+            const rowOffset = this.rowOffsets[this.turnPlayer];
+            const availableCaptures = piece.isKing() ? this.getKingCaptures(pieceTileID) : this.getCapturesFrom(pieceTileID, rowOffset);
+            
+            // if captures are available, we make note of it
+            if(availableCaptures.length !== 0)
+                captureSelections.push(pieceTileID);
+
+            moveSelections.push(pieceTileID);
+        }
+
+        return (captureSelections.length !== 0) ? captureSelections : moveSelections;
+    }
+
+    /**
+     * @method selectMove selects a move to be made
+     * @param {Number} tileID the final position selected for the move
+     */
+    selectMove(tileID){
+        const originalTileObj = this.board.getTileAt(this.selectedTileID);
+        const tileObj = this.board.getTileAt(tileID);
+        // check if the tile selected corresponds to one of the possible moves
+        if (!this.availableMoves.includes(tileID)) {
+            console.log("that's not one of the available moves");
+            return;
+        }
+
+
+        if (tileID === this.selectedTileID) {
+            console.log("desselecting selected tile");
+            this.selectedTileID = 0;
+            this.state = stateEnum.selectPiece;
+            this.scene.toggleSpotlight();
+            this.disableHighlighting();
+
+            // disabling multiple captures if the player so chooses, after capturing once
+            if(this.capturingMultiples){
+                this.capturingMultiples = false;
+                this.turnPlayer = this.getOpponent();
             }
 
-            if (tileObj.getPiece().getPlayer() !== this.turnPlayer) {
-                console.log("that piece does not belong to the current turn player");
-                return;
-            }
+            return;
+        }
+
+        const capture = (Object.keys(this.availableCaptures).length !== 0);
+        const wasKing = originalTileObj.getPiece().isKing();
+        this.move(tileObj, capture);
+
+        // more captures can be made from this position
+        const rowOffset = this.rowOffsets[this.turnPlayer];
+        const newCaptures = (wasKing) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
+        if(capture && newCaptures.length !== 0){
+            this.capturingMultiples = true;
+            // disable highlighting on previously highlighted pieces
+            this.disableHighlighting();
 
             this.selectedTileID = tileID;
             const tileCenter = tileObj.getCenterPos();
             this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight + this.board.position[1], tileCenter[2]));
-            this.scene.toggleSpotlight();
-            this.availableMoves = this.getValidMoves(tileID);
-            this.resetHighlighting();
+
+            this.availableMoves = (wasKing) ? this.getValidMovesKing(tileID) : this.getValidMovesSingle(tileID);
+            this.enableHighlighting();
         }
-        // initial tile selected
-        else {
-            // check if the tile selected corresponds to one of the possible moves
-            if (!this.availableMoves.includes(tileID)) {
-                console.log("that's not one of the available moves");
-                return;
-            }
-
-
-            if (tileID === this.selectedTileID) {
-                console.log("desselecting selected tile");
-                this.selectedTileID = 0;
-                this.scene.toggleSpotlight();
-                this.resetHighlighting();
-                return;
-            }
-
-            const capture = (Object.keys(this.availableCaptures).length !== 0);
-            this.move(tileObj, capture);
+        else{
             this.selectedTileID = 0; // reset selected tile
+            this.state = stateEnum.selectPiece;
             this.scene.toggleSpotlight();
-            this.resetHighlighting()
+            this.disableHighlighting()
             this.turnPlayer = this.getOpponent(); // change turn player
         }
     }
 
     /**
-     * @method getValidMoves Calculates possible moves from the tileID sent as a parameter
+     * @method getValidMovesKing Calculates possible moves for the king from the tileID sent as a parameter
      * @param {Number} tileID id of the tile the moves are calculated from
-     * @returns The moves the player can make from the tile with ID tileID
+     * @returns The moves the player's king piece can make from the tile with ID tileID
      */
-    getValidMoves(tileID) {
-        // initialize the array with the tileID to allow for desselecting this tile later
+    getValidMovesKing(tileID){
+        // reset available captures
+        this.availableCaptures = {};
+
+        // if any captures can be made, they're the only moves available
+        const possibleCaptures = this.getKingCaptures(tileID);
+        if(possibleCaptures.length !== 0){
+            return [tileID, ...possibleCaptures];
+        }
+
+        // no captures can be made, so we check for a normal move
+        // initialize the arrays with the tileID to allow for desselecting this tile later
         let possibleMoves = [tileID];
-        let captures = [tileID];
+
+        for(const rowOffset of this.rowOffsets){
+            if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+                continue;
+
+            if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+                continue;
+
+            // right
+            if (!this.board.tileInLastCol(tileID)) {
+                const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
+                if(rightMoves.length !== 0)
+                    possibleMoves = possibleMoves.concat(rightMoves)
+            }
+    
+            // left
+            if (!this.board.tileInFirstCol(tileID)) {
+                const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
+                if(leftMoves.length !== 0)
+                    possibleMoves = possibleMoves.concat(leftMoves)
+            }
+        }
+
+        return possibleMoves;
+    }
+
+    /**
+     * @method getKingCaptures
+     * @param {Number} tileID id of the tile the moves are calculated from
+     * @returns The capture moves the player's king piece can make from the tile with ID tileID
+     */
+    getKingCaptures(tileID){
+        let possibleCaptures = [];
+
+        for(const rowOffset of this.rowOffsets){
+            if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+                continue;
+
+            if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+                continue;
+
+            // right
+            if (!this.board.tileInLastCol(tileID)) {
+                const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
+                const diagonalOffset = rowOffset + 1;
+                if(rightMoves.length !== 0){
+                    const lastMoveTile = rightMoves[rightMoves.length - 1];
+                    const nextTile = lastMoveTile + diagonalOffset;
+                    if(this.board.tileInsideBoard(nextTile) && !this.board.tileInLastCol(nextTile)){
+                        const nextPiece = this.board.getTileAt(nextTile).getPiece();
+                        if(nextPiece !== null){
+                            if(nextPiece.getPlayer() === this.getOpponent()){
+                                const landingTile = nextTile + diagonalOffset;
+                                if(this.board.tileInsideBoard(landingTile)){
+                                    if(this.board.getTileAt(landingTile).getPiece() === null){
+                                        const captures = this.getKingCapturesToDiagonal(landingTile, nextTile, diagonalOffset);
+                                        if(captures.length !== 0){
+                                            possibleCaptures = possibleCaptures.concat(captures)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    // capture from self
+                    if(!this.board.tileInLastCol(tileID)){
+                        const blockingTile = tileID + diagonalOffset;
+                        const blockingPiece = this.board.getTileAt(blockingTile).getPiece();
+                        if(!this.board.tileInLastCol(blockingTile) && (blockingPiece.getPlayer() === this.getOpponent())){
+                            const landingTile = blockingTile + diagonalOffset;
+                            const captures = this.getKingCapturesToDiagonal(landingTile, blockingTile, diagonalOffset);
+                            if(captures.length !== 0){
+                                possibleCaptures = possibleCaptures.concat(captures)
+                            }
+                        }
+                    }
+                }
+            }
+    
+            // left
+            if (!this.board.tileInFirstCol(tileID)) {
+                const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
+                const diagonalOffset = rowOffset - 1;
+                if(leftMoves.length !== 0){
+                    const lastMoveTile = leftMoves[leftMoves.length - 1];
+                    const nextTile = lastMoveTile + diagonalOffset;
+                    if(this.board.tileInsideBoard(nextTile) && !this.board.tileInFirstCol(nextTile)){
+                        const nextPiece = this.board.getTileAt(nextTile).getPiece();
+                        if(nextPiece !== null){
+                            if(nextPiece.getPlayer() === this.getOpponent()){
+                                const landingTile = nextTile + diagonalOffset;
+                                if(this.board.tileInsideBoard(landingTile)){
+                                    if(this.board.getTileAt(landingTile).getPiece() === null){
+                                        const captures = this.getKingCapturesToDiagonal(landingTile, nextTile, diagonalOffset);
+                                        if(captures.length !== 0){
+                                            possibleCaptures = possibleCaptures.concat(captures)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else{
+                    // capture from self
+                    if(!this.board.tileInFirstCol(tileID)){
+                        const blockingTile = tileID + diagonalOffset;
+                        const blockingPiece = this.board.getTileAt(blockingTile).getPiece();
+                        if(!this.board.tileInFirstCol(blockingTile) && (blockingPiece.getPlayer() === this.getOpponent())){
+                            const landingTile = blockingTile + diagonalOffset;
+                            const captures = this.getKingCapturesToDiagonal(landingTile, blockingTile, diagonalOffset);
+                            if(captures.length !== 0){
+                                possibleCaptures = possibleCaptures.concat(captures)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return possibleCaptures;
+    }
+
+    /**
+     * @method getKingCapturesToDiagonal
+     * @param {Number} tileID     - id of the tile the capture moves are calculated from
+     * @param {Number} prevTileID - id of the previous tile in the diagonal
+     * @param {diagonalOffset}    - offset used to calculate the next tile diagonally
+     * @returns The captures the player's king piece can make from the tile with ID tileID, not passing through tileID
+     */
+    getKingCapturesToDiagonal(tileID, prevTileID, diagonalOffset){
+        let possibleCaptures = []
+
+        if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+            return [];
+
+        if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+        return [];
+        
+        if(this.board.tileInEdgeCols(tileID)){
+            possibleCaptures.push(tileID);
+            this.applyCapture(tileID, [prevTileID])
+        }
+        else{
+            const diagonalMoves = this.getKingMovesToDiagonal(tileID, diagonalOffset);
+            possibleCaptures = possibleCaptures.concat([tileID, ...diagonalMoves])
+            for(const captureMove of possibleCaptures){
+                this.applyCapture(captureMove, [prevTileID])
+            }
+        }
+        
+        return possibleCaptures;
+    }
+    
+    /**
+     * @method getMovesToSideKing
+     * @param {Number} tileID    - id of the tile the moves are calculated from
+     * @param {Number} rowOffset - offset used to calculate the next row
+     * @param {boolean} right    - true if the moves calculated are to the right of the original piece, false otherwise
+     * @returns The moves the player's king piece can make from the tile with ID tileID to the diagonal to the specified side
+     */
+    getMovesToSideKing(tileID, rowOffset, right){
+        let possibleMoves = [];
+        const canMoveToSide = right ? !this.board.tileInLastCol(tileID) : !this.board.tileInFirstCol(tileID);
+
+        if (canMoveToSide) {
+            const sideMove = this.getMoveToSide(tileID, rowOffset, right);
+            if(sideMove !== 0){
+                possibleMoves.push(sideMove);
+                possibleMoves = possibleMoves.concat(this.getMovesToSideKing(sideMove, rowOffset, right));
+            }
+        }
+
+        return possibleMoves;
+    }
+
+    /**
+     * @method getValidMovesSingle Calculates possible moves from the tileID sent as a parameter
+     * @param {Number} tileID id of the tile the moves are calculated from
+     * @returns The moves the player's single piece can make from the tile with ID tileID
+     */
+    getValidMovesSingle(tileID) {
+
+        // reset available captures
         this.availableCaptures = {};
 
         // player 1 moves to a lower row, player 0 to an upper row
-        const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+        const rowOffset = this.rowOffsets[this.turnPlayer];
+
+        // if any captures can be made, they're the only moves available
+        const possibleCaptures = this.getCapturesFrom(tileID, rowOffset);
+        if(possibleCaptures.length !== 0){
+            return [tileID, ...possibleCaptures];
+        }
+
+        // no captures can be made, so we check for a normal move
+        // initialize the arrays with the tileID to allow for desselecting this tile later
+        let possibleMoves = [tileID];
 
         if (!this.board.tileInLastCol(tileID)) {
-            // can move right
-            const move = tileID + rowOffset + 1;
-            if (this.board.tileInsideBoard(move)) {
-                const movePiece = this.board.getTileAt(move).getPiece();
-                if (movePiece === null)
-                    possibleMoves.push(move);
-                else {
-                    // can we capture it?
-                    if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
-                        const captureMove = move + rowOffset + 1;
-
-                        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-                            captures.push(captureMove);
-                            this.availableCaptures[captureMove] = move;
-                        }
-                    }
-                }
-            }
+            const rightMove = this.getMoveToSide(tileID, rowOffset, true);
+            if(rightMove !== 0)
+                possibleMoves.push(rightMove);
         }
 
         if (!this.board.tileInFirstCol(tileID)) {
-            // can move left
-            const move = tileID + rowOffset - 1;
-            if (this.board.tileInsideBoard(move)) {
-                const movePiece = this.board.getTileAt(move).getPiece();
-                if (this.board.getTileAt(move).getPiece() === null)
-                    possibleMoves.push(move);
-                else {
-                    if (!this.board.tileInEdgeCols(move) && movePiece.getPlayer() === this.getOpponent()) {
-                        // can we capture it?
-                        const captureMove = move + rowOffset - 1;
-                        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
-                            captures.push(captureMove);
-                            this.availableCaptures[captureMove] = move;
-                        }
-                    }
-                }
+            const leftMove = this.getMoveToSide(tileID, rowOffset, false);
+            if(leftMove !== 0)
+                possibleMoves.push(leftMove);
+        }
+
+        return possibleMoves;
+    }
+
+    /**
+     * @method getMoveToSide calculates the move that can be performed to one side
+     * @param {Number} tileID    - id of the tile the moves are starting from
+     * @param {Number} rowOffset - offset used to calculate the next row
+     * @param {boolean} right    - true if the moves calculated are to the right of the original piece, false otherwise
+     * @returns the possible move starting at this tile, and to the specified side, 0 if there is none available
+     */
+    getMoveToSide(tileID, rowOffset, right){
+        const diagonalOffset = rowOffset  + ((right) ? 1 : -1);
+
+        return this.getMoveToDiagonal(tileID, diagonalOffset);
+    }
+
+    /**
+     * @method getKingMovesToDiagonal - calculates the moves that can be performed by a king to one diagonal
+     * @param {Number} tileID         - id of the tile the moves are starting from
+     * @param {Number} diagonalOffset - offset used to calculate the next tile diagonally
+     * @returns the possible moves starting at this tile, and to the specified diagonal, [] if there is none available
+     */
+    getKingMovesToDiagonal(tileID, diagonalOffset){
+        // let possibleMoves = [tileID]
+        let possibleMoves = []
+
+        // calculate first move in the diagonal
+        const diagonalMove = this.getMoveToDiagonal(tileID, diagonalOffset);
+        if(diagonalMove === 0)
+            return []
+
+        possibleMoves.push(diagonalMove);
+
+        if(this.board.tileInEdgeCols(diagonalMove)){
+            return possibleMoves;
+        }
+        
+        // calculate next moves in the diagonal
+        const extraMoves = this.getKingMovesToDiagonal(diagonalMove, diagonalOffset);
+        possibleMoves = possibleMoves.concat(extraMoves);
+
+        return possibleMoves;
+    }
+
+    /**
+     * @method getMoveToDiagonal - calculates the moves that can be performed to one diagonal
+     * @param {Number} tileID    - id of the tile the moves are starting from
+     * @param {Number} diagonalOffset - offset used to calculate the next tile diagonally
+     * @returns the possible move starting at this tile, and to the specified diagonal, 0 if there is none available
+     */
+    getMoveToDiagonal(tileID, diagonalOffset){
+        const move = tileID + diagonalOffset;
+        if (this.board.tileInsideBoard(move)) {
+            const movePiece = this.board.getTileAt(move).getPiece();
+            if (movePiece === null)
+                return move;
+        }
+
+        return 0;
+    }
+    
+    /**
+     * @method getCapturesFrom calculates all possible capture moves from a specific tile
+     * @param {Number}  tileID    - id of the tile from where we're calculating captures
+     * @param {Number}  rowOffset - offset used to calculate the next row
+     * @param {Array}   path      - pieces captured thus far
+     * @returns an array containing the possible moves that involve captures
+     */
+     getCapturesFrom(tileID, rowOffset, path = []){
+        let possibleCaptures = []
+
+        // to the left
+        if (!this.board.tileInSecondCol(tileID)) {
+            const capturesToLeft = this.getCapturesToSide(rowOffset, tileID, path, false);
+            possibleCaptures = possibleCaptures.concat(capturesToLeft);
+        }
+
+        // to the right
+        if (!this.board.tileInPenultimateCol(tileID)) {
+            const capturesToRight = this.getCapturesToSide(rowOffset, tileID, path, true);
+            possibleCaptures = possibleCaptures.concat(capturesToRight);
+        }
+
+        return possibleCaptures;
+    }
+
+    /**
+     * @method getCapturesToSide calculates all the possible captures for a given diagonal
+     * @param {Number}  tileID    - id of the tile from where we're calculating captures
+     * @param {Number}  rowOffset - offset used to calculate the next row
+     * @param {Array}   path      - pieces captured thus far
+     * @param {boolean} right     - true if the piece captured is to the right of the original piece, false otherwise
+     * @returns an array containing the possible captures
+     */
+    getCapturesToSide(rowOffset, tileID, path, right){
+        let possibleSideCaptures = [];
+
+        const diagonal = tileID + rowOffset + ((right) ? 1 : -1);
+        if(!this.board.tileInsideBoard(diagonal))
+            return [];
+            
+        const diagonalPiece = this.board.getTileAt(diagonal).getPiece();
+        if(diagonalPiece === null)
+            return [];
+
+        if(diagonalPiece.getPlayer() !== this.getOpponent())
+            return [];
+
+        if(!this.board.tileInFirstCol(diagonal)){
+            let newPath = [...path, diagonal]
+            const capture = this.getCaptureOfPiece(diagonal, rowOffset, newPath, right);
+            if(capture){
+                possibleSideCaptures.push(capture);
+                const moreCaptures = this.getCapturesFrom(capture, rowOffset, newPath);
+                possibleSideCaptures = possibleSideCaptures.concat(moreCaptures);
             }
         }
 
-        // if a capture can be made (captures contains more than the original tileID), that's the only possible move the player can make
-        if (captures.length !== 1)
-            possibleMoves = captures;
+        return possibleSideCaptures;
+    }
 
-        return possibleMoves;
+    /**
+     * @method getCaptureOfPiece  calculates the move to capture a piece, if possible
+     * @param {Number}  piece     - id of the piece to be captured
+     * @param {Number}  rowOffset - offset used to calculate the next row
+     * @param {Array}   path      - pieces captured thus far
+     * @param {boolean} right     - true if the piece captured is to the right of the original piece, false otherwise
+     * @returns the move to capture the piece, if it exists
+     */
+    getCaptureOfPiece(piece, rowOffset, path, right){
+        const captureMove = piece + rowOffset  + ((right) ? 1 : -1);
+        
+        if (this.board.tileInsideBoard(captureMove) && this.board.getTileAt(captureMove).getPiece() === null) {
+            this.applyCapture(captureMove, path);
+            
+            return captureMove;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @method applyCapture applies the result of a capture
+     * @param {Number} captureMove - the move to be registered to capture the tile
+     * @param {Array}  path        - path of pieces captured until captureMove
+     */
+    applyCapture(captureMove, path){
+        this.availableCaptures[captureMove] = path;
     }
 
     /**
@@ -204,31 +640,62 @@ export class GameManager {
 
         oldTile.setPiece(null);
         newTile.setPiece(piece);
+        piece.setTileID(newTile.getID());
 
         if (capture)
             this.capture(this.availableCaptures[newTile.getID()]);
+        
+        // if the tile moved to the edge rows and wasn't promoted yet
+        if(this.board.tileInEdgeRows(newTile.getID()) && !piece.isKing()){
+            piece.promote();
+        }
 
         this.scoreKeeper.setScores(this.player0Pit.length, this.player1Pit.length);
     }
 
     /**
      * @method capture captures the piece on tileID
-     * @param {MyTile} tileID - tile to capture
+     * @param {Array} tileIDs - tiles to capture
      */
-    capture(tileID) {
-        const tile = this.board.getTileAt(tileID);
+    capture(tileIDs) {
+        for(const tileID of tileIDs){
+            const tile = this.board.getTileAt(tileID);
+            const piece = tile.getPiece();
+    
+            // player 1's turn
+            if (this.turnPlayer) {
+                this.player1Pit.push(piece);
+            }
+            // player 0's turn
+            else {
+                this.player0Pit.push(piece);
+            }
 
-        // player 1's turn
-        if (this.turnPlayer) {
-            this.player1Pit.push(tile.getPiece());
-        }
-        // player 0's turn
-        else {
-            this.player0Pit.push(tile.getPiece());
-        }
+            // remove tile from piece
+            piece.setTileID(0);
+    
+            // remove piece from tile
+            tile.setPiece(null);
 
-        // remove piece from tile
-        tile.setPiece(null);
+            // remove piece from board
+            this.piecesInPlay = removeItemFromArray(this.piecesInPlay, piece)
+        }
+    }
+
+    /**
+     * @method disableHighlighting disables the highlighting applied to tiles the player may interact with
+     */
+    disableHighlighting(){
+        for (const tileID of this.availableMoves)
+            this.board.disableHighlight(tileID);
+    }
+
+    /**
+     * @method enableHighlighting enable the highlighting applied to tiles the player may interact with
+     */
+    enableHighlighting(){
+        for (const tileID of this.availableMoves)
+            this.board.enableHighlight(tileID);
     }
 
     /**
@@ -238,8 +705,6 @@ export class GameManager {
         for (const tileID of this.availableMoves)
             this.board.toggleHighlight(tileID);
     }
-
-
 
     /**
      * @method updateShaders updates the shaders of the board and the game timer

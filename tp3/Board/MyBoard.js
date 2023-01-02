@@ -123,6 +123,33 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method tileInFirstRow
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the first row of the board, false otherwise
+     */
+    tileInFirstRow(tileID){
+        return Math.floor((tileID - 1) / this.boardDimensions) === 0;
+    }
+    
+    /**
+     * @method tileInLastRow
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the last row of the board, false otherwise
+     */
+    tileInLastRow(tileID){
+        return Math.floor((tileID - 1) / this.boardDimensions) === (this.boardDimensions - 1);
+    }
+
+    /**
+     * @method tileInEdgeRows
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the last or first row of the board, false otherwise
+     */
+    tileInEdgeRows(tileID){
+        return this.tileInFirstRow(tileID) || this.tileInLastRow(tileID);
+    }
+
+    /**
      * @method tileInFirstCol
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the first column of the board, false otherwise
@@ -132,12 +159,30 @@ export class MyBoard extends CGFobject {
     }
 
     /**
+     * @method tileInSecondCol
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the second column of the board, false otherwise
+     */
+    tileInSecondCol(tileID){
+        return (tileID % this.boardDimensions) === 2;
+    }
+
+    /**
      * @method tileInLastCol
      * @param {Number} tileID - id of the tile
      * @returns true if the tile is on the last column of the board, false otherwise
      */
     tileInLastCol(tileID) {
         return (tileID % this.boardDimensions) === 0;
+    }
+
+    /**
+     * @method tileInPenultimateCol
+     * @param {Number} tileID - id of the tile
+     * @returns true if the tile is on the penultimate column of the board, false otherwise
+     */
+    tileInPenultimateCol(tileID){
+        return (tileID % this.boardDimensions) === (this.boardDimensions - 1);
     }
 
     /**
@@ -156,6 +201,22 @@ export class MyBoard extends CGFobject {
      */
     tileInsideBoard(tileID) {
         return tileID >= 1 && tileID <= Math.pow(this.boardDimensions, 2)
+    }
+
+    /**
+     * @method disableHighlight Disables the highlighting on the tile at tile with tileID
+     * @param {Number} - id of the tile
+     */
+    disableHighlight(tileID){
+        this.getTileAt(tileID).disableHighlight();
+    }
+
+    /**
+     * @method enableHighlight Enables the highlighting on the tile at tile with tileID
+     * @param {Number} - id of the tile
+     */
+    enableHighlight(tileID){
+        this.getTileAt(tileID).enableHighlight();
     }
 
     /**
