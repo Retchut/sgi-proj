@@ -2,6 +2,12 @@ import { CGFappearance } from "../../lib/CGF.js";
 import { MyBoard } from "../Board/MyBoard.js";
 import { MyPiece } from "../Board/MyPiece.js";
 
+const stateEnum = {
+    "selectPiece" : 0,
+    "selectMove" : 1,
+    "animating" : 2
+}
+
 /**
  * GameManager class, manages the game state and handles user input.
  */
@@ -30,6 +36,7 @@ export class GameManager {
         console.warn("TODO: implement restarting game from buttonPrompt (GameManager's clear method)");
         // this.board.clear()
         this.turnPlayer = 0; // 0 - white, 1 - black
+        this.state = stateEnum.selectPiece;
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
         this.capturingMultiples = false;
         this.player0Pit = [];
@@ -103,13 +110,18 @@ export class GameManager {
      * @param {Number} tileID id of the picked object
      */
     handlePick(tileID) {
-        // tile not yet selected (tile ids are in range [1, boardDimensions^2])
-        if (this.selectedTileID === 0) {
-            this.selectTile(tileID);
-        }
-        // initial tile selected
-        else {
-            this.selectMove(tileID)
+        switch (this.state) {
+            case stateEnum.selectPiece:
+                this.selectTile(tileID);
+                break;
+            case stateEnum.selectMove:
+                this.selectMove(tileID)
+                break;
+            case stateEnum.animating:
+                console.warn("TODO: implementAnimations");
+                break;
+            default:
+                break;
         }
     }
 
@@ -132,6 +144,7 @@ export class GameManager {
         }
 
         this.selectedTileID = tileID;
+        this.state = stateEnum.selectMove;
         const tileCenter = tileObj.getCenterPos();
         this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
         this.scene.toggleSpotlight();
@@ -161,6 +174,7 @@ export class GameManager {
         if (tileID === this.selectedTileID) {
             console.log("desselecting selected tile");
             this.selectedTileID = 0;
+            this.state = stateEnum.selectPiece;
             this.scene.toggleSpotlight();
             this.disableHighlighting();
 
@@ -194,6 +208,7 @@ export class GameManager {
         }
         else{
             this.selectedTileID = 0; // reset selected tile
+            this.state = stateEnum.selectPiece;
             this.scene.toggleSpotlight();
             this.disableHighlighting()
             this.turnPlayer = this.getOpponent(); // change turn player
