@@ -33,7 +33,7 @@ export class GameManager {
         this.gameStack = (oldGame === null) ? new GameStack() : new GameStack(oldGame);
     }
 
-    initGameFromStack(){
+    runGameFromStack(){
         // TODO: initgame from stack
     }
 
