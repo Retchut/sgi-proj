@@ -178,7 +178,8 @@ export class GameManager {
 
         // more captures can be made from this position
         const rowOffset = this.rowOffsets[this.turnPlayer];
-        const newCaptures = this.getCapturesFrom(tileID, rowOffset);
+        const movingPiece = this.board.getTileAt(this.selectedTileID).getPiece();
+        const newCaptures = (movingPiece.isKing()) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
         if(capture && newCaptures.length !== 0){
             this.capturingMultiples = true;
             // disable highlighting on previously highlighted pieces
@@ -200,7 +201,7 @@ export class GameManager {
     }
 
     /**
-     * @method getValidMovesKing
+     * @method getValidMovesKing Calculates possible moves for the king from the tileID sent as a parameter
      * @param {Number} tileID id of the tile the moves are calculated from
      * @returns The moves the player's king piece can make from the tile with ID tileID
      */
@@ -208,7 +209,47 @@ export class GameManager {
         // reset available captures
         this.availableCaptures = {};
 
+        // if any captures can be made, they're the only moves available
+        const possibleCaptures = this.getKingCaptures(tileID);
+        if(possibleCaptures.length !== 0){
+            return [tileID, ...possibleCaptures];
+        }
+
+        // no captures can be made, so we check for a normal move
+        // initialize the arrays with the tileID to allow for desselecting this tile later
         let possibleMoves = [tileID];
+
+        for(const rowOffset of this.rowOffsets){
+            if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+                continue;
+
+            if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+                continue;
+
+            // right
+            if (!this.board.tileInLastCol(tileID)) {
+                const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
+                if(rightMoves.length !== 0)
+                    possibleMoves = possibleMoves.concat(rightMoves)
+            }
+    
+            // left
+            if (!this.board.tileInFirstCol(tileID)) {
+                const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
+                if(leftMoves.length !== 0)
+                    possibleMoves = possibleMoves.concat(leftMoves)
+            }
+        }
+
+        return possibleMoves;
+    }
+
+    /**
+     * @method getKingCaptures
+     * @param {Number} tileID id of the tile the moves are calculated from
+     * @returns The capture moves the player's king piece can make from the tile with ID tileID
+     */
+    getKingCaptures(tileID){
         let possibleCaptures = [tileID];
         let singleCaptures = [];
 
@@ -225,14 +266,9 @@ export class GameManager {
                 if(rightMoves.length !== 0){
                     const lastMoveTile = rightMoves[rightMoves.length - 1];
                     const prevTile = (rightMoves.length === 1) ? tileID : rightMoves[rightMoves.length - 2];
-                    const captures = this.getKingCaptures(lastMoveTile, prevTile, true);
-                    possibleMoves = possibleMoves.concat(rightMoves)
-                    possibleMoves = possibleMoves.concat(captures)
+                    const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, true);
                     if(captures.length !== 0){
                         possibleCaptures = possibleCaptures.concat(captures)
-                    }
-                    else{
-                        possibleMoves = possibleMoves.concat(rightMoves)
                     }
                 }
                 else{
@@ -247,7 +283,7 @@ export class GameManager {
                 if(leftMoves.length !== 0){
                     const lastMoveTile = leftMoves[leftMoves.length - 1];
                     const prevTile = (leftMoves.length === 1) ? tileID : leftMoves[leftMoves.length - 2];
-                    const captures = this.getKingCaptures(lastMoveTile, prevTile, false);
+                    const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, false);
                     if(captures.length !== 0){
                         possibleCaptures = possibleCaptures.concat(captures)
                     }
@@ -265,22 +301,18 @@ export class GameManager {
             possibleCaptures = possibleCaptures.concat(singleCaptures);
         }
 
-        if(possibleCaptures.length !== 1){
-            possibleMoves = possibleCaptures;
-        }
 
-
-        return possibleMoves;
+        return possibleCaptures;
     }
 
     /**
-     * @method getKingCaptures
+     * @method getKingCapturesToSide
      * @param {Number} tileID     - id of the tile the moves are calculated from
      * @param {Number} prevTileID - id of the previous tile, used to calculate the direction we're ignoring
      * @param {boolean} right     - indicates if captures start at the right or left
      * @returns The captures the player's king piece can make from the tile with ID tileID, not passing through tileID
      */
-    getKingCaptures(tileID, prevTileID, right){
+    getKingCapturesToSide(tileID, prevTileID, right){
         let possibleCaptures = []
 
         const ignoreDiagonalOffset = prevTileID - tileID;
