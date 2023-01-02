@@ -55,7 +55,7 @@ export class MyPiece extends CGFobject {
 
     /**
      * @method getTileID
-     * @returns this piece's tileID
+     * @returns this piece's current tile's ID
      */
     getTileID(){
         return this.tileID;

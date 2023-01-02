@@ -1,5 +1,6 @@
 import { CGFappearance } from "../../lib/CGF.js";
 import { MyBoard } from "../Board/MyBoard.js";
+import { MyTile } from "../Board/MyTile.js";
 import { MyPiece } from "../Board/MyPiece.js";
 import { removeItemFromArray } from "../Utils/ArrayUtils.js";
 
@@ -132,6 +133,12 @@ export class GameManager {
             return;
         }
 
+        const selectableTiles = this.getSelectableTiles();
+        if(!selectableTiles.includes(tileID)){
+            console.log("Since one is available, you must perform a capture move this round.")
+            return;
+        }
+
         this.selectedTileID = tileID;
         const tileCenter = tileObj.getCenterPos();
         this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
@@ -144,6 +151,30 @@ export class GameManager {
             this.availableMoves = this.getValidMovesSingle(tileID);
         }
         this.enableHighlighting();
+    }
+
+    /**
+     * @method getSelectableTiles calculates the possible selections for pieces in the board
+     */
+    getSelectableTiles(){
+        const moveSelections = [];
+        const captureSelections = [];
+        for(const piece of this.piecesInPlay){
+            if(piece.getPlayer() !== this.turnPlayer)
+                continue;
+
+            const pieceTileID = piece.getTileID();
+            const rowOffset = this.rowOffsets[this.turnPlayer];
+            const availableCaptures = piece.isKing() ? this.getKingCaptures(pieceTileID) : this.getCapturesFrom(pieceTileID, rowOffset);
+            
+            // if captures are available, we make note of it
+            if(availableCaptures.length !== 0)
+                captureSelections.push(pieceTileID);
+
+            moveSelections.push(pieceTileID);
+        }
+
+        return (captureSelections.length !== 0) ? captureSelections : moveSelections;
     }
 
     /**
