@@ -178,8 +178,9 @@ export class GameManager {
 
         // more captures can be made from this position
         const rowOffset = this.rowOffsets[this.turnPlayer];
-        const movingPiece = this.board.getTileAt(this.selectedTileID).getPiece();
-        const newCaptures = (movingPiece.isKing()) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
+        // const movingPiece = this.board.getTileAt(this.selectedTileID).getPiece();
+        // const newCaptures = (movingPiece.isKing()) ? this.getKingCaptures(tileID) : this.getCapturesFrom(tileID, rowOffset);
+        const newCaptures = this.getCapturesFrom(tileID, rowOffset)
         if(capture && newCaptures.length !== 0){
             this.capturingMultiples = true;
             // disable highlighting on previously highlighted pieces
@@ -250,7 +251,7 @@ export class GameManager {
      * @returns The capture moves the player's king piece can make from the tile with ID tileID
      */
     getKingCaptures(tileID){
-        let possibleCaptures = [tileID];
+        let possibleCaptures = [];
         let singleCaptures = [];
 
         for(const rowOffset of this.rowOffsets){
@@ -286,9 +287,6 @@ export class GameManager {
                     const captures = this.getKingCapturesToSide(lastMoveTile, prevTile, false);
                     if(captures.length !== 0){
                         possibleCaptures = possibleCaptures.concat(captures)
-                    }
-                    else{
-                        possibleMoves = possibleMoves.concat(leftMoves)
                     }
                 }
                 else{
