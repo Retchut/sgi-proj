@@ -42,6 +42,9 @@ export class GameManager {
         this.player1RemainingTime = 300000;
         this.availableCaptures = {}; // maps move : list of pieces being captured
 
+        // accessed through the turn player variable value
+        this.rowOffsets = [ this.boardDimensions, -this.boardDimensions ];
+
         this.initPieces(3);
 
         this.timer.setTimes(300, 300);
@@ -174,7 +177,7 @@ export class GameManager {
         this.move(tileObj, capture);
 
         // more captures can be made from this position
-        const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+        const rowOffset = this.rowOffsets[this.turnPlayer];
         const newCaptures = this.getCapturesFrom(tileID, rowOffset);
         if(capture && newCaptures.length !== 0){
             this.capturingMultiples = true;
@@ -204,7 +207,7 @@ export class GameManager {
     getValidMovesKing(tileID){
         let possibleMoves = [tileID];
         
-        const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+        const rowOffset = this.rowOffsets[this.turnPlayer];
 
         // right
         if (!this.board.tileInLastCol(tileID)) {
@@ -256,7 +259,7 @@ export class GameManager {
         this.availableCaptures = {};
 
         // player 1 moves to a lower row, player 0 to an upper row
-        const rowOffset = ((this.turnPlayer === 1) ? -1 : 1) * this.boardDimensions;
+        const rowOffset = this.rowOffsets[this.turnPlayer];
 
         // if any captures can be made, they're the only moves available
         const possibleCaptures = this.getCapturesFrom(tileID, rowOffset);
