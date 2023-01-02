@@ -295,7 +295,19 @@ export class GameManager {
      * @returns the possible move starting at this tile, and to the specified side, 0 if there is none available
      */
     getMoveToSide(tileID, rowOffset, right){
-        const move = tileID + rowOffset  + ((right) ? 1 : -1);
+        const diagonalOffset = rowOffset  + ((right) ? 1 : -1);
+
+        return this.getMoveToDiagonal(tileID, diagonalOffset);
+    }
+
+    /**
+     * @method getMoveToDiagonal - calculates the moves that can be performed to one diagonal
+     * @param {Number} tileID    - id of the tile the moves are starting from
+     * @param {Number} diagonalOffset - offset used to calculate the next tile diagonally
+     * @returns the possible move starting at this tile, and to the specified diagonal, 0 if there is none available
+     */
+    getMoveToDiagonal(tileID, diagonalOffset){
+        const move = tileID + diagonalOffset;
         if (this.board.tileInsideBoard(move)) {
             const movePiece = this.board.getTileAt(move).getPiece();
             if (movePiece === null)
