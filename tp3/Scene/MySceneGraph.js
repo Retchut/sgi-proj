@@ -44,6 +44,7 @@ export class MySceneGraph {
         this.idRoot = null;                    // The id of the root element.
         this.idBoard = null;
         this.idSpotlight = "spotlight";
+        this.gameComponents = [];
 
         this.axisCoords = [];
         this.axisCoords['x'] = [1, 0, 0];
@@ -87,7 +88,7 @@ export class MySceneGraph {
         this.scene.interface.initLights();
         this.scene.interface.initShaders();
         this.scene.interface.initAnimations();
-        this.scene.initGameManager(this.primitives[this.idBoard], this.primitives[this.idTimer], this.primitives[this.idScoreKeeper]);
+        this.scene.initGameManager(this.primitives[this.idBoard], this.primitives[this.idTimer], this.primitives[this.idScoreKeeper], [this.views[this.defaultViewID], this.views["playerW"], this.views["playerB"]]);
         // this.scene.interface.initInterface();
     }
 
@@ -404,6 +405,11 @@ export class MySceneGraph {
         this.scene.viewIDs = viewIDs;
         this.scene.currentViewID = this.defaultViewID;
         // this.scene.defaultCamera = this.views[this.defaultViewID];
+
+        // Check that the game elements were defined
+        if (this.views["playerW"] == null || this.views["playerB"] == null) {
+            return "You must define a view for both players, with ID 'playerW' and 'playerB' for, respectively, the white and black players. Aborting."
+        }
 
         return null;
     }
@@ -1994,7 +2000,11 @@ export class MySceneGraph {
 
         this.drawComponent(this.components[this.idRoot], null);
 
-
+        if (this.gameComponents) {
+            for (const component of this.gameComponents) {
+                if (component) component.display();
+            }
+        }
 
         // restore the last preserved scene matrix
         this.scene.popMatrix();

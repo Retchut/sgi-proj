@@ -1,4 +1,6 @@
+import { MyCameraAnimation } from "../Animation/MyCameraAnimation.js";
 import { MyPiece } from "../Board/MyPiece.js";
+import { MyPlayButton } from "../Board/MyPlayButton.js";
 
 /**
  * GameManager class, manages the game state and handles user input.
@@ -11,7 +13,7 @@ export class GameManager {
      * @param {MyTimer} timer - The timer for the game
      * @param {MyScoreKeeper} scoreKeeper - The score keeper for the game
      */
-    constructor(scene, board, timer, scoreKeeper) {
+    constructor(scene, board, timer, scoreKeeper, views) {
         this.scene = scene;
         this.board = board;
         this.timer = timer;
@@ -19,6 +21,13 @@ export class GameManager {
         this.scene.toggleSpotlight(); // disable spotlight at the beginning of the game (it's enabled by default)
         this.spotlightHeight = 1;
         this.boardDimensions = this.board.getBoardDimensions();
+        this.inCameraAnimation = false;
+        this.cameraAnimation = null;
+        this.initialViewCamera = this.scene.graph.views[this.scene.graph.defaultViewID];
+        this.playerWCamera = this.scene.graph.views["playerW"];
+        this.playerBCamera = this.scene.graph.views["playerB"];
+        this.playButton = new MyPlayButton(this.scene, this.initialViewCamera.position, this.initialViewCamera.calculateDirection());
+        this.scene.graph.gameComponents[0] = this.playButton;
     }
 
     /**
@@ -27,7 +36,7 @@ export class GameManager {
     initGame() {
         console.warn("TODO: implement restarting game from buttonPrompt (GameManager's clear method)");
         // this.board.clear()
-        this.turnPlayer = 0; // 0 - white, 1 - black
+        this.turnPlayer = -1; // -1 - not playing, 0 - white, 1 - black
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
         console.warn("TODO: implement scoring and capturing pieces");
         this.player0Pit = [];
@@ -66,6 +75,13 @@ export class GameManager {
             }
         }
 
+        // clean other rows
+        for (let row = 3; row < 5; row++) {
+            for (const tile of tiles[row]) {
+                tile.setPiece(null);
+            }
+        }
+
         this.timer.setTimes(300, 300);
         this.scoreKeeper.setScores(0, 0);
     }
@@ -83,6 +99,15 @@ export class GameManager {
      * @param {Number} tileID id of the picked object
      */
     handlePick(tileID) {
+        if (tileID > 64) {
+            if (tileID == 65 && this.turnPlayer == -1) {
+                this.turnPlayer = 0;
+                this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerWCamera, 2000);
+                this.inCameraAnimation = true;
+            }
+            return;
+        }
+
         const tileObj = this.board.getTileAt(tileID);
 
         // tile not yet selected (tile ids are in range [1, boardDimensions^2])
@@ -127,6 +152,13 @@ export class GameManager {
             this.selectedTileID = 0; // reset selected tile
             this.scene.toggleSpotlight();
             this.resetHighlighting()
+            this.inCameraAnimation = true;
+            if (this.turnPlayer == 0) {
+                this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerBCamera, 1000);
+            }
+            else {
+                this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerWCamera, 1000);
+            }
             this.turnPlayer = this.getOpponent(); // change turn player
         }
     }
@@ -249,18 +281,34 @@ export class GameManager {
         const tileIDs = this.availableMoves;
         this.board.updateShaders(tileIDs, currTime / 1000 % 100);
 
-        if (this.turnPlayer == 0) {
-            this.player1LastTime = null;
-            if (this.player0LastTime != null) this.player0RemainingTime -= currTime - this.player0LastTime
-            this.player0LastTime = currTime;
+        if (!this.inCameraAnimation && this.turnPlayer >= 0) {
+            if (this.turnPlayer == 0) {
+                this.player1LastTime = null;
+                if (this.player0LastTime != null) this.player0RemainingTime -= currTime - this.player0LastTime
+                this.player0LastTime = currTime;
+            }
+            else if (this.turnPlayer == 1) {
+                this.player0LastTime = null;
+                if (this.player1LastTime != null) this.player1RemainingTime -= currTime - this.player1LastTime
+                this.player1LastTime = currTime;
+            }
+
+            this.timer.setTimes(Math.max(Math.floor(this.player0RemainingTime / 1000), 0), Math.max(Math.floor(this.player1RemainingTime / 1000), 0));
         }
-        else if (this.turnPlayer == 1) {
-            this.player0LastTime = null;
-            if (this.player1LastTime != null) this.player1RemainingTime -= currTime - this.player1LastTime
-            this.player1LastTime = currTime;
+        else if (this.inCameraAnimation) {
+            if (!this.cameraAnimation.update(currTime)) {
+                this.cameraAnimation = null;
+                this.inCameraAnimation = false;
+                if (this.turnPlayer == -1) this.initGame();
+            }
         }
 
-        this.timer.setTimes(Math.max(Math.floor(this.player0RemainingTime / 1000), 0), Math.max(Math.floor(this.player1RemainingTime / 1000), 0));
+        if (this.gameOver() && !this.inCameraAnimation) {
+            this.inCameraAnimation = true;
+            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.initialViewCamera, 2000);
+            this.turnPlayer = -1;
+            return;
+        }
     }
 
     /**
@@ -268,7 +316,8 @@ export class GameManager {
      * @returns true if the game ended, false otherwise
      */
     gameOver() {
-        console.warn("TODO: implement stalemate - gameOver");
+        if (this.player0RemainingTime <= 0 || this.player1RemainingTime <= 0) return true;
+        // console.warn("TODO: implement stalemate - gameOver");
         const playerPieceNum = 3 * this.boardDimensions / 2;
         return this.player0Pit.length === playerPieceNum || this.player1Pit.length === playerPieceNum;
     }

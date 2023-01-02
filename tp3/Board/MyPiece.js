@@ -54,7 +54,7 @@ export class MyPiece extends CGFobject {
     display() {
         this.appearance.apply();
         
-        console.warn("TODO: clean up MyPiece's display method, if possible");
+        // console.warn("TODO: clean up MyPiece's display method, if possible");
         this.side.display();
         this.scene.pushMatrix();
         this.scene.multMatrix(this.ringTransformation);
