@@ -44,7 +44,7 @@ export class GameManager {
 
         // accessed through the turn player variable value
         this.rowOffsets = [ this.boardDimensions, -this.boardDimensions ];
-
+        
         this.initPieces(3);
 
         this.timer.setTimes(300, 300);
@@ -205,40 +205,134 @@ export class GameManager {
      * @returns The moves the player's king piece can make from the tile with ID tileID
      */
     getValidMovesKing(tileID){
+        // reset available captures
+        this.availableCaptures = {};
+
+        // player 1 moves to a lower row, player 0 to an upper row
+        // const rowOffset = this.rowOffsets[this.turnPlayer];
+
+        // if any captures can be made, they're the only moves available
+        // const possibleCaptures = this.getKingCapturesFrom(tileID, rowOffset);
+        // console.log(possibleCaptures);
+        // if(possibleCaptures.length !== 0){
+        //     return [tileID, ...possibleCaptures];
+        // }
+
+
         let possibleMoves = [tileID];
 
         for(const rowOffset of this.rowOffsets){
             // right
             if (!this.board.tileInLastCol(tileID)) {
                 const rightMoves = this.getMovesToSideKing(tileID, rowOffset, true);
-                if(rightMoves.length !== 0)
-                    possibleMoves = possibleMoves.concat(rightMoves)
+                if(rightMoves.length !== 0){
+                    const lastMoveTile = rightMoves[rightMoves.length - 1];
+                    const prevTile = (rightMoves.length === 1) ? tileID : rightMoves[rightMoves.length - 2];
+                    const captures = this.getKingCaptures(lastMoveTile, prevTile, true);
+                    // possibleMoves = possibleMoves.concat(rightMoves)
+                    possibleMoves = possibleMoves.concat(captures)
+                }
             }
     
             // left
             if (!this.board.tileInFirstCol(tileID)) {
                 const leftMoves = this.getMovesToSideKing(tileID, rowOffset, false);
-                if(leftMoves.length !== 0)
-                    possibleMoves = possibleMoves.concat(leftMoves)
+                if(leftMoves.length !== 0){
+                    const lastMoveTile = leftMoves[leftMoves.length - 1];
+                    const prevTile = (leftMoves.length === 1) ? tileID : leftMoves[leftMoves.length - 2];
+                    const captures = this.getKingCaptures(lastMoveTile, prevTile, false);
+                    // possibleMoves = possibleMoves.concat(leftMoves)
+                    possibleMoves = possibleMoves.concat(captures)
+                }
             }
         }
 
 
         return possibleMoves;
     }
+
+    /**
+     * @method getKingCaptures
+     * @param {Number} tileID     - id of the tile the moves are calculated from
+     * @param {Number} prevTileID - id of the previous tile, used to calculate the direction we're ignoring
+     * @param {boolean} right     - indicates if captures start at the right or left
+     * @returns The captures the player's king piece can make from the tile with ID tileID, not passing through tileID
+     */
+    getKingCaptures(tileID, prevTileID, right){
+        let possibleCaptures = []
+
+        const ignoreDiagonalOffset = prevTileID - tileID;
+
+        for(const rowOffset of this.rowOffsets){
+            console.log("hi")
+            if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
+                continue;
+
+            if(this.board.tileInLastRow(tileID) && rowOffset > 0)
+                continue;
+
+            const rightDiagonalOffset = rowOffset  + 1;
+            if(rightDiagonalOffset !== ignoreDiagonalOffset && right){
+                if (!this.board.tileInLastCol(tileID)) {
+                    const diagonalTile = tileID + rightDiagonalOffset;
+                    if(!this.board.tileInLastCol(diagonalTile)){
+                        const diagonalPiece = this.board.getTileAt(diagonalTile).getPiece();
+                        if(diagonalPiece !== null && diagonalPiece.getPlayer() === this.getOpponent()){
+                            const landingTile = diagonalTile + rightDiagonalOffset;
+                            if(this.board.getTileAt(landingTile).getPiece() === null){
+                                if(this.board.tileInEdgeCols(landingTile)){
+                                    possibleCaptures.push(landingTile);
+                                }
+                                else{
+                                    const diagonalMoves = this.getKingMovesToDiagonal(landingTile, rightDiagonalOffset);
+                                    console.log("right:", diagonalMoves)
+                                    possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            const leftDiagonalOffset = rowOffset - 1;
+            if(leftDiagonalOffset !== ignoreDiagonalOffset && !right){
+                if (!this.board.tileInFirstCol(tileID)) {
+                    const diagonalTile = tileID + leftDiagonalOffset;
+                    if(!this.board.tileInFirstCol(diagonalTile)){
+                        const diagonalPiece = this.board.getTileAt(diagonalTile).getPiece();
+                        if(diagonalPiece !== null && diagonalPiece.getPlayer() === this.getOpponent()){
+                            const landingTile = diagonalTile + leftDiagonalOffset;
+                            if(this.board.getTileAt(landingTile).getPiece() === null){
+                                if(this.board.tileInEdgeCols(landingTile)){
+                                    possibleCaptures.push(landingTile);
+                                }
+                                else{
+                                    const diagonalMoves = this.getKingMovesToDiagonal(landingTile, leftDiagonalOffset);
+                                    console.log("left:", diagonalMoves)
+                                    possibleCaptures = possibleCaptures.concat([landingTile, ...diagonalMoves])
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return possibleCaptures;
+    }
     
     /**
      * @method getMovesToSideKing
-     * @param {Number} tileID id of the tile the moves are calculated from
+     * @param {Number} tileID    - id of the tile the moves are calculated from
      * @param {Number} rowOffset - offset used to calculate the next row
      * @param {boolean} right    - true if the moves calculated are to the right of the original piece, false otherwise
      * @returns The moves the player's king piece can make from the tile with ID tileID to the diagonal to the specified side
      */
-     getMovesToSideKing(tileID, rowOffset, right){
+    getMovesToSideKing(tileID, rowOffset, right){
         let possibleMoves = [];
-        const condition = right ? !this.board.tileInLastCol(tileID) : !this.board.tileInFirstCol(tileID);
+        const canMoveToSide = right ? !this.board.tileInLastCol(tileID) : !this.board.tileInFirstCol(tileID);
 
-        if (condition) {
+        if (canMoveToSide) {
             const sideMove = this.getMoveToSide(tileID, rowOffset, right);
             if(sideMove !== 0){
                 possibleMoves.push(sideMove);
@@ -301,6 +395,34 @@ export class GameManager {
     }
 
     /**
+     * @method getKingMovesToDiagonal - calculates the moves that can be performed by a king to one diagonal
+     * @param {Number} tileID         - id of the tile the moves are starting from
+     * @param {Number} diagonalOffset - offset used to calculate the next tile diagonally
+     * @returns the possible moves starting at this tile, and to the specified diagonal, [] if there is none available
+     */
+    getKingMovesToDiagonal(tileID, diagonalOffset){
+        // let possibleMoves = [tileID]
+        let possibleMoves = []
+
+        // calculate first move in the diagonal
+        const diagonalMove = this.getMoveToDiagonal(tileID, diagonalOffset);
+        if(diagonalMove === 0)
+            return []
+
+        possibleMoves.push(diagonalMove);
+
+        if(this.board.tileInEdgeCols(diagonalMove)){
+            return possibleMoves;
+        }
+        
+        // calculate next moves in the diagonal
+        const extraMoves = this.getKingMovesToDiagonal(diagonalMove, diagonalOffset);
+        possibleMoves = possibleMoves.concat(extraMoves);
+
+        return possibleMoves;
+    }
+
+    /**
      * @method getMoveToDiagonal - calculates the moves that can be performed to one diagonal
      * @param {Number} tileID    - id of the tile the moves are starting from
      * @param {Number} diagonalOffset - offset used to calculate the next tile diagonally
@@ -316,7 +438,7 @@ export class GameManager {
 
         return 0;
     }
-
+    
     /**
      * @method getCapturesFrom calculates all possible capture moves from a specific tile
      * @param {Number} tileID    - id of the tile from where we're calculating captures
