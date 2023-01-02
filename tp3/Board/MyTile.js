@@ -37,6 +37,8 @@ export class MyTile extends CGFobject {
         mat4.translate(this.pieceTransformation, this.pieceTransformation, this.centerPos);
         // scale of this scale
         mat4.scale(this.pieceTransformation, this.pieceTransformation, [tileLen * 0.9, tileLen * 0.9, tileLen * 0.9])
+
+        this.pieceAnimation = null;
     }
 
     /**
@@ -69,6 +71,14 @@ export class MyTile extends CGFobject {
      */
     setPiece(piece) {
         this.piece = piece;
+    }
+
+    /**
+     * Sets this tile's piece animation
+     * @param {MyAnimation} animation animation for the piece
+     */
+    setAnimation(animation) {
+        this.pieceAnimation = animation;
     }
 
     /**
@@ -115,6 +125,7 @@ export class MyTile extends CGFobject {
         // display piece if this tile currently contains one
         if (this.piece !== null) {
             this.scene.pushMatrix();
+            if (this.pieceAnimation) this.pieceAnimation.apply();
             this.scene.multMatrix(this.pieceTransformation);
             this.piece.display();
             this.scene.popMatrix();

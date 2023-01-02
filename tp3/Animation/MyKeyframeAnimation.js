@@ -14,6 +14,7 @@ export class MyKeyframeAnimation extends MyAnimation {
         this.keyframes = keyframes;
         this.currentKeyframe = 0;
         this.active = false;
+        this.ended = false;
         this.lastKeyframeTransfMat = this.buildLastKeyframeTransf();
     }
 
@@ -109,6 +110,8 @@ export class MyKeyframeAnimation extends MyAnimation {
         }
         else {
             this.animationTransfMatrix = this.lastKeyframeTransfMat;
+            this.ended = true;
+            console.log("ended");
         }
     }
 
@@ -118,7 +121,7 @@ export class MyKeyframeAnimation extends MyAnimation {
     apply() {
         if(!this.active){
             let nullMatrix = mat4.create();
-            mat4.multiplyScalar(nullMatrix, 0);
+            mat4.scale(nullMatrix, nullMatrix, [0, 0, 0]);
             this.scene.multMatrix(nullMatrix);
             return 0;
         }

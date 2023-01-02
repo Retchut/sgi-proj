@@ -40,7 +40,6 @@ export class MyPlayButton extends CGFobject {
         let position = vec3.create();
         vec3.scale(position, camDirection, 5);
         vec3.add(position, camPosition, position);
-        console.log(position);
         this.globalTransformation = mat4.create();
         mat4.translate(this.globalTransformation, this.globalTransformation, position);
         let rotAngle = Math.atan(camDirection[0] / camDirection[2]);
