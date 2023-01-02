@@ -210,6 +210,7 @@ export class GameManager {
 
         let possibleMoves = [tileID];
         let possibleCaptures = [tileID];
+        let singleCaptures = [];
 
         for(const rowOffset of this.rowOffsets){
             if(this.board.tileInFirstRow(tileID) && rowOffset < 0)
@@ -234,6 +235,10 @@ export class GameManager {
                         possibleMoves = possibleMoves.concat(rightMoves)
                     }
                 }
+                else{
+                    // try to do a simple capture
+                    singleCaptures = this.getCapturesFrom(tileID, rowOffset);
+                }
             }
     
             // left
@@ -250,7 +255,14 @@ export class GameManager {
                         possibleMoves = possibleMoves.concat(leftMoves)
                     }
                 }
+                else{
+                    singleCaptures = this.getCapturesFrom(tileID, rowOffset);
+                }
             }
+        }
+
+        if(singleCaptures.length !== 0){
+            possibleCaptures = possibleCaptures.concat(singleCaptures);
         }
 
         if(possibleCaptures.length !== 1){
@@ -456,9 +468,9 @@ export class GameManager {
     
     /**
      * @method getCapturesFrom calculates all possible capture moves from a specific tile
-     * @param {Number} tileID    - id of the tile from where we're calculating captures
-     * @param {Number} rowOffset - offset used to calculate the next row
-     * @param {Array}  path      - pieces captured thus far
+     * @param {Number}  tileID    - id of the tile from where we're calculating captures
+     * @param {Number}  rowOffset - offset used to calculate the next row
+     * @param {Array}   path      - pieces captured thus far
      * @returns an array containing the possible moves that involve captures
      */
      getCapturesFrom(tileID, rowOffset, path = []){
