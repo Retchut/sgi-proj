@@ -392,8 +392,7 @@ export class GameManager {
         if(this.board.tileInLastRow(tileID) && rowOffset > 0)
         return [];
         
-        if(this.board.tileInLastCol(tileID)){
-            console.log("inside tileinlast col getkingcapturestodiagonal")
+        if(this.board.tileInEdgeCols(tileID)){
             possibleCaptures.push(tileID);
             this.applyCapture(tileID, [prevTileID])
         }
