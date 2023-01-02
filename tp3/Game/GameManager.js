@@ -3,6 +3,7 @@ import { MyBoard } from "../Board/MyBoard.js";
 import { MyTile } from "../Board/MyTile.js";
 import { MyPiece } from "../Board/MyPiece.js";
 import { removeItemFromArray } from "../Utils/ArrayUtils.js";
+import { GameStack } from "./GameStack.js";
 
 const stateEnum = {
     "selectPiece" : 0,
@@ -21,7 +22,7 @@ export class GameManager {
      * @param {MyTimer} timer - The timer for the game
      * @param {MyScoreKeeper} scoreKeeper - The score keeper for the game
      */
-    constructor(scene, board, timer, scoreKeeper) {
+    constructor(scene, board, timer, scoreKeeper, oldGame = null) {
         this.scene = scene;
         this.board = board;
         this.timer = timer;
@@ -29,6 +30,11 @@ export class GameManager {
         this.scene.toggleSpotlight(); // disable spotlight at the beginning of the game (it's enabled by default)
         this.spotlightHeight = 1;
         this.boardDimensions = this.board.getBoardDimensions();
+        this.gameStack = (oldGame === null) ? new GameStack() : new GameStack(oldGame);
+    }
+
+    initGameFromStack(){
+        // TODO: initgame from stack
     }
 
     /**
@@ -221,7 +227,7 @@ export class GameManager {
         }
 
         const capture = (Object.keys(this.availableCaptures).length !== 0);
-        const wasKing = originalTileObj.getPiece().isKing();
+        const wasKing = false; //originalTileObj.getPiece().isKing();
         this.move(tileObj, capture);
 
         // more captures can be made from this position
@@ -642,8 +648,13 @@ export class GameManager {
         newTile.setPiece(piece);
         piece.setTileID(newTile.getID());
 
-        if (capture)
-            this.capture(this.availableCaptures[newTile.getID()]);
+        let capturedPieces = [];
+        if (capture){
+            capturedPieces = this.availableCaptures[newTile.getID()];
+            this.capture(capturedPieces);
+        }
+
+        this.gameStack.push(oldTile.getID(), newTile.getID(), capturedPieces);
         
         // if the tile moved to the edge rows and wasn't promoted yet
         if(this.board.tileInEdgeRows(newTile.getID()) && !piece.isKing()){
