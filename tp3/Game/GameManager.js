@@ -181,7 +181,7 @@ export class GameManager {
         this.selectedTileID = tileID;
         this.state = stateEnum.selectMove;
         const tileCenter = tileObj.getCenterPos();
-        this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight, tileCenter[2]));
+        this.scene.moveSpotlight(vec3.fromValues(tileCenter[0], tileCenter[1] + this.spotlightHeight + this.board.position[1], tileCenter[2]));
         this.scene.toggleSpotlight();
 
         if (tilePiece.isKing()) {
