@@ -358,9 +358,16 @@ export class GameManager {
                 }
                 else{
                     // capture from self
-                    const captures = this.getKingCapturesToDiagonal(tileID, tileID, diagonalOffset);
-                    if(captures.length !== 0){
-                        possibleCaptures = possibleCaptures.concat(captures)
+                    if(!this.board.tileInFirstCol(tileID)){
+                        const blockingTile = tileID + diagonalOffset;
+                        const blockingPiece = this.board.getTileAt(blockingTile).getPiece();
+                        if(!this.board.tileInFirstCol(blockingTile) && (blockingPiece.getPlayer() === this.getOpponent())){
+                            const landingTile = blockingTile + diagonalOffset;
+                            const captures = this.getKingCapturesToDiagonal(landingTile, blockingTile, diagonalOffset);
+                            if(captures.length !== 0){
+                                possibleCaptures = possibleCaptures.concat(captures)
+                            }
+                        }
                     }
                 }
             }
@@ -386,6 +393,7 @@ export class GameManager {
         return [];
 
         if(this.board.tileInLastCol(tileID)){
+            console.log("inside tileinlast col getkingcapturestodiagonal")
             possibleCaptures.push(tileID);
             this.applyCapture(tileID, [prevTileID])
         }
