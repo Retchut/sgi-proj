@@ -21,14 +21,14 @@ export class MyTile extends CGFobject {
         this.displayShader = false;
         this.tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlight.frag');
         this.tileShader.setUniformsValues({
-            shaderTimeFactor : 0,
-            shaderScaleFactor : 1,
-            factors : vec3.create(),
-            matColor : vec4.create()
+            shaderTimeFactor: 0,
+            shaderScaleFactor: 1,
+            factors: vec3.create(),
+            matColor: vec4.create()
         });
 
-        const tileLen = x2-x1;
-        this.centerPos = [x1 + tileLen/2,y1 + tileLen/2,0];
+        const tileLen = x2 - x1;
+        this.centerPos = [x1 + tileLen / 2, y1 + tileLen / 2, 0];
 
         // initialize this tile's piece's values
         this.piece = null;
@@ -43,7 +43,7 @@ export class MyTile extends CGFobject {
      * @method getID 
      * @returns this tile's ID
      */
-    getID(){
+    getID() {
         return this.tileID;
     }
 
@@ -51,15 +51,15 @@ export class MyTile extends CGFobject {
      * @method getCenterPos 
      * @returns this tile's center position
      */
-    getCenterPos(){
-        return this.centerPos;
+    getCenterPos() {
+        return [this.centerPos[0], 0, -this.centerPos[1]];
     }
 
     /**
      * @method getPiece 
      * @returns this tile's piece
      */
-    getPiece(){
+    getPiece() {
         return this.piece;
     }
 
@@ -67,14 +67,14 @@ export class MyTile extends CGFobject {
      * Sets this tile's piece
      * @param {MyPiece} piece piece to be assigned to this tile
      */
-    setPiece(piece){
+    setPiece(piece) {
         this.piece = piece;
     }
 
     /**
      * Toggles the highlighting on the piece in this tile
      */
-    toggleHighlight(){
+    toggleHighlight() {
         this.displayShader = !this.displayShader;
     }
 
@@ -82,10 +82,10 @@ export class MyTile extends CGFobject {
      * @method updateShader updates this tile's highlight shader, by updating its timefactor uniform value
      * @param {Number} currTimeFactor - new value for the shader's timefactor
      */
-    updateShader(currTimeFactor){
+    updateShader(currTimeFactor) {
         this.tileShader.setUniformsValues({ shaderTimeFactor: currTimeFactor });
     }
-    
+
     /**
     * @method display
     * Displays the tile
@@ -93,20 +93,20 @@ export class MyTile extends CGFobject {
     display() {
         this.scene.registerForPick(this.tileID, this);
 
-        if(this.displayShader)
+        if (this.displayShader)
             this.scene.setActiveShader(this.tileShader);
 
         this.tile.display();
 
         // display piece if this tile currently contains one
-        if(this.piece !== null){
+        if (this.piece !== null) {
             this.scene.pushMatrix();
             this.scene.multMatrix(this.pieceTransformation);
             this.piece.display();
             this.scene.popMatrix();
         }
 
-        if(this.displayShader)
+        if (this.displayShader)
             this.scene.setActiveShader(this.scene.defaultShader);
     }
 }
