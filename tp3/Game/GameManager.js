@@ -37,6 +37,7 @@ export class GameManager {
         this.inCameraAnimation = false;
         this.cameraAnimation = null;
         this.pieceAnimation = null;
+        this.captureAnimation = null;
         this.initialViewCamera = this.scene.graph.views[this.scene.graph.defaultViewID];
         this.playerWCamera = this.scene.graph.views["playerW"];
         this.playerBCamera = this.scene.graph.views["playerB"];
@@ -708,6 +709,16 @@ export class GameManager {
         this.pieceAnimation = new MyKeyframeAnimation(this.scene, [new MyKeyframe(0, [oldTile.getCenterPos()[0] - newTile.getCenterPos()[0], newTile.getCenterPos()[2] - oldTile.getCenterPos()[2], 0], [0, 0, 0], [1, 1, 1]), new MyKeyframe(1000, [0, 0, 0], [0, 0, 0], [1, 1, 1])]);
         this.pieceAnimation.initAnimationTime();
         newTile.setAnimation(this.pieceAnimation);
+
+        if (capture) {
+            if (this.turnPlayer == 0) {
+                this.board.playerWTray.setAnimation(this.board.getTileAt(capturedPieces[0]).getCenterPos(), 0);
+            }
+            else if (this.turnPlayer == 1) {
+                this.board.playerBTray.setAnimation(this.board.getTileAt(capturedPieces[0]).getCenterPos(), 1);
+            }
+        }
+
     }
 
     /**
@@ -843,9 +854,23 @@ export class GameManager {
         else if (this.state == stateEnum.animating) {
             console.log("animating")
             this.pieceAnimation.update(currTime - this.prevTime);
-            if(this.pieceAnimation.ended) {
+            if (this.pieceAnimation.ended) {
                 this.state = stateEnum.selectPiece;
                 this.pieceAnimation = null;
+            }
+            if (this.board.playerWTray.animation !== null) {
+                console.log("updating w...");
+                this.board.playerWTray.animation.update(currTime - this.prevTime);
+                if (this.board.playerWTray.animation.ended) {
+                    this.board.playerWTray.setAnimation(null);
+                }
+            }
+            if (this.board.playerBTray.animation !== null) {
+                console.log("updating b...");
+                this.board.playerBTray.animation.update(currTime - this.prevTime);
+                if (this.board.playerBTray.animation.ended) {
+                    this.board.playerBTray.setAnimation(null);
+                }
             }
         }
         else if (this.inCameraAnimation) {
@@ -860,7 +885,6 @@ export class GameManager {
             this.inCameraAnimation = true;
             this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.initialViewCamera, 2000);
             this.turnPlayer = -1;
-            return;
         }
 
         this.prevTime = currTime;
