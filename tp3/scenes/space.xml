@@ -7,13 +7,12 @@
             <to x="0" y="0" z="0" />
         </perspective>
         <perspective id="playerW" near="0.1" far="500" angle="45">
-            <from x="-9.5" y="5" z="-2.5" />
-            <!-- <from x="-1" y="5" z="12" /> -->
+            <from x="-1" y="5" z="12" />
             <to x="-5" y="0" z="5" />
         </perspective>
         <perspective id="playerB" near="0.1" far="500" angle="45">
-            <from x="-5" y="5" z="4" />
-            <to x="0" y="11" z="0" />
+            <from x="-9.5" y="5" z="-2.5" />
+            <to x="-5" y="0" z="5" />
         </perspective>
     </views>
 
@@ -23,12 +22,6 @@
     </ambient>
 
     <lights>
-        <omni id="lightButton" enabled="1">
-            <location x="28" y="20" z="23" w="1.0" />
-            <ambient r="0" g="0" b="0" a="1.0" />
-            <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
-            <specular r="1.0" g="1.0" b="1.0" a="1.0" />
-        </omni>
         <omni id="lightBack" enabled="1">
             <location x="-5" y="-2" z="-5" w="1.0" />
             <ambient r="0" g="0" b="0" a="1.0" />
