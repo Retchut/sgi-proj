@@ -60,8 +60,6 @@ export class GameManager {
      * @method initGame Initializes the GameManager object, setting its fields to their defaults, and generating the board pieces
      */
     initGame() {
-        console.warn("TODO: implement restarting game from buttonPrompt (GameManager's clear method)");
-        // this.board.clear()
         this.turnPlayer = -1; // 0 - white, 1 - black
         this.state = stateEnum.selectPiece;
         this.selectedTileID = 0; // 0 - unselected, (1 to boardDimensions - 1) - selected tile with that id
@@ -97,7 +95,6 @@ export class GameManager {
         const tiles = this.board.getTiles();
 
         for (let row = 0; row < rowsToSpawn; row++) {
-            console.warn("TODO: improve the piece creation algorithm");
             // player 0
             for (const tile of tiles[row]) {
                 if ((tile.getID() + row % 2) % 2 == 1) {
@@ -182,18 +179,18 @@ export class GameManager {
         const tilePiece = tileObj.getPiece();
         // check for a piece on the selected tile
         if (tilePiece === null) {
-            console.log("no piece on this tile");
+            console.warn("no piece on this tile");
             return;
         }
 
         if (tilePiece.getPlayer() !== this.turnPlayer) {
-            console.log("that piece does not belong to the current turn player");
+            console.warn("that piece does not belong to the current turn player");
             return;
         }
 
         const selectableTiles = this.getSelectableTiles();
         if (!selectableTiles.includes(tileID)) {
-            console.log("Since one is available, you must perform a capture move this round.")
+            console.warn("Since one is available, you must perform a capture move this round.")
             return;
         }
 
@@ -245,13 +242,13 @@ export class GameManager {
         const tileObj = this.board.getTileAt(tileID);
         // check if the tile selected corresponds to one of the possible moves
         if (!this.availableMoves.includes(tileID)) {
-            console.log("that's not one of the available moves");
+            console.warn("that's not one of the available moves");
             return;
         }
 
 
         if (tileID === this.selectedTileID) {
-            console.log("desselecting selected tile");
+            console.warn("desselecting selected tile");
             this.selectedTileID = 0;
             this.state = stateEnum.selectPiece;
             this.scene.toggleSpotlight();
@@ -878,7 +875,6 @@ export class GameManager {
      */
     gameOver() {
         if (this.player0RemainingTime <= 0 || this.player1RemainingTime <= 0) return true;
-        // console.warn("TODO: implement stalemate - gameOver");
         const playerPieceNum = 3 * this.boardDimensions / 2;
         return this.player0Pit.length === playerPieceNum || this.player1Pit.length === playerPieceNum;
     }
@@ -888,7 +884,6 @@ export class GameManager {
      * @returns the id of the winning player (0 or 1)
      */
     getWinner() {
-        console.warn("TODO: implement stalemate - getWinner");
         const playerPieceNum = 3 * this.boardDimensions / 2;
         // since this function is only called after a player won, if the following condition is false, then player 0 won
         return (this.player1Pit.length === playerPieceNum) ? 1 : 0;

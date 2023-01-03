@@ -22,7 +22,6 @@ export class MyBoard extends CGFobject {
         mat4.rotate(this.boardTransformation, this.boardTransformation, -Math.PI / 2, [1, 0, 0]);
 
         // generate appearances for both player's tiles
-        console.warn("TODO: rename colorA in xml and scene to colorW, to make it consistent with the remainder of the code -- IF THE SPECIFICATION ALLOWS")
         let vecW = vec3.fromValues(...colorA);
         let vecAmbientW = vec3.create(), vecDiffuseW = vec3.create(), vecSpecularW = vec3.create();
         vec3.scale(vecAmbientW, vecW, 0.2);
@@ -31,7 +30,6 @@ export class MyBoard extends CGFobject {
         vec3.scale(vecSpecularW, vecW, 0.3);
         vec3.add(vecSpecularW, vecSpecularW, vec3.fromValues(0.3, 0.3, 0.3));
         this.appearanceW = new CGFappearance(this.scene);
-        console.warn("TODO : why is the ambient property not being derived from colorA?")
         this.appearanceW.setAmbient(...vecAmbientW, 1);
         this.appearanceW.setDiffuse(...vecDiffuseW, 1);
         this.appearanceW.setSpecular(...vecSpecularW, 1);
