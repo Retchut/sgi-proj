@@ -111,7 +111,6 @@ export class MyKeyframeAnimation extends MyAnimation {
         else {
             this.animationTransfMatrix = this.lastKeyframeTransfMat;
             this.ended = true;
-            console.log("ended");
         }
     }
 

@@ -63,11 +63,10 @@ export class MyTray extends CGFobject {
         if (player == 1) {
             to[0] = -to[0];
             to[1] = -to[1];
-            offset = [-from[0] + to[0], from[2] + to[1], 0 + to[2]]
+            offset = [-from[0] + to[0], from[2] + to[1], 0 + to[2]];
         }
-        else offset = [from[0] - to[0], -from[2] - to[1], 0 - to[2]]
-
-        console.log(from, to);
+        else offset = [from[0] - to[0], -from[2] - to[1], 0 - to[2]];
+        
         this.animation = new MyKeyframeAnimation(this.scene, [new MyKeyframe(0, offset, [0, 0, 0], [1, 1, 1]), new MyKeyframe(250, vec3.add([0, 0, 0], vec3.lerp([0, 0, 0], offset, [0, 0, 0], 0.25), [0, 0, 2]), [0, 0, 0], [1, 1, 1]), new MyKeyframe(250, vec3.add([0, 0, 0], vec3.lerp([0, 0, 0], offset, [0, 0, 0], 0.25), [0, 0, 2]), [0, 0, 0], [1, 1, 1]), new MyKeyframe(1000, [0, 0, 0], [0, 0, 0], [1, 1, 1])]);
         this.animation.initAnimationTime();
     }
