@@ -1,4 +1,4 @@
-import { CGFappearance, CGFobject } from '../../lib/CGF.js';
+import { CGFappearance, CGFobject, CGFshader, CGFtexture } from '../../lib/CGF.js';
 import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
 import { MyTray } from './MyTray.js';
@@ -22,7 +22,6 @@ export class MyBoard extends CGFobject {
         mat4.rotate(this.boardTransformation, this.boardTransformation, -Math.PI / 2, [1, 0, 0]);
 
         // generate appearances for both player's tiles
-        console.warn("TODO: rename colorA in xml and scene to colorW, to make it consistent with the remainder of the code -- IF THE SPECIFICATION ALLOWS")
         let vecW = vec3.fromValues(...colorA);
         let vecAmbientW = vec3.create(), vecDiffuseW = vec3.create(), vecSpecularW = vec3.create();
         vec3.scale(vecAmbientW, vecW, 0.2);
@@ -31,7 +30,6 @@ export class MyBoard extends CGFobject {
         vec3.scale(vecSpecularW, vecW, 0.3);
         vec3.add(vecSpecularW, vecSpecularW, vec3.fromValues(0.3, 0.3, 0.3));
         this.appearanceW = new CGFappearance(this.scene);
-        console.warn("TODO : why is the ambient property not being derived from colorA?")
         this.appearanceW.setAmbient(...vecAmbientW, 1);
         this.appearanceW.setDiffuse(...vecDiffuseW, 1);
         this.appearanceW.setSpecular(...vecSpecularW, 1);
@@ -47,6 +45,17 @@ export class MyBoard extends CGFobject {
         this.appearanceB.setAmbient(...vecAmbientB, 1);
         this.appearanceB.setDiffuse(...vecDiffuseB, 1);
         this.appearanceB.setSpecular(...vecSpecularB, 1);
+
+        const distortionMap = new CGFtexture(this.scene, 'scenes/images/highlight.png');
+        const tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightTile.frag');
+        tileShader.setUniformsValues({
+            shaderTimeFactor: 0
+        });
+
+        const pieceShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightPiece.frag');
+        pieceShader.setUniformsValues({
+            shaderTimeFactor: 0
+        });
 
         // initialize board tiles, starting at its lower left corner
         // tiles will have id (1 to boardDimensions*boardDimensions)
@@ -70,7 +79,7 @@ export class MyBoard extends CGFobject {
                 const x2 = bottomLeft[0] + ((col + 1) * this.tileLen);
 
                 // push the new tile to the row's list
-                rowList.push(new MyTile(this.scene, tileID, x1, x2, y1, y2));
+                rowList.push(new MyTile(this.scene, tileID, x1, x2, y1, y2, distortionMap, tileShader, pieceShader));
                 tileID++;
             }
 
