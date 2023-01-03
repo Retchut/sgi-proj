@@ -47,16 +47,6 @@ export class GameManager {
         this.prevTime = 0;
     }
 
-    runGameFromStack() {
-        this.initGame();
-        // move: [start, end, [captures]]
-        for(const move of this.gameStack.getMoves()){
-            handlePick(move[0])
-            // TODO: pause between picking maybe?
-            handlePick(move[1])
-        }
-    }
-
     /**
      * @method initGame Initializes the GameManager object, setting its fields to their defaults, and generating the board pieces
      */
@@ -74,6 +64,7 @@ export class GameManager {
         this.player0RemainingTime = 300000;
         this.player1RemainingTime = 300000;
         this.availableCaptures = {}; // maps move : list of pieces being captured
+        this.updateTrays();
 
         // accessed through the turn player variable value
         this.rowOffsets = [this.boardDimensions, -this.boardDimensions];
@@ -164,7 +155,6 @@ export class GameManager {
                 this.selectMove(tileID)
                 break;
             case stateEnum.animating:
-                console.warn("TODO: implementAnimations");
                 break;
             default:
                 break;
@@ -180,12 +170,12 @@ export class GameManager {
         const tilePiece = tileObj.getPiece();
         // check for a piece on the selected tile
         if (tilePiece === null) {
-            console.warn("no piece on this tile");
+            console.warn("No piece on this tile.");
             return;
         }
 
         if (tilePiece.getPlayer() !== this.turnPlayer) {
-            console.warn("that piece does not belong to the current turn player");
+            console.warn("That piece does not belong to the current turn player.");
             return;
         }
 
@@ -243,13 +233,13 @@ export class GameManager {
         const tileObj = this.board.getTileAt(tileID);
         // check if the tile selected corresponds to one of the possible moves
         if (!this.availableMoves.includes(tileID)) {
-            console.warn("that's not one of the available moves");
+            console.warn("That's not one of the available moves.");
             return;
         }
 
 
         if (tileID === this.selectedTileID) {
-            console.warn("desselecting selected tile");
+            console.warn("Desselecting selected tile.");
             this.selectedTileID = 0;
             this.state = stateEnum.selectPiece;
             this.scene.toggleSpotlight();
@@ -807,6 +797,25 @@ export class GameManager {
     }
 
     /**
+     * @method runGameFromStack Restarts the game
+     */
+    runGameFromStack() {
+        let currentPlayer = this.turnPlayer;
+        this.initGame();
+        this.turnPlayer = 0;
+        if (currentPlayer == 1) {
+            this.inCameraAnimation = true;
+            this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.playerWCamera, 1000);
+        }
+        // move: [start, end, [captures]]
+        // for(const move of this.gameStack.getMoves()){
+        //     this.handlePick(move[0])
+        //     // TODO: pause between picking maybe?
+        //     this.handlePick(move[1])
+        // }
+    }
+
+    /**
      * @method disableHighlighting disables the highlighting applied to tiles the player may interact with
      */
     disableHighlighting() {
@@ -855,21 +864,18 @@ export class GameManager {
             this.timer.setTimes(Math.max(Math.floor(this.player0RemainingTime / 1000), 0), Math.max(Math.floor(this.player1RemainingTime / 1000), 0));
         }
         else if (this.state == stateEnum.animating) {
-            console.log("animating")
             this.pieceAnimation.update(currTime - this.prevTime);
             if (this.pieceAnimation.ended) {
                 this.state = stateEnum.selectPiece;
                 this.pieceAnimation = null;
             }
             if (this.board.playerWTray.animation !== null) {
-                console.log("updating w...");
                 this.board.playerWTray.animation.update(currTime - this.prevTime);
                 if (this.board.playerWTray.animation.ended) {
                     this.board.playerWTray.setAnimation(null);
                 }
             }
             if (this.board.playerBTray.animation !== null) {
-                console.log("updating b...");
                 this.board.playerBTray.animation.update(currTime - this.prevTime);
                 if (this.board.playerBTray.animation.ended) {
                     this.board.playerBTray.setAnimation(null);

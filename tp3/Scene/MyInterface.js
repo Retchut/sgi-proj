@@ -111,5 +111,8 @@ export class MyInterface extends CGFinterface {
         if(keyCode === "KeyU"){
             this.scene.gameManager.undo();
         }
+        if(keyCode === "KeyR"){
+            this.scene.gameManager.runGameFromStack();
+        }
     }
 }
