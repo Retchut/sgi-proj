@@ -47,7 +47,12 @@ export class GameManager {
     }
 
     runGameFromStack() {
-        // TODO: initgame from stack
+        this.initGame();
+        // move = [start, end, [captures]]
+        for(const move of this.gameStack.getMoves()){
+            handlePick(move[0])
+            handlePick(move[1])
+        }
     }
 
     /**
