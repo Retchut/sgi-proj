@@ -48,9 +48,10 @@ export class GameManager {
 
     runGameFromStack() {
         this.initGame();
-        // move = [start, end, [captures]]
+        // move: [start, end, [captures]]
         for(const move of this.gameStack.getMoves()){
             handlePick(move[0])
+            // TODO: pause between picking maybe?
             handlePick(move[1])
         }
     }
