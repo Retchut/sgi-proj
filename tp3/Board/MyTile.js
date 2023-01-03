@@ -13,22 +13,15 @@ export class MyTile extends CGFobject {
      * @param {Number} y1       - y1 position for this tile's rectangle
      * @param {Number} y2       - y2 position for this tile's rectangle
      */
-    constructor(scene, id, x1, x2, y1, y2) {
+    constructor(scene, id, x1, x2, y1, y2, distortionMap, tileShader, pieceShader) {
         super(scene);
         this.tileID = id;
         this.tile = new MyRectangle(this.scene, id, x1, x2, y1, y2);
 
         this.displayShader = false;
-        this.distortionMap = new CGFtexture(this.scene, 'scenes/images/highlight.png');
-        this.tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightTile.frag');
-        this.tileShader.setUniformsValues({
-            shaderTimeFactor: 0
-        });
-
-        this.pieceShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightPiece.frag');
-        this.tileShader.setUniformsValues({
-            shaderTimeFactor: 0
-        });
+        this.distortionMap = distortionMap;
+        this.tileShader = tileShader;
+        this.pieceShader = pieceShader;
 
         const tileLen = x2 - x1;
         this.centerPos = [x1 + tileLen / 2, y1 + tileLen / 2, 0];

@@ -1,4 +1,4 @@
-import { CGFappearance, CGFobject } from '../../lib/CGF.js';
+import { CGFappearance, CGFobject, CGFshader, CGFtexture } from '../../lib/CGF.js';
 import { getSquareCorner } from './BoardUtils.js';
 import { MyTile } from './MyTile.js';
 import { MyTray } from './MyTray.js';
@@ -48,6 +48,17 @@ export class MyBoard extends CGFobject {
         this.appearanceB.setDiffuse(...vecDiffuseB, 1);
         this.appearanceB.setSpecular(...vecSpecularB, 1);
 
+        const distortionMap = new CGFtexture(this.scene, 'scenes/images/highlight.png');
+        const tileShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightTile.frag');
+        tileShader.setUniformsValues({
+            shaderTimeFactor: 0
+        });
+
+        const pieceShader = new CGFshader(this.scene.gl, 'scenes/shaders/highlight.vert', 'scenes/shaders/highlightPiece.frag');
+        pieceShader.setUniformsValues({
+            shaderTimeFactor: 0
+        });
+
         // initialize board tiles, starting at its lower left corner
         // tiles will have id (1 to boardDimensions*boardDimensions)
         this.size = size;
@@ -70,7 +81,7 @@ export class MyBoard extends CGFobject {
                 const x2 = bottomLeft[0] + ((col + 1) * this.tileLen);
 
                 // push the new tile to the row's list
-                rowList.push(new MyTile(this.scene, tileID, x1, x2, y1, y2));
+                rowList.push(new MyTile(this.scene, tileID, x1, x2, y1, y2, distortionMap, tileShader, pieceShader));
                 tileID++;
             }
 
