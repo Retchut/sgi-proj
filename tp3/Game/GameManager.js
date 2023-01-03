@@ -5,6 +5,8 @@ import { GameStack } from "./GameStack.js";
 import { MyCameraAnimation } from "../Animation/MyCameraAnimation.js";
 import { MyPlayButton } from "../Board/MyPlayButton.js";
 import { MyPiece } from "../Board/MyPiece.js";
+import { MyKeyframeAnimation } from "../Animation/MyKeyframeAnimation.js";
+import { MyKeyframe } from "../Animation/MyKeyframe.js";
 
 const stateEnum = {
     "selectPiece": 0,
@@ -31,14 +33,17 @@ export class GameManager {
         this.scene.toggleSpotlight(); // disable spotlight at the beginning of the game (it's enabled by default)
         this.spotlightHeight = 0.1;
         this.boardDimensions = this.board.getBoardDimensions();
+        this.state = stateEnum.selectPiece;
         this.inCameraAnimation = false;
         this.cameraAnimation = null;
+        this.pieceAnimation = null;
         this.initialViewCamera = this.scene.graph.views[this.scene.graph.defaultViewID];
         this.playerWCamera = this.scene.graph.views["playerW"];
         this.playerBCamera = this.scene.graph.views["playerB"];
         this.playButton = new MyPlayButton(this.scene, this.initialViewCamera.position, this.initialViewCamera.calculateDirection());
         this.scene.graph.gameComponents[0] = this.playButton;
         this.gameStack = (oldGame === null) ? new GameStack() : new GameStack(oldGame);
+        this.prevTime = 0;
     }
 
     runGameFromStack() {
@@ -276,7 +281,6 @@ export class GameManager {
         }
         else {
             this.selectedTileID = 0; // reset selected tile
-            this.state = stateEnum.selectPiece;
             this.scene.toggleSpotlight();
             this.disableHighlighting()
             this.inCameraAnimation = true;
@@ -699,6 +703,11 @@ export class GameManager {
         }
 
         this.scoreKeeper.setScores(this.player0Pit.length, this.player1Pit.length);
+
+        this.state = stateEnum.animating;
+        this.pieceAnimation = new MyKeyframeAnimation(this.scene, [new MyKeyframe(0, [oldTile.getCenterPos()[0] - newTile.getCenterPos()[0], newTile.getCenterPos()[2] - oldTile.getCenterPos()[2], 0], [0, 0, 0], [1, 1, 1]), new MyKeyframe(1000, [0, 0, 0], [0, 0, 0], [1, 1, 1])]);
+        this.pieceAnimation.initAnimationTime();
+        newTile.setAnimation(this.pieceAnimation);
     }
 
     /**
@@ -812,10 +821,12 @@ export class GameManager {
      * @param {Number} currTimeFactor - the current time
      */
     update(currTime) {
+        if (this.prevTime == null) this.prevTime = currTime;
+
         const tileIDs = this.availableMoves;
         this.board.updateShaders(tileIDs, currTime / 1000 % 100);
 
-        if (!this.inCameraAnimation && this.turnPlayer >= 0) {
+        if (!this.inCameraAnimation && this.turnPlayer >= 0 && this.state != stateEnum.animating) {
             if (this.turnPlayer == 0) {
                 this.player1LastTime = null;
                 if (this.player0LastTime != null) this.player0RemainingTime -= currTime - this.player0LastTime
@@ -829,6 +840,14 @@ export class GameManager {
 
             this.timer.setTimes(Math.max(Math.floor(this.player0RemainingTime / 1000), 0), Math.max(Math.floor(this.player1RemainingTime / 1000), 0));
         }
+        else if (this.state == stateEnum.animating) {
+            console.log("animating")
+            this.pieceAnimation.update(currTime - this.prevTime);
+            if(this.pieceAnimation.ended) {
+                this.state = stateEnum.selectPiece;
+                this.pieceAnimation = null;
+            }
+        }
         else if (this.inCameraAnimation) {
             if (!this.cameraAnimation.update(currTime)) {
                 this.cameraAnimation = null;
@@ -837,12 +856,14 @@ export class GameManager {
             }
         }
 
-        if (this.gameOver() && !this.inCameraAnimation) {
+        if (this.gameOver() && this.state != stateEnum.animating && !this.inCameraAnimation) {
             this.inCameraAnimation = true;
             this.cameraAnimation = new MyCameraAnimation(this.scene, this.scene.camera, this.initialViewCamera, 2000);
             this.turnPlayer = -1;
             return;
         }
+
+        this.prevTime = currTime;
     }
 
     /**
