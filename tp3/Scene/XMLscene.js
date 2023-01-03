@@ -234,7 +234,6 @@ export class XMLscene extends CGFscene {
      */
     display() {
         // ---- BEGIN Background, camera and axis setup
-        console.log(this.camera.position)
         this.logPicking();
         this.clearPickRegistration();
 
